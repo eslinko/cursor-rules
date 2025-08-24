@@ -1,0 +1,201 @@
+# Hard Analysis Rules for Code Study, Documentation, and Roadmap Planning
+
+## Core Principles
+
+1. **Analyze only real code** - no assumptions, no speculation, no fantasies
+2. **Verify every statement** - if you can't find it in code, don't write it
+3. **Ask questions when unclear** - better to ask than to invent
+4. **Use grep/search** to find real usage of functions/classes
+5. **Read complete files** when necessary, don't limit to first lines
+6. **Cross-reference** between different parts of the codebase
+7. **Validate dependencies** and relationships through actual code paths
+
+## Analysis Algorithm
+
+### 1. Configuration Analysis
+- Find all configuration files (`config.*`, `*.env`, `*.yml`, `*.json`, `*.properties`, `*.ini`, `*.toml`)
+- Check real environment variables through `grep_search`
+- Compare with documentation claims
+- If mismatch found - fix documentation
+
+### 2. Architecture Analysis
+- Map all services/modules in the codebase
+- Check real dependencies through `read_file`
+- Verify described relationships between components
+- Confirm actual usage of patterns (singletons, factories, etc.)
+
+### 3. API/Interface Analysis
+- Find all routes/endpoints/controllers in relevant directories
+- Check real dependency injection through `grep_search`
+- Verify described service connections
+- Validate middleware and authentication flows
+
+### 4. Data Flow Analysis
+- Trace data through the system
+- Check real method signatures and return types
+- Verify described contracts and interfaces
+- Validate actual transactions and calls
+
+### 5. Model/Data Structure Analysis
+- Find all models/entities/classes in the codebase
+- Check real fields/properties and methods
+- Verify described validations
+- Confirm actual data types
+
+## Critical Verification Commands
+
+### For Configuration Analysis:
+```bash
+# Always check real variables
+grep_search "VARIABLE_NAME" include_pattern="*config*"
+grep_search "VARIABLE_NAME" include_pattern="*.env"
+read_file target_file="config.*" should_read_entire_file=True
+read_file target_file="*.yml" should_read_entire_file=True
+read_file target_file="*.json" should_read_entire_file=True
+```
+
+### For Architecture Analysis:
+```bash
+# Check real dependencies
+grep_search "import.*Service" include_pattern="**/*"
+grep_search "Service.*Depends" include_pattern="**/*"
+grep_search "require.*Service" include_pattern="**/*"
+grep_search "inject.*Service" include_pattern="**/*"
+```
+
+### For API/Interface Analysis:
+```bash
+# Check real routes/endpoints
+list_dir relative_workspace_path="api/"
+list_dir relative_workspace_path="routes/"
+list_dir relative_workspace_path="controllers/"
+list_dir relative_workspace_path="handlers/"
+read_file target_file="**/routes/*" start_line_one_indexed=1 end_line_one_indexed=50
+read_file target_file="**/controllers/*" start_line_one_indexed=1 end_line_one_indexed=50
+```
+
+### For Service/Component Analysis:
+```bash
+# Check real methods/functions
+grep_search "function.*method_name" include_pattern="**/*"
+grep_search "def.*method_name" include_pattern="**/*"
+grep_search "public.*method_name" include_pattern="**/*"
+grep_search "private.*method_name" include_pattern="**/*"
+read_file target_file="**/services/*" start_line_one_indexed=1 end_line_one_indexed=100
+read_file target_file="**/components/*" start_line_one_indexed=1 end_line_one_indexed=100
+```
+
+## Prohibited Actions
+
+❌ **NO assumptions** - if not visible in code, don't write it
+❌ **NO speculation** - verify every claim
+❌ **NO copying** from other projects - analyze only this codebase
+❌ **NO generic templates** - describe specific implementation
+❌ **NO ignoring discrepancies** - fix inconsistencies when found
+❌ **NO pattern matching** without verification - check actual implementation
+
+## Required Questions When Uncertain
+
+1. **"Where is this implemented in code?"** - if you can't find it
+2. **"How does this actually work?"** - if you only see interface
+3. **"What are the real dependencies?"** - if described connections seem assumed
+4. **"What's the actual data format?"** - if described structures seem assumed
+5. **"Is this the current state or planned?"** - distinguish between existing and TODO
+
+## Documentation Verification Template
+
+### For each documentation section:
+1. **Find corresponding code** in the project
+2. **Check real implementation** through `read_file`
+3. **Compare with documentation** - what matches, what doesn't
+4. **Fix discrepancies** through `search_replace`
+5. **Add real examples** from code
+6. **Remove fantasies** - keep only facts
+
+### For each claim:
+- ✅ **Confirmed by code** - can keep
+- ❌ **Not found in code** - must remove or fix
+- ❓ **Unclear** - need to ask question or investigate deeper
+
+## Roadmap Planning Analysis
+
+### Current State Assessment:
+1. **Map existing functionality** through code analysis
+2. **Identify actual dependencies** between components
+3. **Document real technical debt** found in code
+4. **List actual TODO comments** and incomplete features
+5. **Assess real complexity** through code structure
+
+### Gap Analysis:
+1. **Compare requirements** with actual implementation
+2. **Identify missing components** through dependency analysis
+3. **Document integration points** that need work
+4. **Assess scalability bottlenecks** in current architecture
+
+## Final Verification Checklist
+
+After each documentation/analysis update:
+1. **Re-read modified sections**
+2. **Verify code compliance** again
+3. **Ensure no fantasies remain**
+4. **Confirm all examples are real**
+5. **Check for consistency** across related sections
+
+## Key Analysis Commands
+
+```bash
+# Usage search
+grep_search query="ClassName" include_pattern="**/*"
+grep_search query="class ClassName" include_pattern="**/*"
+grep_search query="interface ClassName" include_pattern="**/*"
+
+# File reading
+read_file target_file="path/to/file.*" should_read_entire_file=False start_line_one_indexed=1 end_line_one_indexed=100
+
+# Structure exploration
+list_dir relative_workspace_path="path/to/directory"
+
+# File discovery
+file_search query="filename"
+
+# Cross-reference
+grep_search query="function_name" include_pattern="**/*"
+grep_search query="method_name" include_pattern="**/*"
+grep_search query="procedure_name" include_pattern="**/*"
+```
+
+## Context-Specific Rules
+
+### For Code Study:
+- Focus on understanding actual implementation
+- Map real relationships between components
+- Document actual patterns used
+- Identify real complexity and bottlenecks
+
+### For Documentation:
+- Base all descriptions on actual code
+- Include real examples from codebase
+- Document actual configuration and setup
+- Show real usage patterns
+
+### For Roadmap Planning:
+- Assess current state through code analysis
+- Identify real technical debt
+- Map actual dependencies and integration points
+- Plan based on real complexity, not assumptions
+
+## Quality Gates
+
+Before considering analysis complete:
+- [ ] All claims verified against actual code
+- [ ] No assumptions or speculations remain
+- [ ] All examples are real and testable
+- [ ] Dependencies accurately mapped
+- [ ] Configuration correctly documented
+- [ ] Architecture relationships validated
+
+These rules ensure that all analysis, documentation, and planning are based solely on real code without fantasies or assumptions.
+description:
+globs:
+alwaysApply: false
+---

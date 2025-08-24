@@ -1,0 +1,85 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Structured task decomposition using ListX and ItemY processing
+globs: ["plans/**/*.md", "**/roadmaps/**", "**/*.task.md"]
+alwaysApply: false
+---
+
+# Structured Task Decomposition & Processing
+
+When a task prompt appears in a goal-level format, use the following method:
+
+---
+
+## 📌 Step 1: Identify the Root Goal
+- Write a 1-sentence summary of the main intent.
+- Use wording from the prompt to preserve original focus.
+
+---
+
+## 🧱 Step 2: Decompose Into ListX by Thinking Levels
+
+Create a hierarchy:
+1. **Mission (Why?)**
+2. **Strategic Pillars**
+3. **Modules**
+4. **Components**
+5. **Actions (Tasks)**
+
+➡ Log each layer clearly in the form of:
+```markdown
+Root Goal: [your summary]
+├── ListX-1: [name]
+│   ├── Item 1.1
+│   ├── Item 1.2
+├── ListX-2: ...
+✅ Each ItemY can become a ListX itself — recursion is allowed if needed.
+
+🧪 Step 3: Iterative Validation for Each ItemY
+When you select any ItemY:
+
+Declare which ItemY is being processed.
+
+Define acceptance criteria for a “complete and high-quality” result.
+
+Perform gap analysis: list open questions or unclear areas.
+
+Ask clarifying questions if needed.
+
+Propose a first draft or concept for this item.
+
+Request feedback or simulate internal review.
+
+Apply revisions and explain rationale.
+
+Self-validate using:
+
+Clarity, structure, completeness
+
+Alignment with parent ListX
+
+Usability or reusability
+
+Finalize the item.
+
+Repeat for the next.
+
+💡 Principles
+Think in structured layers — not all parts need to be immediately detailed.
+
+Don’t over-decompose — stop when you reach actionable clarity.
+
+Keep hierarchy intact — avoid mixing conceptual and tactical levels.
+
+Always log your reasoning in each step — treat this as an AI work journal.
+
+✳️ When to use this
+When asked to “break down a task”
+
+When given a vague goal or roadmap item
+
+When planning a complex feature, system, or methodology

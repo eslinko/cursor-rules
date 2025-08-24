@@ -1,0 +1,66 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Structured analysis of current ItemY state
+alwaysApply: false
+---
+
+# 🔍 Step: Understand Current State of ItemY
+
+## 1. Technical Summary
+```yaml
+understanding_summary:
+  file: [path/to/file]
+  lines: [start–end]
+  entry_point: [function or class name]
+  inputs: [list of parameters or dependencies]
+  outputs: [return values or state effects]
+  exceptions: [known error types or edge cases]
+  dependencies: [internal or external services, modules, databases]
+  current_logic: >
+    [Short narrative description of what this code currently does.]
+  known_risks:
+    - [Unvalidated input X]
+    - [Outdated assumption Y]
+    - [Code smell Z]
+```
+
+## 2. Purpose Check
+```yaml
+purpose_alignment:
+  original_intent: >
+    [What was this originally designed to solve?]
+  current_state_matches_intent: [true | false]
+  gaps_detected:
+    - [Gap 1]
+    - [Gap 2]
+```
+
+## 3. Readiness to Proceed
+```yaml
+readiness_check:
+  ready_for_planning: [true | false]
+  next_step_recommendation: >
+    [If false, describe what clarification is needed.]
+  confidence_level: [high | medium | low]
+  summary_ready_for_reference: [true | false]
+  handoff_to_next_step: itemy-planning.mdc
+```
+
+## 4. Final Note
+```yaml
+understanding_complete:
+  confidence_level: [high | medium | low]
+  summary_ready_for_reference: true
+  handoff_to_next_step: itemy-planning.mdc
+```
+
+This file will:
+- Provide a structured analysis of the current state
+- Identify gaps between intent and implementation
+- Assess readiness for planning phase
+- Ensure clear handoff to next steps
+- Maintain consistent documentation standards

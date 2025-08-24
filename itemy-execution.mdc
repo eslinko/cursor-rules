@@ -1,0 +1,78 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Controlled execution of ItemY with logging and criteria tracking
+alwaysApply: false
+---
+
+# ✍️ Step: Controlled Implementation of ItemY
+
+## 1. Execution Context
+```yaml
+execution_context:
+  implementation_plan: [Reference to plan]
+  acceptance_criteria: [Reference to criteria]
+  environment: [Development | Staging | Production]
+  dependencies:
+    - [Dependency 1]
+    - [Dependency 2]
+```
+
+## 2. Step-by-Step Execution
+```yaml
+executed_step:
+  step: "Create input validation layer"
+  action: >
+    [Detailed description of changes made]
+  linked_criteria: [AC1, AC3]
+  change_log:
+    file: [path/to/file]
+    lines_modified: [start–end]
+    diff_summary: >
+      [Brief summary of changes]
+  self_review:
+    passed: [true | false]
+    rationale: >
+      [Explanation of review outcome]
+```
+
+## 3. Plan Deviation Handling
+```yaml
+plan_deviation:
+  reason: >
+    [Clear explanation of why deviation was necessary]
+  approved_by_criteria: [AC0]
+  justification_level: [high | medium | low]
+  impact_assessment:
+    - [Impact 1]
+    - [Impact 2]
+  mitigation_plan: >
+    [Plan to address potential risks]
+```
+
+## 4. Execution Summary
+```yaml
+execution_summary:
+  steps_completed: [number]
+  criteria_fulfilled: [AC0, AC1, AC2, ACmeta]
+  remaining_risks:
+    - [Risk 1 with mitigation plan]
+    - [Risk 2 with mitigation plan]
+  quality_metrics:
+    - [Metric 1]
+    - [Metric 2]
+  ready_for_validation: [true | false]
+  next_steps: >
+    [If not ready, describe what needs to be done]
+```
+
+This file will:
+- Ensure strict adherence to implementation plan
+- Log every action with clear traceability
+- Validate against acceptance criteria
+- Document and justify any deviations
+- Maintain clear connection between actions and criteria
+- Prepare for validation phase

@@ -1,0 +1,165 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Perform external knowledge validation for ItemY
+alwaysApply: false
+---
+
+# 🌍 Step: External Knowledge Integration for ItemY
+
+## 1. Knowledge Self-Assessment
+```yaml
+knowledge_availability_assessment:
+  domain: [auto-inferred topic, e.g., Supabase JWT]
+  ai_confidence_level: [high | medium | low]
+  required_docs_available: [true | false | unknown]
+  known_limitations:
+    - [Limitation 1]
+    - [Limitation 2]
+```
+
+## 2. Expert Request Generation
+```yaml
+generated_prompt:
+  summary: >
+    [What makes this task complex or unknown]
+  prompt: |
+    You are an expert in [detected technology/domain].
+    Please help answer:
+    1. [Dynamic question 1]
+    2. [Dynamic question 2]
+    ...
+
+required_expertise:
+  expert_profile:
+    title: [e.g., Senior API Architect]
+    keywords: [e.g., supabase, rls, jwt]
+  custom_gpt_names:
+    - [gpt-4-[domain]-[expertise]-v[version], e.g., gpt-4-supabase-rbac-v2]
+    - [gpt-4-[domain]-[expertise]-v[version], e.g., gpt-4-jwt-policy-v1]
+```
+
+## 3. Response Processing
+```yaml
+external_insights:
+  key_conclusions:
+    - [Conclusion 1]
+    - [Conclusion 2]
+  best_practices:
+    - [Practice 1]
+    - [Practice 2]
+  constraints:
+    - [Constraint 1]
+    - [Constraint 2]
+
+alignment_assessment:
+  criteria:
+    - ACext: [aligned | partially_aligned | not_aligned]
+    - rationale: >
+      [Explanation of alignment status]
+```
+
+## 4. Documentation Integration
+```yaml
+integration_plan:
+  doc_path: /docs/integrations/[domain].md
+  timestamp: [ISO 8601 format, e.g., 2024-03-14T15:30:00Z]
+  content_blocks:
+    - summary: [Summary of response]
+    - implementation: [Implementation template]
+    - validation: [Validation notes]
+    - references: [Source links]
+  version: [Semantic version, e.g., 1.0.0]
+```
+
+This file will:
+- Perform AI knowledge self-assessment
+- Generate precise expert consultation requests
+- Process and structure expert responses
+- Document insights for future reference
+- Validate against acceptance criteria
+- Maintain knowledge integration standards
+---
+description: Perform external knowledge validation for ItemY
+alwaysApply: false
+---
+
+# 🌍 Step: External Knowledge Integration for ItemY
+
+## 1. Knowledge Self-Assessment
+```yaml
+knowledge_availability_assessment:
+  domain: [auto-inferred topic, e.g., Supabase JWT]
+  ai_confidence_level: [high | medium | low]
+  required_docs_available: [true | false | unknown]
+  known_limitations:
+    - [Limitation 1]
+    - [Limitation 2]
+```
+
+## 2. Expert Request Generation
+```yaml
+generated_prompt:
+  summary: >
+    [What makes this task complex or unknown]
+  prompt: |
+    You are an expert in [detected technology/domain].
+    Please help answer:
+    1. [Dynamic question 1]
+    2. [Dynamic question 2]
+    ...
+
+required_expertise:
+  expert_profile:
+    title: [e.g., Senior API Architect]
+    keywords: [e.g., supabase, rls, jwt]
+  custom_gpt_names:
+    - [gpt-4-[domain]-[expertise]-v[version], e.g., gpt-4-supabase-rbac-v2]
+    - [gpt-4-[domain]-[expertise]-v[version], e.g., gpt-4-jwt-policy-v1]
+```
+
+## 3. Response Processing
+```yaml
+external_insights:
+  key_conclusions:
+    - [Conclusion 1]
+    - [Conclusion 2]
+  best_practices:
+    - [Practice 1]
+    - [Practice 2]
+  constraints:
+    - [Constraint 1]
+    - [Constraint 2]
+
+alignment_assessment:
+  criteria:
+    - ACext: [aligned | partially_aligned | not_aligned]
+    - rationale: >
+      [Explanation of alignment status]
+```
+
+## 4. Documentation Integration
+```yaml
+integration_plan:
+  doc_path: /docs/integrations/[domain].md
+  timestamp: [ISO 8601 format, e.g., 2024-03-14T15:30:00Z]
+  content_blocks:
+    - summary: [Summary of response]
+    - implementation: [Implementation template]
+    - validation: [Validation notes]
+    - references: [Source links]
+  version: [Semantic version, e.g., 1.0.0]
+```
+
+This file will:
+- Perform AI knowledge self-assessment
+- Generate precise expert consultation requests
+- Process and structure expert responses
+- Document insights for future reference
+- Validate against acceptance criteria
+- Maintain knowledge integration standards
+- Prevent AI hallucinations and false omniscience
+- Ensure transparent knowledgement

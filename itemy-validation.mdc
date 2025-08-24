@@ -1,0 +1,75 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Final validation of ItemY implementation against acceptance criteria
+alwaysApply: false
+---
+
+# ✅ Step: Validation of ItemY Completion
+
+## 1. Validation Context
+```yaml
+validation_context:
+  item_name: [ItemY label or identifier]
+  item_type: [backend_function | component_logic | api_contract | etc.]
+  acceptance_criteria_source: @itemy-acceptance.mdc
+  execution_summary_source: @itemy-implementation.mdc
+  reference_documents:
+    - /docs/integrations/[domain].md
+```
+
+## 2. Criteria-Based Validation
+```yaml
+validation_result:
+  - id: AC1
+    title: Logical Correctness
+    status: [✅ | ⚠️ | ❌]
+    evidence: >
+      [Validated through input schema check and test coverage in `executed_step #1`.
+      Output behavior aligns with goal logic.]
+    implementation_reference: >
+      [Reference to specific executed_step]
+    test_coverage:
+      - [Test case 1]
+      - [Test case 2]
+
+  - id: AC2
+    title: Type Safety
+    status: [✅ | ⚠️ | ❌]
+    evidence: >
+      [Description of type safety implementation]
+    justification: >
+      [If ⚠️ or ❌, explain why]
+    rework_recommendation: >
+      [If ⚠️ or ❌, specific steps to fix]
+```
+
+## 3. Summary Decision
+```yaml
+final_validation:
+  all_criteria_met: [true | false]
+  partial_approval: [true | false]
+  criteria_passed: [AC0, AC1, ACext]
+  criteria_failed: [AC2]
+  residual_risks:
+    - [Risk 1 with mitigation plan]
+    - [Risk 2 with mitigation plan]
+  quality_notes:
+    - [Quality note 1]
+    - [Quality note 2]
+  ready_for_closure: [true | false]
+  requires_followup: [true | false]
+  next_steps: >
+    [If not ready, describe what needs to be done]
+```
+
+This file will:
+- Load and validate against acceptance criteria
+- Document evidence for each criterion
+- Provide clear status for each requirement
+- Support partial approvals with justification
+- Maintain quality standards
+- Guide next steps for completion

@@ -1,0 +1,65 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Top-level driver for processing a goal-level task
+alwaysApply: false
+globs: ["**/tasks/*.md", "**/*.plan.md"]
+---
+
+# ⬆️ AI Task Driver: Modular Process
+
+When a high-level task is received:
+
+---
+
+## 🔹 Step 1: Decomposition via Thinking Layers
+@listx-decomposition.mdc
+
+- Apply multi-level ListX structure.
+- Identify Root Goal and sub-branches.
+- For each ItemY that requires attention, follow the structured process below.
+
+---
+
+## 🔁 Step 2: Iterative Execution Per ItemY
+
+Repeat this block for each selected `ItemY` from the ListX:
+
+> Begin processing: `ItemY: [Name]`
+
+1. Analyze and describe current state  
+   👉 `@itemy-understanding.mdc`
+
+2. Reflect on external domain knowledge and standards  
+   👉 `@itemy-knowledge-check.mdc`
+
+3. Define measurable acceptance criteria as formal YAML list  
+   👉 `@itemy-acceptance.mdc`
+
+4. Plan safe, traceable changes based on criteria and context  
+   👉 `@itemy-planning.mdc`
+
+5. Implement step-by-step with inline logging and reasoning  
+   👉 `@itemy-implementation.mdc`
+
+6. Validate the result against each acceptance criterion  
+   👉 `@itemy-validation.mdc`
+
+7. Final retrospective logging and export  
+   👉 `@retrospective.mdc`
+
+
+---
+
+## 🔚 Step 3: Complete the Flow
+- Ensure that all processed ItemY are marked complete.
+- Re-summarize the updated ListX with changes.
+- Reflect on system-wide outcomes, if applicable.
+
+---
+
+🧠 Use this rule whenever starting structured processing from a goal-level request.
+

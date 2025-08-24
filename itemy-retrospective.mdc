@@ -1,0 +1,92 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Structured change planning for ItemY
+alwaysApply: false
+---
+# 📘 Step: Retrospective Summary for ItemY
+
+## 1. Retrospective Context
+```yaml
+retrospective_context:
+  item_name: [ItemY identifier]
+  list_path: ListX-[number] > ItemY-[number and name]
+  output_path: /dev_logs/ListX-[number]_[name]/ItemY-[name]/retrospective.md
+  acceptance_criteria_source: @itemy-acceptance.mdc
+  execution_source: @itemy-implementation.mdc
+  validation_source: @itemy-validation.mdc
+  reference_documents:
+    - /docs/integrations/[domain].md
+write_instruction:
+  write_to_file: true
+  write_format: markdown
+  write_target_path: ${retrospective_context.output_path}
+  write_method: generate_or_overwrite
+  trigger_event: after_summary_compilation
+```
+
+## 2. Retrospective Log Template
+```yaml
+retrospective_summary:
+  goal_summary: >
+    [High-level purpose of ItemY as defined at planning stage]
+
+  criteria_result:
+    passed: [AC0, AC1, ACext]
+    failed: [AC2]
+  
+  implementation_highlights:
+    - [Key implementation step 1]
+    - [Key implementation step 2]
+
+  deviations_and_justifications:
+    - step: "Added custom fallback logic"
+      reason: >
+        Legacy edge case not covered by original plan.
+      criteria_aligned: [AC0]
+
+  final_quality:
+    score: 7.5/10
+    remarks: >
+      Implementation was stable and logically clean.
+      Some fallback paths require stronger typing.
+
+  reusable_patterns:
+    - "Safe fallback with audit logging"
+    - "DTO schema reuse across services"
+
+  lessons_learned:
+    - "Validate legacy edge cases during planning"
+    - "Document token refresh flow before coding"
+
+  references:
+    - /docs/integrations/[domain].md
+```
+
+## 3. Output Instruction
+After compiling the summary, write it to:
+```csharp
+[retrospective_context.output_path]
+```
+in valid Markdown format.
+
+# 💾 Save Retrospective Log
+
+To persist the retrospective, copy the generated YAML block to:
+```bash
+/dev_logs/ListX-3_ContentModules/ItemY-3.2_UserContextProxy/retrospective.md
+
+
+---
+
+## ✅ What this file does:
+
+- AI **aggregates all progress on `ItemY`** into a logically structured record
+- **Automatically saves to `/dev_logs/.../retrospective.md`**
+- Serves as:
+  - engineering decisions log
+  - retrospective source
+  - reusable patterns database

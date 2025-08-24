@@ -1,0 +1,99 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Structured change planning for ItemY
+alwaysApply: false
+---
+
+# 🧭 Step: Plan Implementation of ItemY
+
+## 1. Technical Context
+```yaml
+technical_context:
+  affected_files: [list of files to be modified]
+  entry_points: [main functions or classes to be changed]
+  current_state: >
+    [Brief description of current implementation]
+  technical_constraints:
+    - [Performance requirements]
+    - [Security considerations]
+    - [Compatibility requirements]
+```
+
+## 2. Planning Context
+```yaml
+planning_context:
+  item_name: [Short label or title]
+  item_type: [backend_function | api_contract | component_logic | etc.]
+  goal_summary: >
+    [What does the implementation aim to achieve?]
+  success_criteria:
+    - [Measurable outcome 1]
+    - [Measurable outcome 2]
+```
+
+## 3. Key Considerations
+```yaml
+planning_considerations:
+  dependencies:
+    - [e.g., depends on auth service]
+    - [e.g., requires updated schema X]
+  known_risks:
+    - [e.g., fragile validation logic]
+    - [e.g., limited test coverage]
+  potential_blockers:
+    - [e.g., external API not yet defined]
+  resource_requirements:
+    - [Time estimates]
+    - [Required expertise]
+    - [Tools and environments]
+```
+
+## 4. Implementation Plan
+```yaml
+implementation_plan:
+  steps:
+    - step: "Create input validation layer"
+      targets_criteria: [AC1, AC3]
+      dependencies: [list of required components]
+      estimated_effort: [time estimate]
+    - step: "Refactor legacy return block for clarity"
+      targets_criteria: [AC0, AC2]
+      dependencies: [list of required components]
+      estimated_effort: [time estimate]
+    - step: "Add logging for all failure paths"
+      targets_criteria: [ACmeta]
+      dependencies: [list of required components]
+      estimated_effort: [time estimate]
+    - step: "Write unit tests for 3 cases"
+      targets_criteria: [AC1, ACext]
+      dependencies: [list of required components]
+      estimated_effort: [time estimate]
+```
+
+## 5. Validation Check
+```yaml
+planning_validation:
+  plan_covers_all_criteria: [true | false]
+  ambiguous_elements:
+    - [Optional: clarify use of legacy schema fallback]
+  risk_assessment:
+    - [Identified risk 1]
+    - [Identified risk 2]
+  recommended_next_step: >
+    [Detailed next steps with timeline]
+  readiness_for_implementation: [true | false]
+  implementation_risks:
+    - [Risk 1 with mitigation plan]
+    - [Risk 2 with mitigation plan]
+```
+
+This file will:
+- Strictly bind the plan to acceptance criteria
+- Ensure traceability of each step
+- Make implementation readiness clear
+- Provide complete technical context
+- Include risk assessment and mitigation plan

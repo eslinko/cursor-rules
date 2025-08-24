@@ -1,0 +1,92 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Define detailed, typed acceptance criteria for ItemY with validation logic
+alwaysApply: false
+---
+
+# ✅ Step: Define Acceptance Criteria for ItemY
+
+## 1. Item Context
+```yaml
+item_context:
+  item_type: [backend_function | api_contract | component_logic | etc.]
+  parent_list: [ListX name or reference]
+  strategic_goal: >
+    [Brief description of how this item contributes to the parent list]
+```
+
+## 2. Core Acceptance Criteria
+```yaml
+acceptance_criteria:
+  - id: AC0
+    title: Strategic Alignment
+    description: The result directly contributes to the purpose of the parent ListX.
+    evaluation_method: Compare outcome to original intent of ItemY.
+
+  - id: ACext
+    title: External Coherence
+    description: The result reflects best practices, known models, or community patterns.
+    evaluation_method: Confirm use of known APIs, patterns, references.
+
+  - id: ACmeta
+    title: Clear Traceability
+    description: All decisions and rationale are logged in context.
+    evaluation_method: Review AI chat or PR commentary.
+
+  - id: AC1
+    title: Logical Correctness
+    description: Implements expected logic without side effects.
+    evaluation_method: Step-by-step reasoning + test output.
+
+  - id: AC2
+    title: Type Safety
+    description: Fully typed inputs/outputs; no implicit `any`.
+    evaluation_method: Type checker output / manual inspection.
+
+  - id: AC3
+    title: Explicit Error Handling
+    description: Edge cases and invalid inputs are gracefully managed.
+    evaluation_method: Coverage of try/catch or guards.
+```
+
+## 3. Context-Specific Requirements
+```yaml
+context_requirements:
+  roles:
+    - [frontend_developer | backend_developer | devops_engineer | etc.]
+  requirements:
+    - [Requirement 1 with validation method]
+    - [Requirement 2 with validation method]
+  integration_points:
+    - [Integration point 1]
+    - [Integration point 2]
+```
+
+## 4. Validation Checklist
+```yaml
+validation_checklist:
+  criteria_validation:
+    - All evaluation_methods applied or justified
+    - Result logged and matched against each criterion
+    - Strategic and external alignment traceable
+    - Clarity and reusability addressed
+  quality_gates:
+    - [Quality gate 1]
+    - [Quality gate 2]
+  final_approval:
+    confidence_level: [high | medium | low]
+    ready_for_implementation: [true | false]
+    next_steps: >
+      [If false, describe what needs to be addressed]
+```
+
+This file will:
+- Define clear, measurable acceptance criteria
+- Ensure traceability of requirements
+- Provide validation methods for each criterion
+- Maintain quality standards across implementations
+- Support consistent evaluation of deliverables
