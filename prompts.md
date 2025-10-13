@@ -54,8 +54,15 @@ A clearly structured documentation update plan, validated and logged in the jour
 
 ## 🧩 Rule: `@run-task.mdc`
 
-### Use Case
+### Brief description
 Sequential execution of multi-level plans — designed for structured task decomposition and autonomous flow management.
+
+#### Use Cases
+- **Executing sub-items of a technical plan with full control** — keeps nested tasks aligned and traceable.  
+- **Stepwise migrations or refactorings with measurable criteria** — enables clear validation checkpoints.  
+- **Team collaboration with unified workflow and traceable progress** — ensures consistent logic across contributors.  
+- **Managing complex or lengthy tasks without cognitive drift** — supports long-focus work without mental overload.
+
 
 ### Prompt
 > Execute **Stage N** using `@run-task.mdc`.  
