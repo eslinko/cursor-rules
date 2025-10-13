@@ -52,5 +52,32 @@ A clearly structured documentation update plan, validated and logged in the jour
 
 ---
 
+## 🧩 Rule: `@run-task.mdc`
+
+### Use Case
+Sequential execution of multi-level plans — designed for structured task decomposition and autonomous flow management.
+
+### Prompt
+> Execute **Stage N** using `@run-task.mdc`.  
+>  
+> Write the final results and insights into the **journal** (the same file where the list is located — e.g. `docs/AIJournal.md`, or the explicitly specified one).  
+>  
+> If context is unclear, ask for clarification before execution.
+
+### Example
+> Journal: `docs/AIJournal.md`  
+> Execute Stage 1 using `@run-task.mdc`
+
+### Notes
+- This rule automatically detects and processes nested subtasks inside a two-level plan. Choose a plan item that has nested sub-items and process them sequentially through the internal `ItemY` cycle.  
+- Each sub-item passes through the full internal `ItemY` pipeline (`Understanding → Knowledge Check → Acceptance → Planning → Execution → Validation → Retrospective`).  
+- Keeps task logic consistent, reduces mental load, and maintains clean journal records.  
+- Works best when used after `@analysis.mdc` for high-context continuity.
+
+---
+
+
+---
+
 🪶 *Next section:*  
 Use Cases 4–6 → `run-task.mdc`, `test-qualification.mdc`, `test-to-success.mdc`
