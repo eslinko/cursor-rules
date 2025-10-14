@@ -9,6 +9,9 @@
 5. **Read complete files** when necessary, don't limit to first lines
 6. **Cross-reference** between different parts of the codebase
 7. **Validate dependencies** and relationships through actual code paths
+8. **Integrate rather than duplicate** - extend existing rules instead of creating parallel ones
+9. **Maintain single source of truth** - each concept in one logical place
+10. **Progressive enhancement** - build upon existing knowledge without replacement
 
 ## Analysis Algorithm
 
@@ -17,12 +20,18 @@
 - Check real environment variables through `grep_search`
 - Compare with documentation claims
 - If mismatch found - fix documentation
+- **Path consistency validation**: Audit ALL hardcoded paths and references in the codebase
+- **Structure integrity**: Ensure path consistency across all related components
+- **Resource location verification**: Validate that resources are created/accessed in correct locations
 
 ### 2. Architecture Analysis
 - Map all services/modules in the codebase
 - Check real dependencies through `read_file`
 - Verify described relationships between components
 - Confirm actual usage of patterns (singletons, factories, etc.)
+- **Change propagation validation**: Explicitly enumerate ALL affected files when making structural changes
+- **Compatibility verification**: Validate compatibility between old and new implementations
+- **Legacy pattern identification**: Find and document outdated patterns that need migration
 
 ### 3. API/Interface Analysis
 - Find all routes/endpoints/controllers in relevant directories
@@ -35,6 +44,9 @@
 - Check real method signatures and return types
 - Verify described contracts and interfaces
 - Validate actual transactions and calls
+- **Multi-stage process validation**: Test data compatibility between consecutive stages
+- **Integration contracts**: Verify that Stage N output matches Stage N+1 input expectations
+- **End-to-end validation**: Test complete data flow through all processing stages
 
 ### 5. Model/Data Structure Analysis
 - Find all models/entities/classes in the codebase
@@ -93,6 +105,9 @@ read_file target_file="**/components/*" start_line_one_indexed=1 end_line_one_in
 ❌ **NO generic templates** - describe specific implementation
 ❌ **NO ignoring discrepancies** - fix inconsistencies when found
 ❌ **NO pattern matching** without verification - check actual implementation
+❌ **NO duplication** - integrate new rules into existing structure instead of creating parallel sections
+❌ **NO fragmentation** - maintain single source of truth for each concept
+❌ **NO replacement** - enhance existing knowledge rather than replacing it
 
 ## Required Questions When Uncertain
 
@@ -101,6 +116,9 @@ read_file target_file="**/components/*" start_line_one_indexed=1 end_line_one_in
 3. **"What are the real dependencies?"** - if described connections seem assumed
 4. **"What's the actual data format?"** - if described structures seem assumed
 5. **"Is this the current state or planned?"** - distinguish between existing and TODO
+6. **"Does this duplicate existing rules?"** - check for overlap before adding new content
+7. **"Can this be integrated into existing structure?"** - prefer enhancement over parallel creation
+8. **"Where is the logical home for this concept?"** - find the most relevant existing section
 
 ## Documentation Verification Template
 
@@ -125,6 +143,9 @@ read_file target_file="**/components/*" start_line_one_indexed=1 end_line_one_in
 3. **Document real technical debt** found in code
 4. **List actual TODO comments** and incomplete features
 5. **Assess real complexity** through code structure
+6. **Distinguish implementation states**: "not implemented" vs "implemented incorrectly"
+7. **Verify actual functionality**: Test component behavior, not just existence
+8. **Validate component state**: Ensure components function as intended
 
 ### Gap Analysis:
 1. **Compare requirements** with actual implementation
@@ -140,6 +161,9 @@ After each documentation/analysis update:
 3. **Ensure no fantasies remain**
 4. **Confirm all examples are real**
 5. **Check for consistency** across related sections
+6. **Explicit change specifications**: Detail exact changes required in each component
+7. **Concrete examples**: Provide before/after examples for all modifications
+8. **Validation criteria**: Include testable requirements for successful implementation
 
 ## Key Analysis Commands
 
@@ -195,6 +219,59 @@ Before considering analysis complete:
 - [ ] Architecture relationships validated
 
 These rules ensure that all analysis, documentation, and planning are based solely on real code without fantasies or assumptions.
+
+---
+
+## 🚨 UNIVERSAL SYSTEM PATTERNS
+
+### **Universal Anti-Patterns to Avoid**
+
+❌ **Architectural Drift**: Changes implemented inconsistently across system components
+❌ **Path Fragmentation**: Hardcoded paths scattered throughout codebase
+❌ **Integration Gaps**: Stages developed in isolation without compatibility validation
+❌ **State Misassessment**: Planning based on assumed rather than verified component state
+❌ **Vague Communication**: Ambiguous change descriptions without concrete specifications
+❌ **Legacy Accumulation**: Old patterns coexisting with new implementations
+❌ **Contract Violations**: Data format mismatches between system components
+
+### **Universal Success Patterns**
+
+✅ **Systematic Propagation**: All changes consistently applied across affected components
+✅ **Path Abstraction**: Centralized path management with consistent access patterns
+✅ **Contract-Driven Development**: Clear data contracts between all system stages
+✅ **Verified State Planning**: Development based on tested component functionality
+✅ **Explicit Change Specifications**: Concrete, testable requirements for all modifications
+✅ **Integration-First Design**: Compatibility validation built into development process
+✅ **Legacy Management**: Systematic identification and migration of outdated patterns
+✅ **Knowledge Integration**: Extending existing rules rather than creating parallel ones
+✅ **Single Source of Truth**: Each concept maintained in one logical location
+✅ **Progressive Enhancement**: Building upon existing knowledge without replacement
+
+### **Enhanced Analysis Commands**
+
+```bash
+# Change propagation validation
+grep_search query="old_pattern|legacy|deprecated" include_pattern="**/*"  # Find outdated patterns
+grep_search query="new_pattern" include_pattern="**/*"  # Verify new implementations
+
+# Path and structure consistency checks
+grep_search query="hardcoded_path|absolute_path" include_pattern="**/*"  # Find hardcoded paths
+grep_search query="\.\.\/|\.\/" include_pattern="**/*"  # Find relative path references
+
+# Multi-stage process validation
+read_file target_file="stage_output.*" should_read_entire_file=True  # Examine stage outputs
+grep_search query="input.*format|output.*format" include_pattern="**/*"  # Find data contracts
+
+# State assessment commands
+grep_search query="TODO|FIXME|HACK|BUG|BROKEN" include_pattern="**/*"  # Find incomplete work
+grep_search query="not.*implemented|placeholder|stub" include_pattern="**/*"  # Find incomplete features
+
+# Integration compatibility checks
+grep_search query="interface|contract|schema" include_pattern="**/*"  # Find data contracts
+grep_search query="validate|check|verify" include_pattern="**/*"  # Find validation logic
+```
+
+These universal patterns ensure robust system analysis that prevents architectural inconsistencies, integration failures, and development inefficiencies across any type of software project.
 description:
 globs:
 alwaysApply: false
