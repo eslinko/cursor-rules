@@ -92,10 +92,13 @@ Classical approach (estimate):
 Rules are not "improved prompts" but **programming of AI's thinking system**.
 
 ```
-@analysis.mdc       → Activates analytical mode
-@run-task.mdc       → Activates execution mode
-@test-qualification → Activates critical mode
-@test-to-success    → Activates debugging mode
+@analysis.mdc            → Activates analytical mode
+@run-task.mdc            → Activates execution mode
+@test-qualification      → Activates critical mode
+@test-to-success         → Activates debugging mode
+@unit-test-build         → Activates unit testing mode
+@integration-test-build  → Activates integration testing mode
+@e2e-test-build          → Activates E2E testing mode
 ```
 
 **Why this is revolutionary:**
@@ -460,6 +463,219 @@ goal: "5 tokens instead of 500 for complete context restoration"
 ```
 
 **Result:** Structured bridge file for quick new session start
+
+---
+
+#### **2.2.6 Testing Rules Ecosystem** — Systematic Test Development
+
+**When to use:** Building production-ready test suites (unit, integration, E2E)
+
+**Test Pyramid Architecture:**
+```yaml
+ecosystem:
+  foundation:
+    - @unit-test-build.mdc (single module, heavy mocking)
+  
+  middle_layer:
+    - @integration-test-build.mdc (2-4 modules, minimal mocking)
+  
+  top_layer:
+    - @e2e-test-build.mdc (complete workflows, real infrastructure)
+
+unified_framework:
+  - 4 quality gates (Infrastructure → Passing → Real Validation → ROI)
+  - Progressive development (Infrastructure → Smoke → Real → Strategic)
+  - ROI-driven decisions (defer low-value tests)
+  - Dual language support (JavaScript + Python)
+```
+
+---
+
+##### **@unit-test-build.mdc** — Unit Testing Mode
+
+**When to use:** Single module testing with isolated dependencies
+
+**What activates:**
+```yaml
+cognitive_mode: unit_testing
+scope: Single module (class, function, service)
+mocking: Heavy (all external dependencies mocked)
+speed: < 1s per test
+
+phases:
+  1. Infrastructure: Test runner, mocks, helpers (1-2h)
+  2. Smoke Tests: 60-100 existence checks, 100% passing (2-4h)
+  3. Real Tests: Validate functionality, score > 8/10 (6-10h)
+  4. Strategic: ROI-driven improvements (0.5-1h)
+
+quality_gates:
+  Gate_1: Infrastructure works
+  Gate_2: Smoke 100% passing (auto-trigger @test-qualification)
+  Gate_3: Real tests score > 8/10
+  Gate_4: ROI analysis (ship at 8.5+/10)
+
+anti_patterns:
+  - Green Tests Syndrome (tests pass, but check nothing)
+  - Test All The Things (100% coverage without ROI)
+  - Perfectionism Paralysis (endless refactoring)
+```
+
+**Example command:**
+```
+"Execute Phase 1 using @unit-test-build.mdc method"
+```
+
+**What happens:**
+1. AI creates test infrastructure (runner, mocks, helpers)
+2. Generates 60-100 smoke tests (existence checks)
+3. Validates 100% passing → triggers @test-qualification
+4. Creates real tests (functionality validation)
+5. ROI analysis → ship at 8.5+/10
+
+**Result:** Production-ready unit tests with 95-100% success rate
+
+---
+
+##### **@integration-test-build.mdc** — Integration Testing Mode
+
+**When to use:** Testing 2-4 modules together, validating contracts
+
+**What activates:**
+```yaml
+cognitive_mode: integration_testing
+scope: Multiple modules (2-4 components)
+mocking: Minimal (real modules + mocked external services only)
+speed: 1-10s per test
+database: Real test DB (in-memory SQLite, Docker PostgreSQL, dedicated)
+
+phases:
+  1. Infrastructure: Multi-module harness, test DB setup (2-3h)
+  2. Contract Validation: Module boundaries, API, data, errors (4-6h)
+  3. Flow Testing: Multi-step workflows, scenarios (4-6h)
+
+quality_gates:
+  Gate_1: Contract Compatibility
+  Gate_2: Flow Passing (100%)
+  Gate_3: Real Integration Validation (score > 8/10)
+  Gate_4: ROI Analysis (defer to E2E if low value)
+
+anti_patterns:
+  - Integration Tests at Unit Level (wrong scope)
+  - Over-Mocking Own Modules (defeats integration purpose)
+  - Missing Database Cleanup (test pollution)
+```
+
+**Example command:**
+```
+"Execute Phase 2 using @integration-test-build.mdc method"
+```
+
+**What happens:**
+1. AI creates multi-module test harness
+2. Sets up real test database (transaction rollback between tests)
+3. Validates module contracts (boundaries, API, data formats)
+4. Tests multi-step workflows (2-4 modules working together)
+5. ROI analysis → defer low-value tests to unit or E2E
+
+**Result:** Production-ready integration tests validating module contracts
+
+---
+
+##### **@e2e-test-build.mdc** — End-to-End Testing Mode
+
+**When to use:** Testing complete workflows with real infrastructure
+
+**What activates:**
+```yaml
+cognitive_mode: e2e_testing
+scope: Complete user workflows (3+ actions, full system)
+mocking: Minimal external only (real node, real contracts, real DB)
+speed: 10-60s per test
+infrastructure: Real blockchain node, real services, EVM snapshots
+
+phases:
+  1. Infrastructure: E2E harness, node, snapshots, proof tests (3-4h)
+  2. Deploy Workflows: Contract deployment E2E (8-10h)
+  3. Component Workflows: Component management E2E (6-8h)
+  4. Full Pipeline: Catalog + complete workflows (10-12h)
+
+quality_gates:
+  Gate_1: Infrastructure Validation (node + harness work)
+  Gate_2: Workflow Passing (100%, execution < 30 min)
+  Gate_3: Real E2E Validation (score > 8.5/10, higher threshold)
+  Gate_4: ROI Analysis (selective coverage, 10-30 critical workflows)
+
+e2e_harness:
+  - Node lifecycle management (start/stop/reset)
+  - EVM snapshots (40x speedup for isolation)
+  - State management (create/revert/restore snapshots)
+  - Validation helpers (on-chain state, contracts)
+
+anti_patterns:
+  - Integration at E2E Level (wrong scope, wastes expensive infrastructure)
+  - Hard-Coded Timeouts (flaky tests, use event-based waiting)
+  - No State Isolation (test pollution, use snapshot reset)
+```
+
+**Example command:**
+```
+"Execute Phase 1 using @e2e-test-build.mdc method"
+```
+
+**What happens:**
+1. AI creates E2E harness (node lifecycle, snapshots, validation)
+2. Starts real blockchain node (Hardhat/Ganache)
+3. Creates 3 infrastructure proof tests (node, snapshots, environment)
+4. Develops complete workflow tests (Deploy → Initialize → Activate → Upload → Register)
+5. ROI analysis → selective coverage (10-30 critical workflows, not 200+)
+
+**Result:** Production-ready E2E tests validating critical user journeys with real infrastructure
+
+---
+
+**Testing Ecosystem Metrics (from Amanita project):**
+```yaml
+unit_tests:
+  files: 15
+  tests: 152
+  coverage: 100% critical paths
+  quality: 8.7/10
+  duration: 8-15 hours per module
+  
+integration_tests:
+  files: 3
+  tests: 21
+  coverage: Module contracts + flows
+  quality: 9.0/10
+  duration: 10-15 hours per system
+  
+e2e_tests:
+  files: 9
+  tests: 9 (proof) + plan for 172-212 (full workflows)
+  coverage: Infrastructure validated, full pipeline planned
+  quality: 9.5/10
+  duration: 32-40 hours for complete system
+
+total:
+  test_pyramid: Complete (Unit → Integration → E2E)
+  methodology_lines: 9,284 (comprehensive testing framework)
+  languages: JavaScript + Python (full parity)
+  success_rate: 95-100% (systematic approach with quality gates)
+```
+
+**Differentiation Table:**
+
+| Aspect | Unit | Integration | E2E |
+|--------|------|-------------|-----|
+| **Scope** | Single module | 2-4 modules | Complete workflows (3+ actions) |
+| **Mocking** | Heavy (all external) | Minimal (real modules) | Minimal external only |
+| **Infrastructure** | None (mocked) | Test DB | Real node + contracts + DB |
+| **Speed** | < 1s | 1-10s | 10-60s |
+| **Quality Threshold** | 8.0/10 | 8.0/10 | 8.5/10 (higher due to cost) |
+| **Coverage** | 100-200 tests/module | 20-50 tests/system | 10-30 critical workflows |
+| **ROI** | High (cheap, fast) | Medium (selective) | Low (expensive, selective only) |
+
+---
 
 ### 2.3 Examples from Current Session
 
@@ -940,6 +1156,70 @@ AI command: "log all decisions in AIJournal.md"
 ```
 **Consequences:** AI loses focus, contradictions, time waste.
 
+### 8.4 Testing Rules Quick Start
+
+**Scenario 1: Building Unit Tests from Scratch**
+```
+Step 1: "Execute Phase 1 using @unit-test-build.mdc method"
+Step 2: AI creates infrastructure (runner, mocks, helpers)
+Step 3: AI generates 60-100 smoke tests (existence checks)
+Step 4: Validate 100% passing → auto-trigger @test-qualification
+Step 5: "Execute Phase 2 using @unit-test-build.mdc method"
+Step 6: AI creates real tests (functionality validation)
+Step 7: Ship at 8.5+/10 (ROI analysis)
+
+Result: Production-ready unit tests in 8-15 hours
+```
+
+**Scenario 2: Adding Integration Tests**
+```
+Step 1: "Execute Phase 1 using @integration-test-build.mdc method"
+Step 2: AI creates multi-module harness + test database
+Step 3: "Execute Phase 2 using @integration-test-build.mdc method"
+Step 4: AI validates module contracts (boundaries, API, data)
+Step 5: "Execute Phase 3 using @integration-test-build.mdc method"
+Step 6: AI tests multi-step workflows (2-4 modules together)
+
+Result: Production-ready integration tests in 10-15 hours
+```
+
+**Scenario 3: Building E2E Tests**
+```
+Step 1: "Execute Phase 1 using @e2e-test-build.mdc method"
+Step 2: AI creates E2E harness (node, snapshots, validation helpers)
+Step 3: AI starts real blockchain node + creates proof tests
+Step 4: "Execute Phase 2 using @e2e-test-build.mdc method"
+Step 5: AI develops deployment workflow E2E tests
+Step 6: Continue with Phase 3 (components) and Phase 4 (full pipeline)
+
+Result: Production-ready E2E tests in 32-40 hours, 40x speedup with snapshots
+```
+
+**Testing Rules Commands Reference:**
+```bash
+# Unit Testing
+"Execute Phase 1 using @unit-test-build.mdc method"      # Infrastructure
+"Execute Phase 2 using @unit-test-build.mdc method"      # Smoke tests
+"Execute Phase 3 using @unit-test-build.mdc method"      # Real tests
+
+# Integration Testing
+"Execute Phase 1 using @integration-test-build.mdc"      # Multi-module harness
+"Execute Phase 2 using @integration-test-build.mdc"      # Contract validation
+"Execute Phase 3 using @integration-test-build.mdc"      # Flow testing
+
+# E2E Testing
+"Execute Phase 1 using @e2e-test-build.mdc method"       # E2E infrastructure
+"Execute Phase 2 using @e2e-test-build.mdc method"       # Deploy workflows
+"Execute Phase 3 using @e2e-test-build.mdc method"       # Component workflows
+"Execute Phase 4 using @e2e-test-build.mdc method"       # Full pipeline
+
+# Quality Validation (auto-triggered at Gate 3 for all testing rules)
+"check tests using @test-qualification.mdc method"
+
+# Debugging (auto-triggered on failures)
+"bring tests to 100% success using @test-to-success.mdc method"
+```
+
 ---
 
 ## 9. Risks & Ethics
@@ -986,10 +1266,12 @@ AI accelerates execution, doesn't replace analysis (human)
 - Tooling: linter for command checking
 
 **Direction 2: Rules Catalog Expansion**
+- ✅ **Testing Ecosystem** (completed: unit, integration, E2E)
 - Code review rule
 - Security audit rule
 - Performance optimization rule
 - Documentation generation rule
+- Deployment automation rule
 
 **Direction 3: Metrics & Analytics**
 - Automatic token efficiency calculation
