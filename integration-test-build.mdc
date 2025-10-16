@@ -1,0 +1,3210 @@
+---
+alwaysApply: false
+description: "Systematic methodology for building production-ready integration test suites with contract validation and flow testing"
+---
+
+# @integration-test-build: Integration Test Development
+
+> **Purpose**: Guide AI through systematic integration test development focusing on module interactions, contract validation, and multi-step workflow testing
+
+---
+
+## ⚡ QUICK START
+
+### Scope & Boundaries
+
+**This rule covers:**
+- ✅ Integration tests (multiple modules working together)
+- ✅ Contract validation (module boundary testing)
+- ✅ Flow testing (multi-step workflows across modules)
+- ✅ JavaScript: Mocha + Supertest, Jest, Testcontainers
+- ✅ Python: pytest + httpx, pytest-docker
+
+**This rule does NOT cover (use other rules):**
+- ❌ Unit tests (isolated modules) → @unit-test-build.mdc
+- ❌ E2E tests (full user journeys with UI) → @e2e-test-build.mdc (future)
+- ❌ Smart contract tests (Hardhat, Foundry) → Use framework-native testing
+- ❌ Performance/Load tests → Use specialized tools (k6, JMeter)
+
+---
+
+### When to Use
+- **NEW_INTEGRATION**: No integration tests exist → Full cycle (Infrastructure → Contract → Flow)
+- **EXTEND**: Tests exist (score > 8) → Add tests for new module interactions
+- **CONTRACT_VALIDATION**: Tests exist (score < 8) → Focus on validating contracts
+
+### Default Execution Flow
+```
+Phase 1: Infrastructure (2-3h) → Multi-module harness, test DB, minimal mocks
+    ↓
+Phase 2: Contract Validation (4-6h) → Module boundaries, data contracts, APIs
+    ↓
+Gate 3: Quality Analysis → @test-qualification.mdc (adapted for integration)
+    ↓
+Phase 3: Flow Testing (4-6h) → Multi-step scenarios, workflows, state consistency
+    ↓
+Gate 4: ROI Analysis → E2E flows deferred to @e2e-test-build
+    ↓
+Production Ready (8.5+/10)
+```
+
+### Start Immediately
+```
+"Execute Phase 1 using @integration-test-build.mdc method"
+
+AI will automatically:
+✓ Detect scenario (NEW_INTEGRATION/EXTEND/CONTRACT_VALIDATION)
+✓ Setup multi-module test infrastructure
+✓ Generate contract validation tests (module boundaries)
+✓ Create flow testing scenarios (multi-step workflows)
+✓ Guide to production-ready state (8.5+/10)
+```
+
+### Success Threshold
+```yaml
+production_ready:
+  score: "> 8.5/10 (@test-qualification adapted)"
+  contract_coverage: "> 80% (all critical module boundaries tested)"
+  flow_coverage: "> 70% (critical multi-module workflows)"
+  execution_time: "< 5 minutes (slower than unit tests, faster than e2e)"
+  
+ship_decision: "Contracts validated + flows tested → SHIP, defer e2e to @e2e-test-build"
+```
+
+---
+
+## 📚 DETAILED SECTIONS
+
+### Section 1: Core Principles (Inherited + Integration-Specific)
+### Section 2: Context Detection & Scenarios
+### Section 3: Phases (Infrastructure → Contract → Flow)
+### Section 4: Integration Patterns (Mocking, Database, API)
+### Section 5: Quality Gates (Adapted from @unit-test-build)
+### Section 6: Examples & Templates
+### Section 7: Reference (Metrics, Integration, DoD)
+
+---
+
+## 🎯 CORE PRINCIPLES
+
+### Universal Principles (Inherited from @unit-test-build.mdc)
+
+**Principles 1-5: See @unit-test-build.mdc Section 1 for:**
+1. Progressive Complexity Over Big Bang
+2. Quality Gates Over Quantity Metrics
+3. Test Level Appropriateness
+4. ROI-Driven Over Perfectionism
+5. Evidence-Based Decisions Over Gut Feelings
+
+These principles apply equally to integration testing. See @unit-test-build.mdc lines 73-140 for detailed descriptions.
+
+---
+
+### Integration-Specific Principles
+
+### 6. **Contract Validation First**
+```yaml
+anti_pattern: Test module internals before validating contracts
+success_pattern: Validate module boundaries first, then internal logic
+
+implementation:
+  phase_2_priority: "Test all module interfaces (ContractManager → ArweaveManager)"
+  validate_contracts:
+    - Output format of Module A matches input of Module B
+    - API request/response contracts align
+    - Database schema compatibility
+    - Error contracts (error types propagate correctly)
+  
+  then_internals: "Unit tests cover internals, integration covers handshakes"
+
+key_rule: "Integration = test module handshakes, not internals"
+
+example:
+  correct: "Test: ContractManager.deploy() result → ArweaveManager.uploadMetadata() input"
+  incorrect: "Test: ContractManager internal validation logic (that's unit test)"
+```
+
+### 7. **Real Dependencies Over Mocks**
+```yaml
+anti_pattern: Mock your own modules in integration tests
+success_pattern: Use real module instances, mock only external systems
+
+implementation:
+  load_real:
+    - All your modules: ContractManager, ArweaveManager, CoreLogic, etc
+    - Your database: Test DB (in-memory SQLite, Docker PostgreSQL)
+    - Your internal APIs: Real server for integration testing
+  
+  mock_minimal:
+    - External APIs only: Arweave, IPFS, external REST services
+    - Blockchain RPC: Web3 provider (unless testing on testnet)
+    - System I/O: If not critical to test (file system, external HTTP)
+  
+  comparison:
+    unit_tests: "Mock everything except module under test (heavy mocking)"
+    integration_tests: "Mock nothing except external systems (minimal mocking)"
+
+key_rule: "If mocking > 3 external systems, probably e2e test"
+
+example:
+  correct: "Mock Arweave API, use real ContractManager + ArweaveManager"
+  incorrect: "Mock ContractManager in integration test (defeats purpose)"
+```
+
+### 8. **Flow Testing Focus**
+```yaml
+anti_pattern: Test isolated methods at integration level
+success_pattern: Test multi-step workflows across modules
+
+implementation:
+  phase_3_scenarios:
+    - Happy path: Deploy → Upload → Validate (3 modules cooperating)
+    - Error scenarios: Failure at each step with proper cleanup
+    - Transaction flows: Batch operations (all or nothing)
+    - State consistency: Modules synchronized across workflow
+  
+  not_this:
+    - Testing single method in integration test
+    - Testing module in isolation (that's unit test)
+
+key_rule: "Integration = test conversations between modules, not monologues"
+
+example:
+  correct: "Workflow: User activates → Seller granted → Product created (3 modules)"
+  incorrect: "Test: ArweaveManager.upload() method alone (that's unit test)"
+```
+
+### 9. **Database-Aware Testing**
+```yaml
+anti_pattern: Ignore database or use fully mocked DB
+success_pattern: Test with real database (in-memory or Docker)
+
+implementation:
+  strategy_1_simple: "In-memory SQLite for simple schemas (fast, isolated)"
+  strategy_2_realistic: "Docker PostgreSQL for production-like (complex schemas)"
+  strategy_3_debug: "Dedicated test DB for manual debugging"
+  
+  always_required:
+    - Transaction isolation (each test independent)
+    - Proper cleanup (rollback or TRUNCATE)
+    - Schema migration (consistent state)
+
+key_rule: "Database is part of integration — test with real DB, not mocked"
+
+example:
+  correct: "Test with SQLite :memory: or Docker PostgreSQL"
+  incorrect: "Mock all DB calls (defeats integration testing purpose)"
+```
+
+---
+
+## 📖 SECTION 2: CONTEXT DETECTION & SCENARIOS
+
+> **Self-Orchestrating**: Rule automatically detects context and selects appropriate execution path
+
+### **Detection Logic**
+
+```yaml
+step_1_check_infrastructure:
+  question: "Does tests/integration/ directory exist with test runner configured?"
+  if_no: → SCENARIO: NEW_INTEGRATION (Full cycle)
+  if_yes: → Continue to step 2
+
+step_2_check_existing_tests:
+  question: "Do integration tests exist for affected modules?"
+  if_no: → SCENARIO: NEW_INTEGRATION (Create integration tests)
+  if_yes: → Continue to step 3
+
+step_3_check_quality:
+  question: "What is integration test quality score?"
+  method: "@test-qualification.mdc (adapted for integration level)"
+  if_score_below_8: → SCENARIO: CONTRACT_VALIDATION (focus on contracts)
+  if_score_above_8: → SCENARIO: EXTEND (add for new modules)
+```
+
+### **Scenarios**
+
+**Scenario A: NEW_INTEGRATION** — No integration tests exist → Full cycle (Phases 1, 2, 3)  
+**Duration**: 10-14 hours | **Output**: Production-ready integration test suite from scratch
+
+**Scenario B: EXTEND** — Tests exist (score > 8) → Add tests for new module interactions  
+**Duration**: 3-5 hours | **Output**: Extended coverage for new modules, contracts validated
+
+**Scenario C: CONTRACT_VALIDATION** — Tests exist (score < 8) → Focus on contract validation  
+**Duration**: 4-6 hours | **Output**: All contracts validated, score > 8/10
+
+---
+
+## 🎯 SELF-ORCHESTRATION FRAMEWORK
+
+> **Built-in orchestration**: No need for separate @run-task.mdc or @analysis.mdc
+
+### **How It Works**
+
+```yaml
+single_rule_execution:
+  input: "@integration-test-build.mdc + task description"
+  
+  automatic_steps:
+    1. Context Detection → Determine scenario (NEW/EXTEND/CONTRACT_VALIDATION)
+    2. ItemY Generation → Create phase-specific tasks
+    3. Progressive Execution → Phase 1 → Phase 2 → Phase 3 → Done
+    4. Quality Gates → Auto-trigger @test-qualification (adapted)
+    5. ROI Analysis → Defer e2e flows to @e2e-test-build
+    6. Anti-pattern Detection → Continuous monitoring
+  
+  output: "Production-ready integration tests without additional orchestration"
+```
+
+### **ItemY Structure (Per Phase)**
+
+Each Phase = ListX with ItemY tasks following @run-task pattern:
+
+```yaml
+ItemY_Template:
+  understanding:
+    sub_rule: "@itemy-understanding.mdc (optional)"
+    actions:
+      - Analyze current state (which modules need integration testing)
+      - Identify module boundaries and contracts
+      - Check existing integration patterns
+  
+  knowledge_check:
+    sub_rule: "@itemy-knowledge-check.mdc (optional)"
+    actions:
+      - Review integration testing best practices
+      - Check contract testing patterns
+      - Identify critical module interactions
+  
+  acceptance_criteria:
+    sub_rule: "@itemy-acceptance.mdc (optional)"
+    actions:
+      - [ ] Specific, measurable criteria per phase
+      - [ ] Contract validation thresholds
+      - [ ] Flow coverage targets
+  
+  planning:
+    sub_rule: "@itemy-planning.mdc (optional)"
+    actions:
+      - Break down into concrete steps
+      - Identify module dependencies
+      - Plan test DB strategy
+  
+  implementation:
+    sub_rule: "@itemy-execution.mdc (optional)"
+    actions:
+      - Execute step-by-step
+      - Load multiple modules together
+      - Use minimal mocking
+  
+  validation:
+    sub_rule: "@itemy-validation.mdc (optional)"
+    actions:
+      - Run integration tests
+      - Check contract compatibility
+      - Validate flow completion
+  
+  retrospective:
+    sub_rule: "@itemy-retrospective.mdc (optional)"
+    actions:
+      - Document integration learnings
+      - Identify contract issues
+      - Note flow testing insights
+
+execution_note: |
+  AI can execute each step using embedded logic OR delegate to @itemy-*.mdc sub-rules.
+  Recommendation: Use sub-rules for complex contract validation (Phase 2).
+```
+
+---
+
+## 📖 SECTION 3: PHASES (Infrastructure → Contract → Flow)
+
+### **Phase 1: Integration Infrastructure**
+**Goal**: Enable integration testing (multiple modules working together)  
+**Duration**: 2-3 hours  
+**Cognitive Mode**: EXECUTION
+
+```yaml
+deliverables:
+  - tests/integration/ directory structure
+  - Multi-module test harness (loads modules together, not isolated)
+  - Test database setup (choose strategy: in-memory, Docker, or dedicated)
+  - Minimal mock infrastructure (external APIs only, not your modules)
+  - Integration test runner configuration
+  - Scripts: test:integration, test:integration:parallel, test:integration:coverage
+
+validation:
+  - [ ] Multiple modules load together successfully
+  - [ ] Test database works (can read/write)
+  - [ ] External APIs mocked (Arweave, Web3 RPC)
+  - [ ] 2-3 proof integration tests pass (Module A → Module B interaction)
+  - [ ] Execution time < 10 seconds for proof tests
+```
+
+**Framework Setup Examples:**
+
+**JavaScript (Mocha + Supertest + Testcontainers):**
+```json
+// package.json scripts
+{
+  "test:integration": "mocha 'tests/integration/**/*.test.js' --timeout 30000",
+  "test:integration:parallel": "mocha --parallel 'tests/integration/**/*.test.js' --timeout 30000",
+  "test:integration:coverage": "nyc mocha 'tests/integration/**/*.test.js'"
+}
+
+// Dependencies
+"devDependencies": {
+  "mocha": "^10.0.0",
+  "chai": "^4.3.0",
+  "supertest": "^6.3.0",     // For API testing
+  "testcontainers": "^10.0.0", // For Docker DB (optional)
+  "nyc": "^15.1.0"
+}
+```
+
+**Python (pytest + httpx + pytest-docker):**
+```ini
+# pytest.ini
+[pytest]
+testpaths = tests/integration
+timeout = 30
+addopts = -v --tb=short --strict-markers
+
+# With parallel
+addopts = -v --tb=short -n auto
+
+# With coverage
+addopts = -v --cov=src --cov-report=html --cov-fail-under=70
+
+# With Docker DB (optional)
+markers =
+    integration: Integration tests requiring database
+    docker: Tests requiring Docker containers
+```
+
+```bash
+# requirements-test.txt
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+pytest-xdist>=3.0.0          # Parallel execution
+pytest-docker>=2.0.0          # Docker containers (optional)
+httpx>=0.24.0                 # Async HTTP client for API tests
+```
+
+**Multi-Module Test Harness:**
+
+**JavaScript:**
+```javascript
+// tests/integration/helpers/IntegrationHarness.js
+class IntegrationHarness {
+  constructor() {
+    this.modules = {};
+    this.testDB = null;
+    this.externalMocks = {};
+  }
+  
+  async setupIntegrationEnvironment() {
+    // 1. Setup test database (in-memory for speed)
+    const sqlite3 = require('sqlite3');
+    this.testDB = new sqlite3.Database(':memory:');
+    await this.testDB.exec(testSchema);
+    
+    // 2. Mock external APIs (minimal)
+    this.externalMocks.arweave = sinon.stub(ArweaveClient.prototype, 'upload')
+      .resolves('fake-cid-123');
+    this.externalMocks.web3 = sinon.stub(Web3Provider.prototype, 'sendTransaction')
+      .resolves({ hash: '0xfake' });
+    
+    // 3. Load REAL modules (not mocked!)
+    this.modules.contractManager = new ContractManager(this.testDB);
+    this.modules.arweaveManager = new ArweaveManager();
+    this.modules.coreLogic = new CoreLogic(this.testDB);
+    
+    return this.modules;
+  }
+  
+  async teardownIntegrationEnvironment() {
+    // Cleanup external mocks
+    sinon.restore();
+    
+    // Close DB connection
+    if (this.testDB) {
+      await this.testDB.close();
+    }
+  }
+}
+
+module.exports = { IntegrationHarness };
+```
+
+**Python:**
+```python
+# tests/integration/helpers/integration_harness.py
+import sqlite3
+from unittest.mock import Mock, patch
+import pytest
+
+class IntegrationHarness:
+    def __init__(self):
+        self.modules = {}
+        self.test_db = None
+        self.external_mocks = {}
+    
+    async def setup_integration_environment(self):
+        # 1. Setup test database (in-memory for speed)
+        self.test_db = sqlite3.connect(':memory:')
+        self.test_db.executescript(test_schema)
+        
+        # 2. Mock external APIs (minimal)
+        self.external_mocks['arweave'] = Mock()
+        self.external_mocks['arweave'].upload.return_value = 'fake-cid-123'
+        
+        # 3. Load REAL modules (not mocked!)
+        self.modules['contract_manager'] = ContractManager(self.test_db)
+        self.modules['arweave_manager'] = ArweaveManager()
+        self.modules['core_logic'] = CoreLogic(self.test_db)
+        
+        return self.modules
+    
+    async def teardown_integration_environment(self):
+        # Close DB connection
+        if self.test_db:
+            self.test_db.close()
+
+# Pytest fixture for auto-setup/teardown
+@pytest.fixture
+async def integration_env():
+    harness = IntegrationHarness()
+    modules = await harness.setup_integration_environment()
+    yield modules
+    await harness.teardown_integration_environment()
+```
+
+**Proof Integration Test Example:**
+
+**JavaScript:**
+```javascript
+// tests/integration/proof.test.js
+const { expect } = require('chai');
+const { IntegrationHarness } = require('./helpers/IntegrationHarness');
+
+describe('Integration Proof Tests', () => {
+  let harness, modules;
+  
+  before(async () => {
+    harness = new IntegrationHarness();
+    modules = await harness.setupIntegrationEnvironment();
+  });
+  
+  after(async () => {
+    await harness.teardownIntegrationEnvironment();
+  });
+  
+  it('should integrate ContractManager → ArweaveManager', async () => {
+    // Module A: Deploy contract
+    const deployment = await modules.contractManager.deploy('Test');
+    
+    // Module B: Upload metadata (using Module A output)
+    const metadata = { address: deployment.proxy };
+    const cid = await modules.arweaveManager.uploadMetadata(metadata);
+    
+    // Integration validated: data flowed from A to B
+    expect(cid).to.exist;
+    expect(deployment.proxy).to.equal(metadata.address);
+  });
+});
+```
+
+**Python:**
+```python
+# tests/integration/test_proof.py
+import pytest
+
+@pytest.mark.asyncio
+async def test_contract_manager_to_arweave_integration(integration_env):
+    """Integration: ContractManager → ArweaveManager"""
+    modules = integration_env
+    
+    # Module A: Deploy contract
+    deployment = await modules['contract_manager'].deploy('Test')
+    
+    # Module B: Upload metadata (using Module A output)
+    metadata = {'address': deployment['proxy']}
+    cid = await modules['arweave_manager'].upload_metadata(metadata)
+    
+    # Integration validated: data flowed from A to B
+    assert cid is not None
+    assert deployment['proxy'] == metadata['address']
+```
+
+### **Phase 2: Contract Validation Tests** 🔴 CRITICAL
+**Goal**: Validate all module contracts and boundaries  
+**Duration**: 4-6 hours  
+**Cognitive Mode**: CRITICAL ANALYSIS  
+**Expected Output**: 15-25 contract tests
+
+```yaml
+trigger: After Phase 1 (infrastructure ready)
+
+critical_focus:
+  question: "Do module contracts align?"
+  method: "Validate data format compatibility at module boundaries"
+
+contract_types:
+  1. Module-to-Module: Output of Module A → Input of Module B
+  2. API Contracts: Request/response format consistency
+  3. Data Contracts: Database schema compatibility
+  4. Error Contracts: Error propagation between modules
+
+characteristics:
+  test_focus: "Module boundaries, not internals"
+  modules_loaded: "2+ real modules (minimal mocks)"
+  database: "Test DB required for data contract validation"
+
+acceptance_criteria:
+  - [ ] All critical module boundaries tested (> 80% coverage)
+  - [ ] Data format compatibility validated
+  - [ ] API request/response contracts checked
+  - [ ] Error propagation works correctly
+  - [ ] No contract violations found
+  - [ ] Tests pass with real modules (not mocked)
+```
+
+**Contract Testing Patterns:**
+
+**Pattern 1: Module-to-Module Data Contracts**
+
+Validates that Module A output format matches Module B input expectations.
+
+**JavaScript Example:**
+```javascript
+describe('Contract: ContractManager → ArweaveManager', () => {
+  it('should validate deployment data contract', async () => {
+    // GIVEN: Deploy contract with ContractManager
+    const deployment = await contractManager.deployUUPS('TestContract', [], []);
+    
+    // WHEN: Prepare metadata for ArweaveManager
+    const metadata = {
+      contractAddress: deployment.proxy,
+      implementationAddress: deployment.logic,
+      contractName: 'TestContract',
+      network: deployment.network
+    };
+    
+    // THEN: ArweaveManager accepts this format (contract validated)
+    const cid = await arweaveManager.uploadContractMetadata(metadata);
+    
+    // Contract checks:
+    expect(metadata.contractAddress).to.equal(deployment.proxy); // Format aligned
+    expect(metadata.implementationAddress).to.exist; // Required field present
+    expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/); // Upload succeeded
+  });
+});
+```
+
+**Python Example:**
+```python
+@pytest.mark.asyncio
+async def test_contract_manager_to_arweave_data_contract(integration_env):
+    """Contract: ContractManager → ArweaveManager data format compatibility"""
+    contract_mgr = integration_env['contract_manager']
+    arweave_mgr = integration_env['arweave_manager']
+    
+    # GIVEN: Deploy contract with ContractManager
+    deployment = await contract_mgr.deploy_uups('TestContract', [], [])
+    
+    # WHEN: Prepare metadata for ArweaveManager
+    metadata = {
+        'contract_address': deployment['proxy'],
+        'implementation_address': deployment['logic'],
+        'contract_name': 'TestContract',
+        'network': deployment['network']
+    }
+    
+    # THEN: ArweaveManager accepts this format (contract validated)
+    cid = await arweave_mgr.upload_contract_metadata(metadata)
+    
+    # Contract checks:
+    assert metadata['contract_address'] == deployment['proxy']  # Format aligned
+    assert metadata['implementation_address'] is not None  # Required field
+    assert re.match(r'^[A-Za-z0-9_-]{43}$', cid)  # Upload succeeded
+```
+
+---
+
+**Pattern 2: API Contracts**
+
+Validates request/response format consistency across endpoints.
+
+**JavaScript Example:**
+```javascript
+const request = require('supertest');
+const app = require('../../src/api/app'); // Load real API
+
+describe('API Contract: POST /deploy → GET /deploy/:id', () => {
+  it('should maintain deployment ID format consistency', async () => {
+    // WHEN: POST /deploy creates deployment
+    const postResponse = await request(app)
+      .post('/deploy')
+      .send({ contractName: 'Test', pausable: true })
+      .expect(201);
+    
+    const deploymentId = postResponse.body.deploymentId;
+    
+    // THEN: GET /deploy/:id accepts same ID format
+    const getResponse = await request(app)
+      .get(`/deploy/${deploymentId}`)
+      .expect(200);
+    
+    // Contract validated:
+    expect(getResponse.body.id).to.equal(deploymentId); // ID format consistent
+    expect(getResponse.body.contractName).to.equal('Test'); // Data persisted
+  });
+});
+```
+
+**Python Example:**
+```python
+import httpx
+import pytest
+
+@pytest.mark.asyncio
+async def test_api_contract_post_deploy_to_get_deploy(test_api_client):
+    """API Contract: POST /deploy → GET /deploy/:id consistency"""
+    
+    # WHEN: POST /deploy creates deployment
+    post_response = await test_api_client.post('/deploy', json={
+        'contract_name': 'Test',
+        'pausable': True
+    })
+    assert post_response.status_code == 201
+    deployment_id = post_response.json()['deployment_id']
+    
+    # THEN: GET /deploy/:id accepts same ID format
+    get_response = await test_api_client.get(f'/deploy/{deployment_id}')
+    assert get_response.status_code == 200
+    
+    # Contract validated:
+    assert get_response.json()['id'] == deployment_id  # ID format consistent
+    assert get_response.json()['contract_name'] == 'Test'  # Data persisted
+```
+
+---
+
+**Pattern 3: Database Schema Contracts**
+
+Validates schema compatibility when multiple modules access same database.
+
+**JavaScript Example:**
+```javascript
+describe('Database Contract: Shared Schema Across Modules', () => {
+  it('should validate schema compatibility for deployments table', async () => {
+    // GIVEN: ContractManager writes to deployments table
+    const deployment = await contractManager.deploy('Test');
+    await contractManager.saveDeployment(deployment);
+    
+    // WHEN: ArweaveManager reads from same table
+    const savedDeployment = await arweaveManager.getDeploymentForUpload(deployment.id);
+    
+    // THEN: Schema contract validated
+    expect(savedDeployment.proxy).to.equal(deployment.proxy); // Column exists
+    expect(savedDeployment.logic).to.equal(deployment.logic); // Column type correct
+    expect(savedDeployment.network).to.exist; // Required column present
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_database_contract_shared_schema(integration_env, test_db):
+    """Database Contract: deployments table schema compatibility"""
+    contract_mgr = integration_env['contract_manager']
+    arweave_mgr = integration_env['arweave_manager']
+    
+    # GIVEN: ContractManager writes to deployments table
+    deployment = await contract_mgr.deploy('Test')
+    await contract_mgr.save_deployment(deployment)
+    
+    # WHEN: ArweaveManager reads from same table
+    saved = await arweave_mgr.get_deployment_for_upload(deployment['id'])
+    
+    # THEN: Schema contract validated
+    assert saved['proxy'] == deployment['proxy']  # Column exists
+    assert saved['logic'] == deployment['logic']  # Type matches
+    assert saved['network'] is not None  # Required column present
+```
+
+---
+
+**Pattern 4: Error Propagation Contracts**
+
+Validates errors flow correctly between modules.
+
+**JavaScript Example:**
+```javascript
+describe('Error Contract: Module B Error → Module A Handling', () => {
+  it('should propagate ArweaveManager errors to ContractManager', async () => {
+    // GIVEN: ArweaveManager will fail (external API error)
+    const arweaveStub = sinon.stub(ArweaveClient.prototype, 'upload')
+      .rejects(new Error('Arweave service unavailable'));
+    
+    // WHEN: ContractManager tries to deploy + upload
+    try {
+      await contractManager.deployAndUpload('Test');
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      // THEN: Error propagated correctly
+      expect(error.message).to.include('Arweave service unavailable');
+      expect(error.module).to.equal('ArweaveManager'); // Source identified
+      expect(error.originalError).to.exist; // Stack trace preserved
+    }
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_error_contract_arweave_to_contract_manager(integration_env, mocker):
+    """Error Contract: ArweaveManager error → ContractManager handling"""
+    contract_mgr = integration_env['contract_manager']
+    
+    # GIVEN: ArweaveManager will fail
+    mock_upload = mocker.patch('arweave.client.upload')
+    mock_upload.side_effect = Exception('Arweave service unavailable')
+    
+    # WHEN: ContractManager tries to deploy + upload
+    with pytest.raises(Exception) as exc_info:
+        await contract_mgr.deploy_and_upload('Test')
+    
+    # THEN: Error propagated correctly
+    assert 'Arweave service unavailable' in str(exc_info.value)
+    assert hasattr(exc_info.value, 'module')  # Source identified
+    assert exc_info.value.__cause__ is not None  # Original error preserved
+```
+
+---
+
+### **Phase 3: Flow Testing (Multi-Step Scenarios)** 🔴 CRITICAL
+**Goal**: Validate complete workflows through multiple modules  
+**Duration**: 4-6 hours  
+**Cognitive Mode**: STRATEGIC  
+**Expected Output**: 10-20 flow tests
+
+```yaml
+trigger: After Phase 2 (contracts validated)
+
+strategic_focus:
+  question: "Do multi-module workflows complete successfully?"
+  method: "Test realistic scenarios across 2+ modules"
+
+flow_types:
+  1. Happy Path: Complete workflow succeeds (all modules cooperate)
+  2. Error Scenarios: Failure at each step with proper handling
+  3. Transaction Flows: Multi-step atomic operations (all or nothing)
+  4. State Consistency: Modules maintain synchronized state
+
+characteristics:
+  test_scope: "Multi-step workflows, not single operations"
+  modules_involved: "2-4 modules per flow"
+  realistic_scenarios: "Based on production use cases"
+
+acceptance_criteria:
+  - [ ] Critical workflows tested (> 70% of production flows)
+  - [ ] Multi-module interactions validated
+  - [ ] Error handling across flow works (cleanup, rollback)
+  - [ ] State consistency guaranteed across modules
+  - [ ] Rollback/cleanup mechanisms tested
+```
+
+**Flow Testing Patterns:**
+
+**Pattern 1: Happy Path Flows**
+
+Complete workflow succeeds with all modules cooperating.
+
+**JavaScript Example:**
+```javascript
+describe('Flow: Deploy → Upload → Validate (Happy Path)', () => {
+  it('should complete full deployment workflow', async () => {
+    // STEP 1: Deploy contract (ContractManager)
+    const deployment = await contractManager.deployUUPS('TestContract', [], []);
+    expect(deployment.proxy).to.exist;
+    expect(deployment.logic).to.exist;
+    
+    // STEP 2: Upload metadata to Arweave (ArweaveManager)
+    const metadata = {
+      contractAddress: deployment.proxy,
+      implementationAddress: deployment.logic,
+      timestamp: Date.now()
+    };
+    const cid = await arweaveManager.uploadContractMetadata(metadata);
+    expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/);
+    
+    // STEP 3: Validate on-chain (Web3Utils)
+    const onChainCode = await web3Utils.getCode(deployment.proxy);
+    expect(onChainCode).to.not.equal('0x'); // Contract deployed
+    
+    // FLOW VALIDATED: 3 modules worked together successfully
+    expect(deployment.arweaveCID).to.equal(cid); // State consistent
+  });
+});
+```
+
+**Python Example:**
+```python
+@pytest.mark.asyncio
+async def test_happy_path_deploy_upload_validate_flow(integration_env):
+    """Flow: Deploy → Upload → Validate (3 modules)"""
+    contract_mgr = integration_env['contract_manager']
+    arweave_mgr = integration_env['arweave_manager']
+    web3_utils = integration_env['web3_utils']
+    
+    # STEP 1: Deploy contract
+    deployment = await contract_mgr.deploy_uups('TestContract', [], [])
+    assert deployment['proxy'] is not None
+    assert deployment['logic'] is not None
+    
+    # STEP 2: Upload metadata to Arweave
+    metadata = {
+        'contract_address': deployment['proxy'],
+        'implementation_address': deployment['logic'],
+        'timestamp': time.time()
+    }
+    cid = await arweave_mgr.upload_contract_metadata(metadata)
+    assert re.match(r'^[A-Za-z0-9_-]{43}$', cid)
+    
+    # STEP 3: Validate on-chain
+    on_chain_code = await web3_utils.get_code(deployment['proxy'])
+    assert on_chain_code != '0x'  # Contract deployed
+    
+    # FLOW VALIDATED: 3 modules worked together
+    assert deployment['arweave_cid'] == cid  # State consistent
+```
+
+---
+
+**Pattern 2: Error Handling Flows**
+
+Workflow fails at specific step, validates proper cleanup and error handling.
+
+**JavaScript Example:**
+```javascript
+describe('Flow: Error Handling (Deploy OK → Upload FAILS)', () => {
+  it('should handle mid-flow failure with cleanup', async () => {
+    // STEP 1: Deploy succeeds
+    const deployment = await contractManager.deployUUPS('Test', [], []);
+    expect(deployment.proxy).to.exist;
+    
+    // STEP 2: Upload FAILS (simulate Arweave service down)
+    const arweaveStub = sinon.stub(ArweaveClient.prototype, 'upload')
+      .rejects(new Error('Arweave service down'));
+    
+    // WHEN: Try to complete flow
+    try {
+      await contractManager.deployAndUploadWithRetry('Test');
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      // THEN: Error handled, cleanup triggered
+      expect(error.message).to.include('Arweave service down');
+      
+      // Validate cleanup: Deployment marked as "metadata_upload_failed"
+      const deploymentStatus = await contractManager.getDeploymentStatus(deployment.id);
+      expect(deploymentStatus).to.equal('metadata_upload_failed');
+    }
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_error_flow_deploy_ok_upload_fails(integration_env, mocker):
+    """Flow: Deploy succeeds → Upload fails → Cleanup triggered"""
+    contract_mgr = integration_env['contract_manager']
+    
+    # STEP 1: Deploy succeeds
+    deployment = await contract_mgr.deploy_uups('Test', [], [])
+    assert deployment['proxy'] is not None
+    
+    # STEP 2: Upload FAILS (simulate Arweave down)
+    mock_upload = mocker.patch('arweave.client.upload')
+    mock_upload.side_effect = Exception('Arweave service down')
+    
+    # WHEN: Try to complete flow
+    with pytest.raises(Exception) as exc_info:
+        await contract_mgr.deploy_and_upload_with_retry('Test')
+    
+    # THEN: Error handled, cleanup triggered
+    assert 'Arweave service down' in str(exc_info.value)
+    
+    # Validate cleanup: Deployment marked as failed
+    status = await contract_mgr.get_deployment_status(deployment['id'])
+    assert status == 'metadata_upload_failed'
+```
+
+---
+
+**Pattern 3: Transaction Atomicity Flows**
+
+Multi-step operation that must be atomic (all succeed or all fail).
+
+**JavaScript Example:**
+```javascript
+describe('Flow: Batch Upload (Transaction Atomicity)', () => {
+  it('should ensure all-or-nothing for batch operations', async () => {
+    const contracts = ['Contract1', 'Contract2', 'Contract3'];
+    
+    // WHEN: Batch deploy + upload (atomic operation)
+    const results = await contractManager.deployBatchAndUpload(contracts);
+    
+    // THEN: All succeeded OR all failed (no partial state)
+    const allSucceeded = results.every(r => r.status === 'success');
+    const allFailed = results.every(r => r.status === 'failed');
+    
+    expect(allSucceeded || allFailed).to.be.true;
+    expect(results).to.have.length(3);
+    
+    // Validate state consistency in DB
+    if (allSucceeded) {
+      const dbCount = await db.query('SELECT COUNT(*) FROM deployments');
+      expect(dbCount.rows[0].count).to.equal(3);
+    } else {
+      const dbCount = await db.query('SELECT COUNT(*) FROM deployments');
+      expect(dbCount.rows[0].count).to.equal(0); // Rolled back
+    }
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_transaction_atomicity_batch_upload(integration_env, test_db):
+    """Flow: Batch upload must be atomic (all or nothing)"""
+    contract_mgr = integration_env['contract_manager']
+    contracts = ['Contract1', 'Contract2', 'Contract3']
+    
+    # WHEN: Batch deploy + upload (atomic operation)
+    results = await contract_mgr.deploy_batch_and_upload(contracts)
+    
+    # THEN: All succeeded OR all failed (no partial state)
+    all_succeeded = all(r['status'] == 'success' for r in results)
+    all_failed = all(r['status'] == 'failed' for r in results)
+    
+    assert all_succeeded or all_failed
+    assert len(results) == 3
+    
+    # Validate state consistency in DB
+    cursor = test_db.execute('SELECT COUNT(*) FROM deployments')
+    count = cursor.fetchone()[0]
+    
+    if all_succeeded:
+        assert count == 3  # All persisted
+    else:
+        assert count == 0  # All rolled back
+```
+
+---
+
+**Pattern 4: State Consistency Flows**
+
+Modules maintain synchronized state across multi-step operations.
+
+**JavaScript Example:**
+```javascript
+describe('Flow: State Consistency (User Activation → Seller → Product)', () => {
+  it('should maintain state consistency across 3 modules', async () => {
+    // STEP 1: Activate user (UserModule)
+    const user = await userModule.activateUser('0xUser', 'invite-code');
+    expect(user.activated).to.be.true;
+    
+    // STEP 2: Grant seller role (RoleModule)
+    await roleModule.grantSellerRole('0xUser');
+    const role = await roleModule.getUserRole('0xUser');
+    expect(role).to.equal('seller');
+    
+    // STEP 3: Create product (ProductModule)
+    const product = await productModule.createProduct('0xUser', { name: 'Test' });
+    expect(product.seller).to.equal('0xUser');
+    
+    // STATE CONSISTENCY VALIDATED:
+    // All modules have consistent view of user
+    const userState = await userModule.getUser('0xUser');
+    const roleState = await roleModule.getUserRole('0xUser');
+    const productState = await productModule.getProductsBySeller('0xUser');
+    
+    expect(userState.activated).to.be.true;
+    expect(roleState).to.equal('seller');
+    expect(productState).to.have.length(1);
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_state_consistency_user_seller_product_flow(integration_env):
+    """Flow: State consistency across User → Role → Product modules"""
+    user_module = integration_env['user_module']
+    role_module = integration_env['role_module']
+    product_module = integration_env['product_module']
+    
+    # STEP 1: Activate user
+    user = await user_module.activate_user('0xUser', 'invite-code')
+    assert user['activated'] is True
+    
+    # STEP 2: Grant seller role
+    await role_module.grant_seller_role('0xUser')
+    role = await role_module.get_user_role('0xUser')
+    assert role == 'seller'
+    
+    # STEP 3: Create product
+    product = await product_module.create_product('0xUser', {'name': 'Test'})
+    assert product['seller'] == '0xUser'
+    
+    # STATE CONSISTENCY VALIDATED:
+    user_state = await user_module.get_user('0xUser')
+    role_state = await role_module.get_user_role('0xUser')
+    products = await product_module.get_products_by_seller('0xUser')
+    
+    assert user_state['activated'] is True
+    assert role_state == 'seller'
+    assert len(products) == 1
+```
+
+---
+
+## 📖 SECTION 4: INTEGRATION PATTERNS (Mocking, Database, API)
+
+### **4.1 Minimal Mocking Strategy**
+
+> **Philosophy**: Integration tests validate that **your modules** work together. Mock only **external systems**, not your own code.
+
+**What to Mock (Minimal List):**
+```yaml
+mock_external_systems_only:
+  - External APIs: Arweave, IPFS, external REST services, blockchain explorers
+  - Blockchain RPC: Web3 provider (unless testing on testnet/mainnet fork)
+  - System calls: File system (if not critical to test), time manipulation (Date.now/datetime.now)
+  - Third-party services: Email, SMS, payment gateways
+
+reasoning: "These systems are outside your control, slow, or have side effects"
+```
+
+**What to Use REAL (Your Modules):**
+```yaml
+use_real_modules:
+  - ALL your modules: ContractManager, ArweaveManager, CoreLogic, UserService, etc
+  - Your database: Test DB (in-memory SQLite, Docker PostgreSQL)
+  - Your internal APIs: Real HTTP server for integration testing
+  - Your business logic: All domain logic executed for real
+
+reasoning: "Integration = test module conversations, not isolation"
+```
+
+**Comparison with Unit Testing:**
+
+| Aspect | Unit Tests | Integration Tests |
+|--------|------------|-------------------|
+| **Mock your modules** | ✅ Yes (heavy mocking) | ❌ No (use real instances) |
+| **Mock external APIs** | ✅ Yes | ✅ Yes (minimal, only external) |
+| **Mock database** | ✅ Yes (or skip DB tests) | ❌ No (use test DB) |
+| **Modules loaded** | 1 (isolated) | 2-4+ (working together) |
+| **Test focus** | Single module behavior | Module handshakes/contracts |
+| **Execution speed** | Very fast (< 1s) | Slower (1-10s per test) |
+
+---
+
+**Code Examples:**
+
+**JavaScript (Mocha + Sinon):**
+```javascript
+// ✅ CORRECT: Minimal mocking in integration tests
+describe('Contract Deployment Integration', () => {
+  let contractManager;  // REAL module
+  let arweaveManager;   // REAL module
+  let testDB;           // REAL test database
+  let mockArweaveAPI;   // MOCK (external API only)
+  
+  beforeEach(async () => {
+    // Setup test database (REAL)
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(testSchema);
+    
+    // Mock ONLY external Arweave API (not your modules!)
+    mockArweaveAPI = sinon.stub(ArweaveClient.prototype, 'post')
+      .resolves({ id: 'fake-tx-id', status: 'confirmed' });
+    
+    // Use REAL modules (not mocked)
+    contractManager = new ContractManager(testDB);
+    arweaveManager = new ArweaveManager(); // Uses mocked API internally
+  });
+  
+  afterEach(async () => {
+    sinon.restore(); // Clean up mocks
+    await testDB.close();
+  });
+  
+  it('should deploy contract and upload metadata (2 modules)', async () => {
+    // STEP 1: ContractManager deploys (REAL logic)
+    const deployment = await contractManager.deployUUPS('TestContract', [], []);
+    expect(deployment.proxy).to.exist;
+    
+    // STEP 2: ArweaveManager uploads (REAL logic, mocked external API)
+    const metadata = { contractAddress: deployment.proxy };
+    const cid = await arweaveManager.uploadMetadata(metadata);
+    
+    // INTEGRATION VALIDATED: Both modules worked together
+    expect(cid).to.exist;
+    expect(mockArweaveAPI.calledOnce).to.be.true; // External API called
+  });
+});
+```
+
+**Python (pytest + unittest.mock):**
+```python
+@pytest.fixture
+def integration_setup(mocker):
+    """Setup with minimal mocking (external APIs only)"""
+    # Setup test database (REAL)
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript(test_schema)
+    
+    # Mock ONLY external Arweave API (not your modules!)
+    mock_api = mocker.patch('arweave.api.ArweaveClient.post')
+    mock_api.return_value = {'id': 'fake-tx-id', 'status': 'confirmed'}
+    
+    # Use REAL modules (not mocked)
+    contract_mgr = ContractManager(test_db)
+    arweave_mgr = ArweaveManager()  # Uses mocked API internally
+    
+    yield contract_mgr, arweave_mgr, test_db, mock_api
+    
+    # Cleanup
+    test_db.close()
+
+@pytest.mark.asyncio
+async def test_deploy_and_upload_integration(integration_setup):
+    """Integration: ContractManager + ArweaveManager (2 modules)"""
+    contract_mgr, arweave_mgr, test_db, mock_api = integration_setup
+    
+    # STEP 1: ContractManager deploys (REAL logic)
+    deployment = await contract_mgr.deploy_uups('TestContract', [], [])
+    assert deployment['proxy'] is not None
+    
+    # STEP 2: ArweaveManager uploads (REAL logic, mocked external API)
+    metadata = {'contract_address': deployment['proxy']}
+    cid = await arweave_mgr.upload_metadata(metadata)
+    
+    # INTEGRATION VALIDATED: Both modules worked together
+    assert cid is not None
+    assert mock_api.call_count == 1  # External API called once
+```
+
+---
+
+**Anti-Pattern (Don't Do This in Integration Tests):**
+```javascript
+// ❌ WRONG: Over-mocking your own modules defeats integration testing purpose
+describe('BAD Integration Test', () => {
+  it('should mock everything (NOT integration)', async () => {
+    // ❌ Mocking ContractManager (your module!)
+    const mockContractManager = sinon.stub(ContractManager.prototype, 'deploy')
+      .resolves({ proxy: '0xFake' });
+    
+    // ❌ Mocking ArweaveManager (your module!)
+    const mockArweaveManager = sinon.stub(ArweaveManager.prototype, 'upload')
+      .resolves('fake-cid');
+    
+    // This is NOT integration — modules never actually interact!
+    // This is just a unit test pretending to be integration test
+  });
+});
+```
+
+---
+
+**Decision Tree: Should I Mock This?**
+```yaml
+decision_tree:
+  question_1: "Is this MY module (written by my team)?"
+  if_yes: "❌ DON'T MOCK — Use real instance"
+  if_no: "→ Continue to question 2"
+  
+  question_2: "Is this an external system (outside my codebase)?"
+  if_yes: "→ Continue to question 3"
+  if_no: "❌ DON'T MOCK — Use real instance"
+  
+  question_3: "Is it slow (>1s), has side effects, or requires credentials?"
+  if_yes: "✅ MOCK IT — Stub with realistic responses"
+  if_no: "❌ DON'T MOCK — Use real call (if fast and safe)"
+```
+
+### **4.2 Database Testing Strategies**
+
+> **Critical for Integration**: Integration tests MUST use a real database (not mocked). Choose the right strategy for your needs.
+
+**Strategy 1: In-Memory Database (Fast & Isolated)**
+
+**Tools**: SQLite `:memory:` (JS/Python), H2 (Java)  
+**Setup Time**: < 1 second  
+**Pros**: Lightning fast, perfect isolation, no cleanup needed, zero configuration  
+**Cons**: Not production-like, limited DB features (no triggers, stored procedures, advanced types)  
+**When to Use**: Simple schemas, no DB-specific features, fast CI/CD pipelines
+
+**JavaScript Setup:**
+```javascript
+const sqlite3 = require('sqlite3');
+
+describe('Integration Tests with In-Memory DB', () => {
+  let db;
+  
+  beforeEach(async () => {
+    // Create in-memory database (fresh for each test)
+    db = new sqlite3.Database(':memory:');
+    
+    // Apply schema
+    await db.exec(`
+      CREATE TABLE deployments (
+        id INTEGER PRIMARY KEY,
+        proxy TEXT NOT NULL,
+        logic TEXT NOT NULL,
+        network TEXT DEFAULT 'localhost'
+      );
+      
+      CREATE TABLE metadata (
+        deployment_id INTEGER REFERENCES deployments(id),
+        cid TEXT NOT NULL
+      );
+    `);
+  });
+  
+  afterEach(async () => {
+    await db.close(); // Auto-cleanup (memory freed)
+  });
+  
+  it('should test with in-memory DB', async () => {
+    const deployment = await contractManager.deploy('Test');
+    const saved = await db.get('SELECT * FROM deployments WHERE id = ?', deployment.id);
+    expect(saved.proxy).to.equal(deployment.proxy);
+  });
+});
+```
+
+**Python Setup:**
+```python
+import sqlite3
+import pytest
+
+@pytest.fixture
+def in_memory_db():
+    """In-memory SQLite database (fresh for each test)"""
+    conn = sqlite3.connect(':memory:')
+    
+    # Apply schema
+    conn.executescript('''
+        CREATE TABLE deployments (
+            id INTEGER PRIMARY KEY,
+            proxy TEXT NOT NULL,
+            logic TEXT NOT NULL,
+            network TEXT DEFAULT 'localhost'
+        );
+        
+        CREATE TABLE metadata (
+            deployment_id INTEGER REFERENCES deployments(id),
+            cid TEXT NOT NULL
+        );
+    ''')
+    
+    yield conn
+    
+    conn.close()  # Auto-cleanup (memory freed)
+
+@pytest.mark.asyncio
+async def test_with_in_memory_db(in_memory_db):
+    """Integration test with in-memory DB"""
+    deployment = await contract_mgr.deploy('Test')
+    cursor = in_memory_db.execute('SELECT * FROM deployments WHERE id = ?', (deployment['id'],))
+    saved = cursor.fetchone()
+    assert saved['proxy'] == deployment['proxy']
+```
+
+---
+
+**Strategy 2: Docker Containers (Recommended for Production-Like Testing)**
+
+**Tools**: Testcontainers (JS), pytest-docker (Python), Docker Compose  
+**Setup Time**: 2-5 seconds (first time), < 1 second (cached image)  
+**Pros**: Production-like environment, isolated, disposable, supports ALL DB features, multiple DB engines  
+**Cons**: Requires Docker installed, slightly slower than in-memory  
+**When to Use**: Complex schemas, DB-specific features (triggers, stored procedures), realistic testing, PostgreSQL/MySQL/MongoDB
+
+**JavaScript Setup (Testcontainers):**
+```javascript
+const { GenericContainer } = require('testcontainers');
+const { Client } = require('pg');
+
+describe('Integration Tests with Docker PostgreSQL', () => {
+  let container;
+  let client;
+  
+  before(async function() {
+    this.timeout(30000); // First time: pulls image
+    
+    // Start PostgreSQL container
+    container = await new GenericContainer('postgres:14')
+      .withExposedPorts(5432)
+      .withEnvironment({ POSTGRES_PASSWORD: 'test', POSTGRES_DB: 'testdb' })
+      .start();
+    
+    // Connect to container
+    client = new Client({
+      host: container.getHost(),
+      port: container.getMappedPort(5432),
+      user: 'postgres',
+      password: 'test',
+      database: 'testdb'
+    });
+    await client.connect();
+    
+    // Apply schema
+    await client.query(`
+      CREATE TABLE deployments (
+        id SERIAL PRIMARY KEY,
+        proxy VARCHAR(42) NOT NULL,
+        logic VARCHAR(42) NOT NULL,
+        network VARCHAR(50) DEFAULT 'localhost'
+      );
+    `);
+  });
+  
+  after(async () => {
+    await client.end();
+    await container.stop(); // Container destroyed
+  });
+  
+  afterEach(async () => {
+    // Cleanup between tests (transaction rollback or TRUNCATE)
+    await client.query('TRUNCATE TABLE deployments CASCADE');
+  });
+  
+  it('should test with Docker PostgreSQL', async () => {
+    const deployment = await contractManager.deploy('Test');
+    const result = await client.query('SELECT * FROM deployments WHERE id = $1', [deployment.id]);
+    expect(result.rows[0].proxy).to.equal(deployment.proxy);
+  });
+});
+```
+
+**Python Setup (pytest-docker):**
+```python
+import pytest
+import psycopg2
+from testcontainers.postgres import PostgresContainer
+
+@pytest.fixture(scope='session')
+def postgres_container():
+    """Docker PostgreSQL container (one per test session)"""
+    with PostgresContainer('postgres:14') as postgres:
+        yield postgres
+
+@pytest.fixture
+def docker_db(postgres_container):
+    """Connection to Docker PostgreSQL"""
+    conn = psycopg2.connect(postgres_container.get_connection_url())
+    cursor = conn.cursor()
+    
+    # Apply schema
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS deployments (
+            id SERIAL PRIMARY KEY,
+            proxy VARCHAR(42) NOT NULL,
+            logic VARCHAR(42) NOT NULL,
+            network VARCHAR(50) DEFAULT 'localhost'
+        );
+    ''')
+    conn.commit()
+    
+    yield conn
+    
+    # Cleanup between tests
+    cursor.execute('TRUNCATE TABLE deployments CASCADE')
+    conn.commit()
+    
+    conn.close()
+
+@pytest.mark.asyncio
+async def test_with_docker_postgres(docker_db):
+    """Integration test with Docker PostgreSQL"""
+    deployment = await contract_mgr.deploy('Test')
+    cursor = docker_db.cursor()
+    cursor.execute('SELECT * FROM deployments WHERE id = %s', (deployment['id'],))
+    saved = cursor.fetchone()
+    assert saved[1] == deployment['proxy']  # proxy column
+```
+
+---
+
+**Strategy 3: Dedicated Test Database (Manual Debugging)**
+
+**Setup**: Persistent test DB (not destroyed after tests), manual reset between runs  
+**Pros**: Debuggable (inspect after test failure), fast re-runs (no container startup), realistic  
+**Cons**: State leak risk (test pollution), manual cleanup, shared resource  
+**When to Use**: Manual debugging, complex data setup, local development exploration
+
+**Configuration Example:**
+```javascript
+// config/test.js
+module.exports = {
+  database: {
+    host: 'localhost',
+    port: 5432,
+    database: 'my_app_test', // Dedicated test DB
+    user: 'test_user',
+    password: 'test_pass'
+  }
+};
+
+// Setup script (run once before tests)
+// npm run test:db:setup
+const { Client } = require('pg');
+async function setupTestDB() {
+  const client = new Client(config.database);
+  await client.connect();
+  await client.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
+  await client.query(fs.readFileSync('./schema.sql', 'utf8'));
+  await client.end();
+}
+```
+
+**Cleanup Pattern (Critical for all strategies):**
+```javascript
+describe('Integration Tests with Cleanup', () => {
+  afterEach(async () => {
+    // OPTION 1: Transaction rollback (fastest, isolation)
+    await db.query('ROLLBACK');
+    
+    // OPTION 2: Truncate tables (if not using transactions)
+    await db.query('TRUNCATE TABLE deployments, metadata CASCADE');
+    
+    // OPTION 3: Delete all (slower)
+    await db.query('DELETE FROM deployments');
+    await db.query('DELETE FROM metadata');
+  });
+});
+```
+
+**Python Cleanup Pattern:**
+```python
+@pytest.fixture
+def db_with_cleanup(test_db):
+    """Auto-cleanup after each test"""
+    yield test_db
+    
+    # OPTION 1: Transaction rollback
+    test_db.rollback()
+    
+    # OPTION 2: Truncate tables
+    test_db.execute('TRUNCATE TABLE deployments, metadata CASCADE')
+    test_db.commit()
+```
+
+---
+
+**Decision Matrix: Which DB Strategy?**
+
+| Factor | In-Memory (SQLite) | Docker (PostgreSQL/MySQL) | Dedicated Test DB |
+|--------|-------------------|---------------------------|-------------------|
+| **Speed** | ⚡⚡⚡ Fastest (<1s) | ⚡⚡ Fast (1-5s) | ⚡⚡ Fast (if persistent) |
+| **Isolation** | ✅ Perfect | ✅ Perfect | ⚠️ Risk of pollution |
+| **Production-like** | ❌ No | ✅ Yes | ✅ Yes |
+| **DB features** | ⚠️ Limited | ✅ All features | ✅ All features |
+| **Setup complexity** | ⚡ Simple | ⚡⚡ Requires Docker | ⚡⚡⚡ Manual config |
+| **Debugging** | ❌ Data lost after test | ⚠️ Container logs | ✅ Easy inspection |
+| **CI/CD friendly** | ✅ Perfect | ✅ Good (Docker support) | ⚠️ Needs DB service |
+
+**Recommendation:**
+- **Start with**: In-Memory (SQLite) for simple schemas
+- **Upgrade to**: Docker (Testcontainers) when you need production-like DB
+- **Use Dedicated DB**: Only for manual debugging sessions
+
+### **4.3 API Integration Testing Patterns**
+
+> **Integration Level**: Test REST/GraphQL APIs with real backend modules (not mocked routes). Different from unit (mocked HTTP) and E2E (full UI + backend).
+
+**Pattern 1: Single Route Integration**
+
+Test individual API endpoint with real backend modules loaded.
+
+**JavaScript (Supertest):**
+```javascript
+const request = require('supertest');
+const app = require('../../src/api/app'); // Load real Express app
+
+describe('API Integration: POST /deploy', () => {
+  let testDB;
+  
+  beforeEach(async () => {
+    // Setup test DB (real database, not mocked)
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(schema);
+    
+    // App uses real modules (ContractManager, ArweaveManager)
+    app.locals.db = testDB;
+  });
+  
+  it('should deploy contract via API with real modules', async () => {
+    const response = await request(app)
+      .post('/deploy')
+      .send({
+        contractName: 'TestContract',
+        pausable: true,
+        ownable: true
+      })
+      .expect(201);
+    
+    // Integration validated: API → ContractManager → Database
+    expect(response.body.deploymentId).to.exist;
+    expect(response.body.proxy).to.match(/^0x[a-fA-F0-9]{40}$/);
+    
+    // Verify database state (real persistence)
+    const saved = await testDB.get('SELECT * FROM deployments WHERE id = ?', response.body.deploymentId);
+    expect(saved.proxy).to.equal(response.body.proxy);
+  });
+});
+```
+
+**Python (httpx + TestClient):**
+```python
+from fastapi.testclient import TestClient
+from app.main import app  # Load real FastAPI app
+import pytest
+
+@pytest.fixture
+def api_client(in_memory_db):
+    """Test client with real backend modules"""
+    # Override DB dependency with test DB
+    app.dependency_overrides[get_db] = lambda: in_memory_db
+    
+    client = TestClient(app)
+    yield client
+    
+    app.dependency_overrides.clear()
+
+def test_deploy_contract_via_api(api_client):
+    """API Integration: POST /deploy with real modules"""
+    response = api_client.post('/deploy', json={
+        'contract_name': 'TestContract',
+        'pausable': True,
+        'ownable': True
+    })
+    
+    assert response.status_code == 201
+    data = response.json()
+    
+    # Integration validated: API → ContractManager → Database
+    assert 'deployment_id' in data
+    assert re.match(r'^0x[a-fA-F0-9]{40}$', data['proxy'])
+```
+
+---
+
+**Pattern 2: Multi-Endpoint Flow**
+
+Test multiple API endpoints in sequence (realistic user flow).
+
+**JavaScript Example:**
+```javascript
+describe('API Flow: Deploy → Get Status → Upload Metadata', () => {
+  it('should complete deployment flow across 3 endpoints', async () => {
+    // STEP 1: POST /deploy (create deployment)
+    const deployResponse = await request(app)
+      .post('/deploy')
+      .send({ contractName: 'Test', pausable: true })
+      .expect(201);
+    
+    const deploymentId = deployResponse.body.deploymentId;
+    
+    // STEP 2: GET /deploy/:id (check status)
+    const statusResponse = await request(app)
+      .get(`/deploy/${deploymentId}`)
+      .expect(200);
+    
+    expect(statusResponse.body.status).to.equal('deployed');
+    expect(statusResponse.body.proxy).to.exist;
+    
+    // STEP 3: POST /metadata (upload metadata)
+    const metadataResponse = await request(app)
+      .post('/metadata')
+      .send({
+        deploymentId: deploymentId,
+        metadata: { name: 'Test', version: '1.0.0' }
+      })
+      .expect(200);
+    
+    expect(metadataResponse.body.cid).to.exist;
+    
+    // FLOW VALIDATED: 3 endpoints worked together with persistent state
+    const finalStatus = await request(app)
+      .get(`/deploy/${deploymentId}`)
+      .expect(200);
+    
+    expect(finalStatus.body.metadataCID).to.equal(metadataResponse.body.cid);
+  });
+});
+```
+
+**Python Example:**
+```python
+def test_api_flow_deploy_to_metadata(api_client):
+    """API Flow: Deploy → Get Status → Upload Metadata"""
+    
+    # STEP 1: POST /deploy
+    deploy_resp = api_client.post('/deploy', json={
+        'contract_name': 'Test',
+        'pausable': True
+    })
+    assert deploy_resp.status_code == 201
+    deployment_id = deploy_resp.json()['deployment_id']
+    
+    # STEP 2: GET /deploy/:id
+    status_resp = api_client.get(f'/deploy/{deployment_id}')
+    assert status_resp.status_code == 200
+    assert status_resp.json()['status'] == 'deployed'
+    
+    # STEP 3: POST /metadata
+    metadata_resp = api_client.post('/metadata', json={
+        'deployment_id': deployment_id,
+        'metadata': {'name': 'Test', 'version': '1.0.0'}
+    })
+    assert metadata_resp.status_code == 200
+    cid = metadata_resp.json()['cid']
+    
+    # FLOW VALIDATED: State persisted across endpoints
+    final_status = api_client.get(f'/deploy/{deployment_id}')
+    assert final_status.json()['metadata_cid'] == cid
+```
+
+---
+
+**Pattern 3: Authentication Flow Integration**
+
+Test login → token generation → protected endpoint access.
+
+**JavaScript Example:**
+```javascript
+describe('Auth Flow Integration: Login → Token → Protected Endpoint', () => {
+  it('should authenticate and access protected resource', async () => {
+    // STEP 1: POST /auth/login (get token)
+    const loginResponse = await request(app)
+      .post('/auth/login')
+      .send({ username: 'test@example.com', password: 'test123' })
+      .expect(200);
+    
+    const token = loginResponse.body.token;
+    expect(token).to.exist;
+    
+    // STEP 2: GET /user/profile (protected endpoint with token)
+    const profileResponse = await request(app)
+      .get('/user/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+    
+    expect(profileResponse.body.email).to.equal('test@example.com');
+    
+    // STEP 3: POST /user/update (protected action)
+    const updateResponse = await request(app)
+      .post('/user/update')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ displayName: 'Test User' })
+      .expect(200);
+    
+    // INTEGRATION VALIDATED: AuthService + TokenService + UserService worked together
+    expect(updateResponse.body.displayName).to.equal('Test User');
+  });
+  
+  it('should reject invalid token', async () => {
+    await request(app)
+      .get('/user/profile')
+      .set('Authorization', 'Bearer invalid-token')
+      .expect(401);
+  });
+});
+```
+
+**Python Example:**
+```python
+def test_auth_flow_integration(api_client):
+    """Auth Flow: Login → Token → Protected Endpoint"""
+    
+    # STEP 1: POST /auth/login
+    login_resp = api_client.post('/auth/login', json={
+        'username': 'test@example.com',
+        'password': 'test123'
+    })
+    assert login_resp.status_code == 200
+    token = login_resp.json()['token']
+    
+    # STEP 2: GET /user/profile (with token)
+    profile_resp = api_client.get('/user/profile', headers={
+        'Authorization': f'Bearer {token}'
+    })
+    assert profile_resp.status_code == 200
+    assert profile_resp.json()['email'] == 'test@example.com'
+    
+    # STEP 3: POST /user/update (protected action)
+    update_resp = api_client.post('/user/update', 
+        headers={'Authorization': f'Bearer {token}'},
+        json={'display_name': 'Test User'}
+    )
+    assert update_resp.status_code == 200
+    assert update_resp.json()['display_name'] == 'Test User'
+
+def test_auth_reject_invalid_token(api_client):
+    """Auth Flow: Invalid token rejected"""
+    resp = api_client.get('/user/profile', headers={
+        'Authorization': 'Bearer invalid-token'
+    })
+    assert resp.status_code == 401
+```
+
+---
+
+**Pattern 4: Error Response Validation**
+
+Validate consistent error format across all endpoints.
+
+**JavaScript Example:**
+```javascript
+describe('API Error Response Consistency', () => {
+  const expectedErrorFormat = {
+    statusCode: expect.any(Number),
+    error: expect.any(String),
+    message: expect.any(String),
+    timestamp: expect.any(String)
+  };
+  
+  it('should return 400 with consistent format for validation errors', async () => {
+    const response = await request(app)
+      .post('/deploy')
+      .send({ contractName: '' }) // Invalid: empty name
+      .expect(400);
+    
+    expect(response.body).toMatchObject(expectedErrorFormat);
+    expect(response.body.error).to.equal('ValidationError');
+  });
+  
+  it('should return 404 with consistent format for not found', async () => {
+    const response = await request(app)
+      .get('/deploy/nonexistent-id')
+      .expect(404);
+    
+    expect(response.body).toMatchObject(expectedErrorFormat);
+    expect(response.body.error).to.equal('NotFoundError');
+  });
+  
+  it('should return 401 with consistent format for auth errors', async () => {
+    const response = await request(app)
+      .get('/user/profile')
+      .expect(401); // No token provided
+    
+    expect(response.body).toMatchObject(expectedErrorFormat);
+    expect(response.body.error).to.equal('UnauthorizedError');
+  });
+});
+```
+
+**Python Example:**
+```python
+def test_error_response_consistency(api_client):
+    """Validate consistent error format across all endpoints"""
+    
+    # 400 Bad Request
+    bad_request = api_client.post('/deploy', json={'contract_name': ''})
+    assert bad_request.status_code == 400
+    assert 'error' in bad_request.json()
+    assert 'message' in bad_request.json()
+    assert bad_request.json()['error'] == 'ValidationError'
+    
+    # 404 Not Found
+    not_found = api_client.get('/deploy/nonexistent-id')
+    assert not_found.status_code == 404
+    assert 'error' in not_found.json()
+    assert not_found.json()['error'] == 'NotFoundError'
+    
+    # 401 Unauthorized
+    unauthorized = api_client.get('/user/profile')
+    assert unauthorized.status_code == 401
+    assert 'error' in unauthorized.json()
+    assert unauthorized.json()['error'] == 'UnauthorizedError'
+```
+
+---
+
+**Setup/Teardown Pattern for API Integration Tests:**
+
+**JavaScript:**
+```javascript
+describe('API Integration Tests', () => {
+  let server;
+  let testDB;
+  
+  before(async () => {
+    // Setup test database
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(schema);
+    
+    // Start test server with real modules
+    app.locals.db = testDB;
+    server = app.listen(0); // Random port
+  });
+  
+  after(async () => {
+    await testDB.close();
+    await server.close();
+  });
+  
+  afterEach(async () => {
+    // Cleanup between tests
+    await testDB.query('TRUNCATE TABLE deployments CASCADE');
+  });
+});
+```
+
+**Python:**
+```python
+@pytest.fixture(scope='module')
+def test_server(in_memory_db):
+    """Start test server with real modules"""
+    app.dependency_overrides[get_db] = lambda: in_memory_db
+    
+    with TestClient(app) as client:
+        yield client
+    
+    app.dependency_overrides.clear()
+```
+
+---
+
+## 📖 SECTION 5: QUALITY GATES (Adapted from @unit-test-build)
+
+> **Framework**: Uses same 4-gate progressive validation as @unit-test-build.mdc, adapted for integration testing context.  
+> **Reference**: See @unit-test-build.mdc Section 4 for detailed gate architecture and philosophy.
+
+**Integration-Specific Adaptations:**
+
+---
+
+### **Gate 1: Contract Compatibility Check** 🔴 CRITICAL
+
+**Auto-Trigger**: After Phase 2 (Contract Validation Tests complete)  
+**Question**: "Do module contracts align at all boundaries?"  
+**Method**: Automated contract validation
+
+```yaml
+gate_1_checks:
+  module_to_module_contracts:
+    question: "Does Module A output match Module B input format?"
+    validation:
+      - Check: Data structure compatibility (fields, types)
+      - Check: Required fields present
+      - Check: Optional fields handled
+      - Example: ContractManager.deploy() → ArweaveManager.uploadMetadata()
+    
+    threshold: "All critical module boundaries validated (> 80% coverage)"
+  
+  api_contracts:
+    question: "Are API request/response formats consistent?"
+    validation:
+      - Check: POST /deploy response → GET /deploy/:id accepts same ID format
+      - Check: Status codes consistent (201 for create, 200 for read)
+      - Check: Error responses follow same format
+    
+    threshold: "All API contracts validated"
+  
+  data_contracts:
+    question: "Are database schemas compatible across modules?"
+    validation:
+      - Check: Module A writes → Module B reads (same table, same columns)
+      - Check: Foreign keys valid
+      - Check: Column types match expectations
+      - Example: deployments table accessed by ContractManager + ArweaveManager
+    
+    threshold: "All shared data contracts validated"
+  
+  error_contracts:
+    question: "Do errors propagate correctly between modules?"
+    validation:
+      - Check: Module B error → Module A catches and handles
+      - Check: Error types preserved (ValidationError, NotFoundError)
+      - Check: Stack traces available for debugging
+    
+    threshold: "Error propagation tested for all critical paths"
+
+pass_criteria:
+  - [ ] All critical contracts validated (> 80% of module boundaries)
+  - [ ] Zero contract violations found in tests
+  - [ ] API contracts consistent across endpoints
+  - [ ] Database schema compatibility confirmed
+  - [ ] Error propagation works correctly
+
+next_steps:
+  if_pass: "✅ Continue to Gate 2 (Flow Passing)"
+  if_fail: "❌ Fix contract mismatches before proceeding"
+```
+
+**Contract Validation Script (Auto-run):**
+```javascript
+// Auto-triggered after Phase 2
+function validateContracts(testResults) {
+  const contractTests = testResults.filter(t => t.suite.includes('Contract:'));
+  const passing = contractTests.filter(t => t.status === 'passed').length;
+  const total = contractTests.length;
+  const coverage = (passing / total) * 100;
+  
+  console.log(`Contract Coverage: ${coverage.toFixed(1)}% (${passing}/${total})`);
+  
+  if (coverage < 80) {
+    throw new Error(`Gate 1 FAILED: Contract coverage ${coverage}% < 80% threshold`);
+  }
+  
+  return { passed: true, coverage, message: '✅ Gate 1 PASSED: Contracts validated' };
+}
+```
+
+---
+
+### **Gate 2: Flow Passing Check**
+
+**Auto-Trigger**: After Gate 1 passes  
+**Question**: "Do all multi-step workflows execute successfully?"  
+**Method**: Integration test execution results
+
+```yaml
+gate_2_checks:
+  all_tests_passing:
+    question: "Are all integration tests passing?"
+    threshold: "100% passing (zero failures)"
+    rationale: "Integration tests validate critical workflows — no failures allowed"
+  
+  workflows_complete:
+    question: "Do workflows complete end-to-end?"
+    validation:
+      - Check: Deploy → Upload → Validate (3 modules) completes
+      - Check: User → Seller → Product (3 modules) completes
+      - Check: No timeouts or hanging operations
+    
+    threshold: "All critical workflows complete within timeout (< 5 minutes)"
+  
+  no_multi_module_errors:
+    question: "Are there errors in multi-module operations?"
+    validation:
+      - Check: No module communication errors
+      - Check: No state inconsistencies between modules
+      - Check: No database conflicts
+    
+    threshold: "Zero multi-module errors"
+
+pass_criteria:
+  - [ ] 100% integration tests passing
+  - [ ] All workflows complete end-to-end
+  - [ ] Execution time < 5 minutes (acceptable for integration)
+  - [ ] Zero module communication errors
+
+next_steps:
+  if_pass: "✅ Continue to Gate 3 (Quality Analysis)"
+  if_fail: "❌ Apply @test-to-success.mdc to fix failing tests"
+```
+
+---
+
+### **Gate 3: Real Integration Validation** 🔴 CRITICAL
+
+**Auto-Trigger**: After Gate 2 passes  
+**Method**: @test-qualification.mdc (adapted for integration level)  
+**Question**: "Are tests validating REAL integration (not disguised unit tests)?"
+
+**Integration-Specific Quality Criteria:**
+
+**P0 - Critical (Must Pass):**
+
+**1. NO_UNIT_TESTS_AT_INTEGRATION_LEVEL**
+```yaml
+anti_pattern: "Testing isolated methods at integration level"
+detection:
+  - Single module loaded in test
+  - No module communication tested
+  - Testing internal logic (not boundaries)
+
+correct_pattern: "Test module handshakes, defer isolated logic to unit tests"
+validation:
+  - [ ] Each test loads 2+ modules
+  - [ ] Tests validate module interactions
+  - [ ] Tests focus on boundaries, not internals
+
+example_violation:
+  # ❌ WRONG: This is a unit test, not integration
+  it('should validate invite code format', async () => {
+    const valid = contractManager._validateInviteCode('ABC123');
+    expect(valid).to.be.true;
+  });
+
+example_correct:
+  # ✅ RIGHT: Tests integration between modules
+  it('should activate user with valid invite (2 modules)', async () => {
+    // InviteModule + UserModule working together
+    const invite = await inviteModule.create('ABC123');
+    const user = await userModule.activateWithInvite('ABC123');
+    expect(user.activated).to.be.true;
+  });
+```
+
+**2. VALIDATE_REAL_INTEGRATION**
+```yaml
+anti_pattern: "Mocking your own modules (defeats integration purpose)"
+detection:
+  - ContractManager mocked (your module!)
+  - ArweaveManager stubbed (your module!)
+  - Only external API called
+
+correct_pattern: "Use REAL modules, mock only external systems"
+validation:
+  - [ ] All your modules loaded as real instances
+  - [ ] Only external APIs mocked (< 3 external mocks per test)
+  - [ ] Real database used (in-memory or Docker)
+
+example_violation:
+  # ❌ WRONG: Mocking your own modules
+  const mockContract = sinon.stub(ContractManager.prototype, 'deploy')
+    .resolves({ proxy: '0xFake' });
+  const mockArweave = sinon.stub(ArweaveManager.prototype, 'upload')
+    .resolves('fake-cid');
+  // Not integration — modules never interact!
+
+example_correct:
+  # ✅ RIGHT: Real modules, minimal external mocks
+  const mockArweaveAPI = sinon.stub(ArweaveClient.prototype, 'post')
+    .resolves({ id: 'tx-123' }); // Mock external API only
+  
+  // Use REAL modules
+  const contractManager = new ContractManager(testDB);
+  const arweaveManager = new ArweaveManager();
+```
+
+**3. NO_OVER_MOCKING**
+```yaml
+anti_pattern: "Mocking > 3 external systems (probably e2e test, not integration)"
+detection:
+  - Mocking: Arweave + Web3 + IPFS + Email + Database + ...
+  - Test becomes complex mock orchestration
+  - Hard to understand what's being tested
+
+correct_pattern: "Mock ≤ 3 external systems, use real for the rest"
+validation:
+  - [ ] External mocks count ≤ 3 per test
+  - [ ] If > 3 mocks → consider e2e test instead
+  - [ ] Mocks are simple (return value, not complex behavior)
+
+rule_of_thumb: |
+  Integration tests: Mock external systems (≤ 3)
+  E2E tests: Mock nothing OR use testnet/staging environment
+```
+
+**4. CORRECT_FLOW_LOGIC**
+```yaml
+anti_pattern: "Artificial workflows that don't happen in production"
+detection:
+  - Test sequence doesn't match user flow
+  - Testing edge cases that unit tests should cover
+  - Flow is too simple (single operation)
+
+correct_pattern: "Realistic workflows that mirror production"
+validation:
+  - [ ] Workflow matches production user flow
+  - [ ] Multi-step scenarios (2-4 modules)
+  - [ ] State consistency validated across workflow
+
+example_violation:
+  # ❌ WRONG: Not realistic workflow
+  it('should test random method combination', async () => {
+    await moduleA.methodX();
+    await moduleB.methodY();
+    await moduleA.methodZ();
+    // This sequence never happens in production
+  });
+
+example_correct:
+  # ✅ RIGHT: Realistic production workflow
+  it('should complete user onboarding flow', async () => {
+    // 1. User activates (UserModule)
+    const user = await userModule.activate(invite);
+    
+    // 2. Seller role granted (RoleModule)
+    await roleModule.grantSeller(user.id);
+    
+    // 3. First product created (ProductModule)
+    const product = await productModule.create(user.id, data);
+    
+    // This is the actual production onboarding flow
+  });
+```
+
+**Scoring Formula (Integration-Specific):**
+
+```javascript
+function calculateIntegrationQualityScore(tests) {
+  let score = 10.0;
+  
+  // P0 violations (critical)
+  const unitTestsAtIntegrationLevel = countIsolatedTests(tests);
+  score -= unitTestsAtIntegrationLevel * 2.0; // -2 per violation
+  
+  const mockedOwnModules = countMockedOwnModules(tests);
+  score -= mockedOwnModules * 1.5; // -1.5 per mocked module
+  
+  const overMockedTests = countOverMocked(tests); // > 3 external mocks
+  score -= overMockedTests * 1.0; // -1 per over-mocked test
+  
+  const unrealisticFlows = countUnrealisticFlows(tests);
+  score -= unrealisticFlows * 1.0; // -1 per unrealistic flow
+  
+  return Math.max(0, score);
+}
+```
+
+**Pass Criteria:**
+```yaml
+integration_quality_threshold: "> 8.0/10"
+
+scoring:
+  9.0_to_10.0: "Excellent — production-ready integration tests"
+  8.0_to_8.9: "Good — minor improvements possible"
+  7.0_to_7.9: "Acceptable — fix P0 issues before shipping"
+  below_7.0: "Poor — significant refactoring needed"
+```
+
+**Next Steps:**
+```yaml
+if_score_above_8:
+  action: "✅ Continue to Gate 4 (ROI Analysis)"
+  message: "Integration tests validated for production"
+
+if_score_7_to_8:
+  action: "⚠️ Fix P0 issues, then revalidate"
+  method: "@test-to-success.mdc for systematic fixes"
+
+if_score_below_7:
+  action: "❌ Major refactoring required"
+  recommendations:
+    - "Review minimal mocking strategy (Section 4.1)"
+    - "Ensure real modules loaded, not mocked"
+    - "Validate workflows are production-realistic"
+```
+
+---
+
+### **Gate 4: ROI Analysis (Integration-Specific)**
+
+**Auto-Trigger**: After Gate 3 passes (score > 8/10)  
+**Question**: "Should we add more integration tests OR defer to e2e?"  
+**Method**: ROI framework from @unit-test-build.mdc (adapted)
+
+```yaml
+roi_framework_reference:
+  source: "@unit-test-build.mdc Section 4.4"
+  adaptation: "Integration tests focus on module contracts + flows, NOT full e2e"
+
+integration_specific_decisions:
+  high_roi_additions:
+    - Additional contract validation tests (< 80% coverage)
+    - Critical workflow variants (error scenarios)
+    - Database integration edge cases
+    
+    action: "Add these tests (high value, low cost)"
+  
+  low_roi_additions:
+    - Full e2e user journeys with UI
+    - Performance/load testing
+    - External system integration (real APIs)
+    
+    action: "Defer to @e2e-test-build.mdc OR specialized tools"
+  
+  defer_to_e2e:
+    criteria:
+      - Test requires full UI interaction
+      - Test requires real external services (not mocked)
+      - Test covers entire system (frontend + backend + database + external)
+    
+    rationale: "E2E tests are slower, more brittle — use sparingly for critical paths"
+
+ship_decision:
+  threshold: "Score > 8.5/10 AND all critical contracts validated"
+  
+  if_met:
+    action: "✅ SHIP INTEGRATION TESTS"
+    message: "Production-ready integration test suite"
+  
+  if_not_met:
+    options:
+      - "Add high-ROI tests (if score 8.0-8.5)"
+      - "Fix quality issues (if score < 8.0)"
+      - "Defer complex scenarios to @e2e-test-build.mdc"
+```
+
+**ROI Decision Tree (Integration Tests):**
+```yaml
+proposed_test: "New integration test idea"
+
+question_1: "Does this test module interactions (2+ modules)?"
+  if_no: "❌ Defer to @unit-test-build.mdc (unit test)"
+  if_yes: "→ Continue to question 2"
+
+question_2: "Does this test require real external services (not mocked)?"
+  if_yes: "❌ Defer to @e2e-test-build.mdc OR run on testnet"
+  if_no: "→ Continue to question 3"
+
+question_3: "Does this test cover critical workflow?"
+  if_yes: "✅ HIGH ROI — Add this test"
+  if_no: "→ Continue to question 4"
+
+question_4: "Does this test add unique contract validation?"
+  if_yes: "✅ MEDIUM ROI — Consider adding"
+  if_no: "❌ LOW ROI — Skip or defer"
+```
+
+---
+
+**Quality Gates Summary:**
+
+```yaml
+gate_flow:
+  Gate_1_Contract_Compatibility:
+    trigger: "After Phase 2 (Contract Validation)"
+    threshold: "> 80% contract coverage"
+    next: "Gate 2 OR fix contracts"
+  
+  Gate_2_Flow_Passing:
+    trigger: "After Gate 1 passes"
+    threshold: "100% tests passing"
+    next: "Gate 3 OR @test-to-success"
+  
+  Gate_3_Real_Integration_Validation:
+    trigger: "After Gate 2 passes"
+    method: "@test-qualification.mdc (adapted)"
+    threshold: "Score > 8.0/10"
+    next: "Gate 4 OR refactor"
+  
+  Gate_4_ROI_Analysis:
+    trigger: "After Gate 3 passes"
+    decision: "Ship at 8.5+ OR add high-ROI tests"
+    defer: "E2E tests to @e2e-test-build.mdc"
+
+production_ready_criteria:
+  - [ ] All 4 gates passed
+  - [ ] Score > 8.5/10
+  - [ ] Contract coverage > 80%
+  - [ ] All critical workflows tested
+  - [ ] Minimal mocking validated (< 3 external mocks/test)
+```
+
+---
+
+---
+
+## 📖 SECTION 6: EXAMPLES & TEMPLATES
+
+> **Quick Reference**: Most examples are embedded in previous sections. This section provides references + copy-paste ready templates.
+
+### **6.1 Example Library (References)**
+
+**Contract Validation Examples** (See Section 3, Phase 2):
+- **Module-to-Module**: Lines 577-633 (ContractManager → ArweaveManager)
+- **API Contracts**: Lines 637-692 (POST /deploy → GET /deploy/:id)
+- **Database Schema**: Lines 696-737 (shared deployments table)
+- **Error Propagation**: Lines 741-785 (ArweaveManager error → ContractManager)
+
+**Flow Testing Examples** (See Section 3, Phase 3):
+- **Happy Path**: Lines 823-884 (Deploy → Upload → Validate, 3 modules)
+- **Error Handling**: Lines 888-944 (Deploy OK → Upload FAILS → Cleanup)
+- **Transaction Atomicity**: Lines 948-1005 (Batch operations)
+- **State Consistency**: Lines 1009-1072 (User → Seller → Product)
+
+**API Integration Examples** (See Section 4.3):
+- **Single Route**: Lines 1534-1607 (POST /deploy with real modules)
+- **Multi-Endpoint Flow**: Lines 1611-1685 (Deploy → Status → Metadata)
+- **Auth Flow**: Lines 1689-1768 (Login → Token → Protected)
+- **Error Validation**: Lines 1772-1839 (Consistent error format)
+
+---
+
+### **6.2 Copy-Paste Ready Templates**
+
+**Template 1: Module Integration Test (JavaScript)**
+
+```javascript
+// tests/integration/modules/module-integration.test.js
+const { expect } = require('chai');
+const sinon = require('sinon');
+const sqlite3 = require('sqlite3');
+
+describe('ModuleA ↔ ModuleB Integration', () => {
+  let testDB;
+  let moduleA, moduleB;
+  let mockExternalAPI;
+  
+  beforeEach(async () => {
+    // 1. Setup test database (REAL)
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(`
+      CREATE TABLE entities (
+        id INTEGER PRIMARY KEY,
+        data TEXT NOT NULL
+      );
+    `);
+    
+    // 2. Mock ONLY external APIs
+    mockExternalAPI = sinon.stub(ExternalClient.prototype, 'call')
+      .resolves({ status: 'success' });
+    
+    // 3. Load REAL modules (not mocked)
+    moduleA = new ModuleA(testDB);
+    moduleB = new ModuleB(testDB);
+  });
+  
+  afterEach(async () => {
+    sinon.restore();
+    await testDB.close();
+  });
+  
+  it('should integrate ModuleA → ModuleB', async () => {
+    // GIVEN: ModuleA creates entity
+    const entity = await moduleA.create({ name: 'Test' });
+    expect(entity.id).to.exist;
+    
+    // WHEN: ModuleB processes entity (uses ModuleA output)
+    const result = await moduleB.process(entity.id);
+    
+    // THEN: Integration validated
+    expect(result.status).to.equal('processed');
+    expect(result.entityId).to.equal(entity.id);
+    
+    // VALIDATE: Data persisted correctly
+    const saved = await testDB.get('SELECT * FROM entities WHERE id = ?', entity.id);
+    expect(saved.data).to.contain('processed');
+  });
+});
+```
+
+**Template 1: Module Integration Test (Python)**
+
+```python
+# tests/integration/modules/test_module_integration.py
+import pytest
+import sqlite3
+from unittest.mock import Mock
+
+@pytest.fixture
+def integration_env(mocker):
+    """Setup integration environment"""
+    # 1. Setup test database (REAL)
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript('''
+        CREATE TABLE entities (
+            id INTEGER PRIMARY KEY,
+            data TEXT NOT NULL
+        );
+    ''')
+    
+    # 2. Mock ONLY external APIs
+    mock_external = mocker.patch('external.client.call')
+    mock_external.return_value = {'status': 'success'}
+    
+    # 3. Load REAL modules (not mocked)
+    module_a = ModuleA(test_db)
+    module_b = ModuleB(test_db)
+    
+    yield module_a, module_b, test_db, mock_external
+    
+    test_db.close()
+
+@pytest.mark.asyncio
+async def test_module_integration(integration_env):
+    """ModuleA ↔ ModuleB Integration"""
+    module_a, module_b, test_db, mock_external = integration_env
+    
+    # GIVEN: ModuleA creates entity
+    entity = await module_a.create({'name': 'Test'})
+    assert entity['id'] is not None
+    
+    # WHEN: ModuleB processes entity
+    result = await module_b.process(entity['id'])
+    
+    # THEN: Integration validated
+    assert result['status'] == 'processed'
+    assert result['entity_id'] == entity['id']
+    
+    # VALIDATE: Data persisted correctly
+    cursor = test_db.execute('SELECT * FROM entities WHERE id = ?', (entity['id'],))
+    saved = cursor.fetchone()
+    assert 'processed' in saved[1]  # data column
+```
+
+---
+
+**Template 2: API Integration Test (JavaScript)**
+
+```javascript
+// tests/integration/api/api-integration.test.js
+const request = require('supertest');
+const { expect } = require('chai');
+const app = require('../../../src/api/app');
+const sqlite3 = require('sqlite3');
+
+describe('API Integration Tests', () => {
+  let testDB;
+  
+  before(async () => {
+    // Setup test database
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(testSchema);
+    
+    // Inject test DB into app
+    app.locals.db = testDB;
+  });
+  
+  after(async () => {
+    await testDB.close();
+  });
+  
+  afterEach(async () => {
+    // Cleanup between tests
+    await testDB.query('TRUNCATE TABLE entities CASCADE');
+  });
+  
+  it('should test POST → GET flow', async () => {
+    // WHEN: POST /entities (create)
+    const createResponse = await request(app)
+      .post('/entities')
+      .send({ name: 'Test Entity' })
+      .expect(201);
+    
+    const entityId = createResponse.body.id;
+    expect(entityId).to.exist;
+    
+    // THEN: GET /entities/:id (read)
+    const getResponse = await request(app)
+      .get(`/entities/${entityId}`)
+      .expect(200);
+    
+    expect(getResponse.body.name).to.equal('Test Entity');
+    
+    // VALIDATE: Data persisted in DB
+    const saved = await testDB.get('SELECT * FROM entities WHERE id = ?', entityId);
+    expect(saved.name).to.equal('Test Entity');
+  });
+});
+```
+
+**Template 2: API Integration Test (Python)**
+
+```python
+# tests/integration/api/test_api_integration.py
+import pytest
+from fastapi.testclient import TestClient
+from app.main import app
+import sqlite3
+
+@pytest.fixture
+def api_client():
+    """Test client with real backend"""
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript(test_schema)
+    
+    # Override DB dependency
+    app.dependency_overrides[get_db] = lambda: test_db
+    
+    client = TestClient(app)
+    yield client, test_db
+    
+    test_db.close()
+    app.dependency_overrides.clear()
+
+def test_post_then_get_flow(api_client):
+    """API Integration: POST → GET flow"""
+    client, test_db = api_client
+    
+    # WHEN: POST /entities (create)
+    create_resp = client.post('/entities', json={'name': 'Test Entity'})
+    assert create_resp.status_code == 201
+    entity_id = create_resp.json()['id']
+    
+    # THEN: GET /entities/:id (read)
+    get_resp = client.get(f'/entities/{entity_id}')
+    assert get_resp.status_code == 200
+    assert get_resp.json()['name'] == 'Test Entity'
+    
+    # VALIDATE: Data persisted in DB
+    cursor = test_db.execute('SELECT * FROM entities WHERE id = ?', (entity_id,))
+    saved = cursor.fetchone()
+    assert saved[1] == 'Test Entity'  # name column
+```
+
+---
+
+**Template 3: Database Integration Test (JavaScript)**
+
+```javascript
+// tests/integration/database/db-integration.test.js
+const { expect } = require('chai');
+const sqlite3 = require('sqlite3');
+
+describe('Database Integration Tests', () => {
+  let testDB;
+  let moduleA, moduleB;
+  
+  beforeEach(async () => {
+    // Setup in-memory database (fresh for each test)
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(`
+      CREATE TABLE shared_data (
+        id INTEGER PRIMARY KEY,
+        module_a_field TEXT,
+        module_b_field TEXT
+      );
+    `);
+    
+    // Load modules that share the same DB
+    moduleA = new ModuleA(testDB);
+    moduleB = new ModuleB(testDB);
+  });
+  
+  afterEach(async () => {
+    await testDB.close();
+  });
+  
+  it('should validate database schema compatibility', async () => {
+    // GIVEN: ModuleA writes to shared table
+    const id = await moduleA.createRecord({ data: 'A' });
+    
+    // WHEN: ModuleB reads and updates same record
+    const record = await moduleB.getRecord(id);
+    await moduleB.updateRecord(id, { additionalData: 'B' });
+    
+    // THEN: Schema validated (both modules can access)
+    const final = await testDB.get('SELECT * FROM shared_data WHERE id = ?', id);
+    expect(final.module_a_field).to.equal('A');
+    expect(final.module_b_field).to.equal('B');
+  });
+  
+  it('should validate transaction isolation', async () => {
+    // Begin transaction
+    await testDB.run('BEGIN TRANSACTION');
+    
+    // Create records in transaction
+    const id1 = await moduleA.createRecord({ data: 'Test1' });
+    const id2 = await moduleA.createRecord({ data: 'Test2' });
+    
+    // Rollback
+    await testDB.run('ROLLBACK');
+    
+    // VALIDATE: No data persisted
+    const count = await testDB.get('SELECT COUNT(*) as cnt FROM shared_data');
+    expect(count.cnt).to.equal(0);
+  });
+});
+```
+
+**Template 3: Database Integration Test (Python)**
+
+```python
+# tests/integration/database/test_db_integration.py
+import pytest
+import sqlite3
+
+@pytest.fixture
+def db_integration_env():
+    """Setup database integration environment"""
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript('''
+        CREATE TABLE shared_data (
+            id INTEGER PRIMARY KEY,
+            module_a_field TEXT,
+            module_b_field TEXT
+        );
+    ''')
+    
+    # Load modules that share the same DB
+    module_a = ModuleA(test_db)
+    module_b = ModuleB(test_db)
+    
+    yield module_a, module_b, test_db
+    
+    test_db.close()
+
+async def test_database_schema_compatibility(db_integration_env):
+    """Validate database schema compatibility"""
+    module_a, module_b, test_db = db_integration_env
+    
+    # GIVEN: ModuleA writes to shared table
+    record_id = await module_a.create_record({'data': 'A'})
+    
+    # WHEN: ModuleB reads and updates same record
+    record = await module_b.get_record(record_id)
+    await module_b.update_record(record_id, {'additional_data': 'B'})
+    
+    # THEN: Schema validated
+    cursor = test_db.execute('SELECT * FROM shared_data WHERE id = ?', (record_id,))
+    final = cursor.fetchone()
+    assert final[1] == 'A'  # module_a_field
+    assert final[2] == 'B'  # module_b_field
+
+async def test_transaction_isolation(db_integration_env):
+    """Validate transaction isolation"""
+    module_a, module_b, test_db = db_integration_env
+    
+    # Begin transaction
+    test_db.execute('BEGIN TRANSACTION')
+    
+    # Create records in transaction
+    id1 = await module_a.create_record({'data': 'Test1'})
+    id2 = await module_a.create_record({'data': 'Test2'})
+    
+    # Rollback
+    test_db.execute('ROLLBACK')
+    
+    # VALIDATE: No data persisted
+    cursor = test_db.execute('SELECT COUNT(*) FROM shared_data')
+    count = cursor.fetchone()[0]
+    assert count == 0
+```
+
+### **6.3 Integration-Specific Anti-Patterns**
+
+> **Critical**: These anti-patterns are unique to integration testing. Different from unit test anti-patterns.
+
+---
+
+**Anti-Pattern 1: Unit Tests at Integration Level**
+
+**Symptom**: Testing isolated module methods in integration test suite  
+**Detection**: Single module loaded, no module interaction, testing internal logic
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ This is a UNIT test disguised as integration test
+describe('Integration: ContractManager', () => {
+  it('should validate invite code format', async () => {
+    const contractManager = new ContractManager();
+    
+    // Testing INTERNAL method (no other modules involved)
+    const valid = contractManager._validateInviteCode('ABC123');
+    expect(valid).to.be.true;
+    
+    // This is unit test behavior, not integration!
+  });
+});
+```
+
+**Python:**
+```python
+# ❌ This is a UNIT test disguised as integration test
+class TestContractManagerIntegration:
+    def test_validate_invite_code_format(self):
+        contract_mgr = ContractManager()
+        
+        # Testing INTERNAL method (no other modules involved)
+        valid = contract_mgr._validate_invite_code('ABC123')
+        assert valid is True
+        
+        # This is unit test behavior, not integration!
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ INTEGRATION test: 2+ modules working together
+describe('Integration: InviteModule ↔ UserModule', () => {
+  let inviteModule, userModule, testDB;
+  
+  beforeEach(async () => {
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(testSchema);
+    
+    // Load REAL modules (2+ modules)
+    inviteModule = new InviteModule(testDB);
+    userModule = new UserModule(testDB);
+  });
+  
+  it('should activate user with valid invite (2 modules)', async () => {
+    // GIVEN: InviteModule creates invite
+    const invite = await inviteModule.create('ABC123');
+    
+    // WHEN: UserModule activates with invite (uses InviteModule output)
+    const user = await userModule.activateWithInvite('ABC123');
+    
+    // THEN: Integration validated (modules interacted)
+    expect(user.activated).to.be.true;
+    expect(user.inviteUsed).to.equal(invite.id);
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ INTEGRATION test: 2+ modules working together
+@pytest.fixture
+def integration_modules(test_db):
+    invite_module = InviteModule(test_db)
+    user_module = UserModule(test_db)
+    return invite_module, user_module
+
+async def test_user_activation_with_invite(integration_modules, test_db):
+    """Integration: InviteModule ↔ UserModule"""
+    invite_module, user_module = integration_modules
+    
+    # GIVEN: InviteModule creates invite
+    invite = await invite_module.create('ABC123')
+    
+    # WHEN: UserModule activates with invite
+    user = await user_module.activate_with_invite('ABC123')
+    
+    # THEN: Integration validated
+    assert user['activated'] is True
+    assert user['invite_used'] == invite['id']
+```
+
+**Fix**: Move isolated method tests to `tests/unit/`, keep only multi-module interactions in `tests/integration/`
+
+---
+
+**Anti-Pattern 2: Over-Mocking Your Own Modules**
+
+**Symptom**: Mocking internal modules (your own code) instead of external APIs  
+**Detection**: > 2 mocked internal modules, no real module interaction
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ Mocking YOUR OWN modules defeats integration purpose
+describe('Integration: Deployment Flow', () => {
+  it('should deploy and upload', async () => {
+    // ❌ Mocking ContractManager (YOUR module!)
+    const mockContractManager = sinon.stub(ContractManager.prototype, 'deploy')
+      .resolves({ proxy: '0xFakeProxy', logic: '0xFakeLogic' });
+    
+    // ❌ Mocking ArweaveManager (YOUR module!)
+    const mockArweaveManager = sinon.stub(ArweaveManager.prototype, 'upload')
+      .resolves('fake-cid-123');
+    
+    // Calling mocked methods (NOT integration — modules never interact!)
+    const deployment = await mockContractManager.deploy('Test');
+    const cid = await mockArweaveManager.upload(deployment);
+    
+    expect(cid).to.equal('fake-cid-123');
+    // This proves nothing about real integration!
+  });
+});
+```
+
+**Python:**
+```python
+# ❌ Mocking YOUR OWN modules defeats integration purpose
+def test_deployment_flow_wrong(mocker):
+    # ❌ Mocking ContractManager (YOUR module!)
+    mock_contract = mocker.patch('app.ContractManager.deploy')
+    mock_contract.return_value = {'proxy': '0xFakeProxy', 'logic': '0xFakeLogic'}
+    
+    # ❌ Mocking ArweaveManager (YOUR module!)
+    mock_arweave = mocker.patch('app.ArweaveManager.upload')
+    mock_arweave.return_value = 'fake-cid-123'
+    
+    # Calling mocked methods (NOT integration!)
+    deployment = mock_contract.deploy('Test')
+    cid = mock_arweave.upload(deployment)
+    
+    assert cid == 'fake-cid-123'
+    # This proves nothing about real integration!
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ Use REAL modules, mock only external APIs
+describe('Integration: Deployment Flow', () => {
+  let contractManager, arweaveManager, testDB;
+  let mockArweaveAPI; // Mock EXTERNAL API only
+  
+  beforeEach(async () => {
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(testSchema);
+    
+    // Mock ONLY external Arweave API (not your modules!)
+    mockArweaveAPI = sinon.stub(ArweaveClient.prototype, 'post')
+      .resolves({ id: 'tx-123', status: 'confirmed' });
+    
+    // Use REAL modules (YOUR code)
+    contractManager = new ContractManager(testDB);
+    arweaveManager = new ArweaveManager(); // Uses mocked API internally
+  });
+  
+  afterEach(() => sinon.restore());
+  
+  it('should deploy and upload (real modules)', async () => {
+    // REAL ContractManager deploys
+    const deployment = await contractManager.deploy('TestContract');
+    expect(deployment.proxy).to.match(/^0x[a-fA-F0-9]{40}$/);
+    
+    // REAL ArweaveManager uploads (real logic, mocked external API)
+    const metadata = { contractAddress: deployment.proxy };
+    const cid = await arweaveManager.uploadMetadata(metadata);
+    
+    // Integration validated: Real modules worked together
+    expect(cid).to.exist;
+    expect(mockArweaveAPI.calledOnce).to.be.true; // External API called
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ Use REAL modules, mock only external APIs
+@pytest.fixture
+def integration_env(mocker):
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript(test_schema)
+    
+    # Mock ONLY external Arweave API
+    mock_api = mocker.patch('arweave.api.ArweaveClient.post')
+    mock_api.return_value = {'id': 'tx-123', 'status': 'confirmed'}
+    
+    # Use REAL modules
+    contract_mgr = ContractManager(test_db)
+    arweave_mgr = ArweaveManager()
+    
+    yield contract_mgr, arweave_mgr, test_db, mock_api
+    test_db.close()
+
+async def test_deployment_flow_correct(integration_env):
+    """Integration: Real modules working together"""
+    contract_mgr, arweave_mgr, test_db, mock_api = integration_env
+    
+    # REAL ContractManager deploys
+    deployment = await contract_mgr.deploy('TestContract')
+    assert re.match(r'^0x[a-fA-F0-9]{40}$', deployment['proxy'])
+    
+    # REAL ArweaveManager uploads
+    metadata = {'contract_address': deployment['proxy']}
+    cid = await arweave_mgr.upload_metadata(metadata)
+    
+    # Integration validated
+    assert cid is not None
+    assert mock_api.call_count == 1  # External API called
+```
+
+**Fix**: Use real instances of YOUR modules, mock only external systems (APIs, services)
+
+---
+
+**Anti-Pattern 3: Missing Database Cleanup (Test Pollution)**
+
+**Symptom**: Tests pass individually but fail when run together; different results in different order  
+**Detection**: Test suite results depend on execution order
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ No cleanup — tests pollute each other
+describe('Integration: User Management', () => {
+  let testDB, userModule;
+  
+  before(async () => {
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(testSchema);
+    userModule = new UserModule(testDB);
+  });
+  
+  // ❌ NO afterEach cleanup!
+  
+  it('should create user with ID 1', async () => {
+    const user = await userModule.create({ name: 'Alice' });
+    expect(user.id).to.equal(1); // Passes first time
+  });
+  
+  it('should create user with ID 1', async () => {
+    const user = await userModule.create({ name: 'Bob' });
+    expect(user.id).to.equal(1); // ❌ FAILS! ID is 2 (Alice already exists)
+  });
+});
+```
+
+**Python:**
+```python
+# ❌ No cleanup — tests pollute each other
+@pytest.fixture(scope='module')  # ❌ scope='module' = shared state!
+def user_module():
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript(test_schema)
+    return UserModule(test_db)
+
+def test_create_user_id_1(user_module):
+    user = user_module.create({'name': 'Alice'})
+    assert user['id'] == 1  # Passes first time
+
+def test_create_user_id_1_again(user_module):
+    user = user_module.create({'name': 'Bob'})
+    assert user['id'] == 1  # ❌ FAILS! ID is 2
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ Proper cleanup: transaction rollback OR truncate
+describe('Integration: User Management', () => {
+  let testDB, userModule;
+  
+  beforeEach(async () => {
+    testDB = new sqlite3.Database(':memory:');
+    await testDB.exec(testSchema);
+    userModule = new UserModule(testDB);
+  });
+  
+  afterEach(async () => {
+    // OPTION 1: Close and recreate (in-memory)
+    await testDB.close();
+    
+    // OPTION 2: Truncate tables (persistent DB)
+    // await testDB.query('TRUNCATE TABLE users CASCADE');
+    
+    // OPTION 3: Transaction rollback (if using transactions)
+    // await testDB.query('ROLLBACK');
+  });
+  
+  it('should create user with ID 1', async () => {
+    const user = await userModule.create({ name: 'Alice' });
+    expect(user.id).to.equal(1); // ✅ Always passes
+  });
+  
+  it('should create user with ID 1 (isolated)', async () => {
+    const user = await userModule.create({ name: 'Bob' });
+    expect(user.id).to.equal(1); // ✅ Always passes (fresh DB)
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ Proper cleanup: fresh DB for each test
+@pytest.fixture  # ✅ scope='function' (default) = fresh for each test
+def user_module():
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript(test_schema)
+    
+    yield UserModule(test_db)
+    
+    # Cleanup
+    test_db.close()
+
+def test_create_user_id_1(user_module):
+    user = user_module.create({'name': 'Alice'})
+    assert user['id'] == 1  # ✅ Always passes
+
+def test_create_user_id_1_isolated(user_module):
+    user = user_module.create({'name': 'Bob'})
+    assert user['id'] == 1  # ✅ Always passes (fresh DB)
+
+# OPTION 2: Transaction-based cleanup
+@pytest.fixture
+def user_module_with_transaction():
+    test_db = sqlite3.connect(':memory:')
+    test_db.executescript(test_schema)
+    test_db.execute('BEGIN TRANSACTION')
+    
+    yield UserModule(test_db)
+    
+    # Rollback transaction (cleanup)
+    test_db.execute('ROLLBACK')
+    test_db.close()
+```
+
+**Fix**: Use `beforeEach` (not `before`), add cleanup in `afterEach` (truncate, rollback, or fresh DB)
+
+---
+
+## 📖 SECTION 7: REFERENCE (Quick Reference + Definition of Done)
+
+### **7.1 Quick Reference: Integration vs Unit vs E2E**
+
+| Aspect | Unit Tests | Integration Tests | E2E Tests |
+|--------|------------|-------------------|-----------|
+| **Scope** | Single module | 2-4 modules | Entire system |
+| **Dependencies** | Mocked (heavy) | Real modules + mocked external | Real everything |
+| **Database** | Mocked or none | Test DB (in-memory/Docker) | Test/staging DB |
+| **Speed** | ⚡⚡⚡ Very fast (< 1s) | ⚡⚡ Fast (1-10s) | ⚡ Slow (10s-minutes) |
+| **Isolation** | ✅ Perfect | ✅ High (test DB) | ⚠️ Shared state risks |
+| **Focus** | Method behavior | Module contracts | User journeys |
+| **Execution** | Every commit | Every PR | Nightly/deploy |
+| **Rule** | @unit-test-build.mdc | @integration-test-build.mdc | @e2e-test-build.mdc (future) |
+
+---
+
+### **7.2 Definition of Done (Integration Tests)**
+
+```yaml
+production_ready_checklist:
+  infrastructure:
+    - [ ] tests/integration/ directory created
+    - [ ] Test runner configured (Mocha/pytest)
+    - [ ] Test DB strategy selected (in-memory/Docker)
+    - [ ] NPM scripts: test:integration, test:integration:parallel, test:integration:coverage
+  
+  phases_complete:
+    - [ ] Phase 1: Infrastructure setup (multi-module harness)
+    - [ ] Phase 2: Contract validation (> 80% coverage)
+    - [ ] Phase 3: Flow testing (> 70% critical workflows)
+  
+  quality_gates_passed:
+    - [ ] Gate 1: Contract Compatibility (> 80% contract coverage)
+    - [ ] Gate 2: Flow Passing (100% tests passing)
+    - [ ] Gate 3: Real Integration Validation (score > 8.0/10)
+    - [ ] Gate 4: ROI Analysis (ship at 8.5+/10)
+  
+  integration_criteria:
+    - [ ] All tests load 2+ real modules (not mocked)
+    - [ ] External mocks ≤ 3 per test
+    - [ ] Real database used (in-memory or Docker)
+    - [ ] Workflows are production-realistic
+    - [ ] Execution time < 5 minutes
+  
+  documentation:
+    - [ ] Integration test patterns documented
+    - [ ] Setup/teardown patterns clear
+    - [ ] Contract validation examples provided
+  
+  ci_cd_ready:
+    - [ ] Tests run in CI/CD pipeline
+    - [ ] Parallel execution configured
+    - [ ] Coverage reporting enabled
+    - [ ] Failure notifications configured
+
+ship_criteria:
+  minimum: "Score > 8.0/10 AND all P0 criteria met"
+  recommended: "Score > 8.5/10 AND contract coverage > 80%"
+  excellent: "Score > 9.0/10 AND flow coverage > 80%"
+```
+
+---
+
+### **7.3 Integration with Other Rules**
+
+```yaml
+upstream_rules:
+  - "@run-task.mdc": Orchestrates ItemY execution within phases
+  - "@analysis.mdc": Can be used for complex integration planning
+  - "@unit-test-build.mdc": Unit tests should pass before integration
+
+downstream_rules:
+  - "@test-qualification.mdc": Validates integration test quality (Gate 3)
+  - "@test-to-success.mdc": Fixes failing integration tests
+  - "@e2e-test-build.mdc": E2E tests validate full user journeys (deferred from Gate 4)
+
+parallel_rules:
+  - "@meta.extract.mdc": Can extract integration testing patterns
+  - "@meta.gap.mdc": Can identify gaps in integration coverage
+```
+
+---
+
+### **7.4 Troubleshooting (Common Issues)**
+
+**Issue 1: Tests Pass Locally, Fail in CI**
+- **Symptom**: Integration tests work on dev machine, fail in CI/CD
+- **Cause**: Environment differences (DB, external services)
+- **Fix**: Use Docker containers (Testcontainers) for consistent environment
+
+**Issue 2: Flaky Integration Tests**
+- **Symptom**: Tests intermittently fail
+- **Cause**: Race conditions, shared state, timing issues
+- **Fix**: 
+  - Ensure test isolation (independent tests)
+  - Use transaction rollback for DB cleanup
+  - Add explicit waits for async operations
+
+**Issue 3: Slow Integration Tests**
+- **Symptom**: Tests take > 5 minutes
+- **Cause**: Too many modules, slow DB, not parallelized
+- **Fix**:
+  - Run tests in parallel (`--parallel` flag)
+  - Use in-memory DB for speed
+  - Defer slow workflows to E2E tests
+
+**Issue 4: Contract Mismatches**
+- **Symptom**: Module A output doesn't match Module B input
+- **Cause**: API changes, schema drift
+- **Fix**:
+  - Add contract validation tests (Phase 2)
+  - Use TypeScript interfaces for contracts
+  - Document contract expectations
+
+**Issue 5: Over-Mocking (Disguised Unit Tests)**
+- **Symptom**: Gate 3 score < 8.0 due to mocking violations
+- **Cause**: Mocking your own modules instead of external systems
+- **Fix**:
+  - Review minimal mocking strategy (Section 4.1)
+  - Load real module instances
+  - Mock only external APIs (< 3 per test)
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025-10-15  
+**Status**: ✅ Production Ready  
+**Lines**: 3210 (comprehensive integration testing methodology)
+
+**Compatibility**:
+- **Languages**: JavaScript (Node.js) + Python 3.8+
+- **Frameworks**: 
+  - JavaScript: Mocha, Jest, Supertest, Testcontainers
+  - Python: pytest, httpx, pytest-docker, pytest-asyncio
+- **Databases**: SQLite (in-memory), PostgreSQL (Docker), MySQL (Docker)
+
+**Related Rules**:
+- **@unit-test-build.mdc**: Unit tests (prerequisite, shares framework)
+- **@test-qualification.mdc**: Quality validation (auto-triggered at Gate 3, adapted for integration)
+- **@test-to-success.mdc**: Systematic fixing of failing tests (auto-triggered at Gate 2 if needed)
+- **@run-task.mdc**: Optional orchestration for ItemY execution
+- **@e2e-test-build.mdc**: E2E tests (future, for scenarios deferred from Gate 4)
+
+**Changelog**:
+
+**v1.0** (2025-10-15) — Production Release
+- ✅ **Foundation**: Quick Start (60 lines) + Core Principles (9 principles: 5 universal + 4 integration-specific)
+- ✅ **Phases**: 3 specialized phases (Infrastructure, Contract Validation, Flow Testing)
+- ✅ **Patterns**: Minimal Mocking (philosophy + decision tree), 3 DB strategies, 4 API patterns
+- ✅ **Quality Gates**: 4-gate framework adapted for integration (Contract Compatibility, Flow Passing, Real Integration Validation, ROI Analysis)
+- ✅ **Examples**: 44 code examples (22 JS + 22 Python), 6 copy-paste ready templates
+- ✅ **Anti-Patterns**: 3 integration-specific anti-patterns with BEFORE/AFTER examples
+- ✅ **Documentation**: Quick Reference table, Definition of Done, Troubleshooting (5 issues)
+- ✅ **Language Support**: Full parity for JavaScript + Python (dual examples for all patterns)
+- ✅ **DRY Compliance**: Smart references to @unit-test-build for shared framework (~15% size reduction)
+- ✅ **Production Ready**: Comprehensive, tested methodology ready for immediate use
+
+**Development Notes**:
+- Created from @unit-test-build.mdc analysis (60% functional differences, 40% overlap)
+- Integration focus: Module contracts + multi-step flows (NOT isolated methods or full e2e)
+- Minimal mocking strategy (opposite of unit testing): Mock only external systems
+- Database-aware testing (3 strategies: in-memory, Docker, dedicated)
+- Skip beta — ship production-ready v1.0
+
+**Metrics**:
+- Total sections: 7 (Quick Start → Reference)
+- Code examples: 44 (dual language)
+- Patterns documented: 16 (contract, flow, mocking, DB, API)
+- Quality gates: 4 (adapted for integration level)
+- Test file templates: 6 (3 types × 2 languages)
+- Lines: 3210 (40% larger than unit-test-build due to unique integration content)
