@@ -1,0 +1,2287 @@
+---
+alwaysApply: false
+description: "Universal methodology for building production-ready unit test suites with progressive quality gates"
+---
+
+# @unit-test-build: Progressive Unit Test Development
+
+> **Purpose**: Guide AI through systematic unit test development with built-in quality gates and cognitive mode switching to prevent false successes and perfectionism
+
+---
+
+## ⚡ QUICK START
+
+### Scope & Boundaries
+
+**This rule covers:**
+- ✅ Unit tests (isolated module testing with mocks)
+- ✅ JavaScript: Mocha, Jest, Sinon, NYC
+- ✅ Python: pytest, unittest.mock, pytest-cov
+- ✅ Progressive development (Infrastructure → Smoke → Real → Strategic)
+
+**This rule does NOT cover (use other rules):**
+- ❌ Integration tests (multiple modules) → @integration-test-build.mdc (future)
+- ❌ E2E tests (full user flows) → @e2e-test-build.mdc (future)
+- ❌ Smart contract tests (Hardhat, Foundry) → Use framework-native testing
+- ❌ Performance/Load tests → Use specialized tools (k6, JMeter)
+
+---
+
+### When to Use
+- **NEW**: No tests exist → Full cycle (Infrastructure → Smoke → Real → Strategic)
+- **EXTEND**: Tests exist (score > 8) → Add tests for new features
+- **REFACTOR**: Tests exist (score < 8) → Improve quality to production-ready
+
+### Default Execution Flow
+```
+Phase 1: Infrastructure (1-2h) → Test runner, mocks, helpers
+    ↓
+Phase 2.1: Smoke Tests (2-4h) → Existence checks, 60-100 tests, 100% passing
+    ↓
+Gate 3: Quality Analysis → Auto-trigger @test-qualification.mdc
+    ↓
+Phase 2.2: Real Tests (6-10h) → Validate functionality, score > 8/10
+    ↓
+Gate 4: ROI Analysis → High-ROI improvements only
+    ↓
+Phase 2.3: Strategic (0.5-1h) → Optional enhancements OR DONE
+    ↓
+Production Ready (8.5+/10)
+```
+
+### Start Immediately
+```
+"Execute Phase 1 using @unit-test-build.mdc method"
+
+AI will automatically:
+✓ Detect scenario (NEW/EXTEND/REFACTOR)
+✓ Generate ItemY structure for each phase
+✓ Auto-trigger quality gates at checkpoints
+✓ Apply ROI framework for strategic decisions
+✓ Guide to production-ready state (8.5+/10)
+```
+
+### Success Threshold
+```yaml
+production_ready:
+  score: "> 8.5/10 (@test-qualification)"
+  critical_coverage: "> 85%"
+  all_tests_passing: "100%"
+  execution_time: "< 90 seconds"
+  
+ship_decision: "Achieved 8.5+/10 → SHIP, defer rest to integration/e2e"
+```
+
+---
+
+## 📚 DETAILED SECTIONS
+
+### Section 1: Core Principles
+### Section 2: Context Detection & Scenarios (Advanced)
+### Section 3: Phases (Detailed Execution)
+### Section 4: Quality Gates (Auto-Triggered)
+### Section 5: Cognitive Modes & Anti-Patterns
+### Section 6: Quality Criteria & Templates
+### Section 7: Reference (Metrics, Integration, DoD)
+
+---
+
+## 🎯 CORE PRINCIPLES
+
+### 1. **Progressive Complexity Over Big Bang**
+```yaml
+anti_pattern: Write all tests at once, hope for quality
+success_pattern: Incremental quality improvement through phases
+
+implementation:
+  phase_1: Infrastructure → enables testing
+  phase_2_1: Smoke tests → validates structure, identifies gaps
+  phase_2_2: Real tests → validates actual functionality
+  phase_2_3: Strategic → optimizes ROI, defers low-value tests
+
+key_rule: Each phase builds on previous, never skip phases
+```
+
+### 2. **Quality Gates Over Quantity Metrics**
+```yaml 
+anti_pattern: "100 tests passing = success"
+success_pattern: "Critical paths validated = production ready"
+
+implementation:
+  gate_1: Existence - do tests exist for all modules?
+  gate_2: Passing - do all tests execute without errors?
+  gate_3: Validation - do tests check REAL functionality? (critical)
+  gate_4: Strategic - are remaining gaps worth fixing at unit level?
+
+key_rule: Auto-triggered gates ensure quality at each phase transition
+```
+
+### 3. **Test Level Appropriateness Over Test All Things**
+```yaml
+anti_pattern: Everything at unit level
+success_pattern: Right test at right level (unit/integration/e2e)
+
+implementation:
+  unit: Isolated module logic, heavy mocking
+  integration: Module interactions, minimal mocking
+  e2e: Full user flows, no mocking
+
+key_rule: If test requires multiple real modules → defer to integration
+```
+
+### 4. **ROI-Driven Over Perfectionism**
+```yaml
+anti_pattern: "Not 100% = not done"
+success_pattern: "8.5/10 + strategic gaps = ship it"
+
+implementation:
+  threshold: "8.5/10 quality score = production ready for unit tests"
+  diminishing_returns: "8.5 → 9.0 might cost 4+ hours for minimal gain"
+  decision_framework: "ROI analysis in Gate 4 (time vs value vs risk)"
+
+key_rule: Perfectionism is a bug, not a feature - ship strategically
+```
+
+### 5. **Evidence-Based Decisions Over Gut Feelings**
+```yaml
+anti_pattern: "This feels like enough tests"
+success_pattern: "Decisions backed by concrete metrics and criteria"
+
+implementation:
+  metrics: Quality score (6.5 → 8.5), coverage %, critical path count
+  criteria: @test-qualification P0/P1/P2 framework
+  calculations: ROI ratio (time vs value), test level analysis
+  no_assumptions: Every decision has measurable justification
+
+key_rule: No gut feelings, no blind best practices - only data-driven decisions
+```
+
+---
+
+## 📖 SECTION 2: CONTEXT DETECTION & SCENARIOS (Advanced)
+
+> **Self-Orchestrating**: Rule automatically detects context and selects appropriate execution path
+
+### **Detection Logic**
+
+```yaml
+step_1_check_infrastructure:
+  question: "Does tests/ directory exist with test runner configured?"
+  if_no: → SCENARIO: NEW (Full cycle)
+  if_yes: → Continue to step 2
+
+step_2_check_existing_tests:
+  question: "Do tests exist for affected modules?"
+  if_no: → SCENARIO: NEW (Create test files)
+  if_yes: → Continue to step 3
+
+step_3_check_quality:
+  question: "What is quality score of existing tests?"
+  method: "Apply @test-qualification.mdc"
+  if_score_below_6: → SCENARIO: REFACTOR (Quality improvement)
+  if_score_6_to_8: → SCENARIO: EXTEND + IMPROVE
+  if_score_above_8: → SCENARIO: EXTEND (Targeted additions)
+```
+
+### **Scenarios**
+
+**Scenario A: NEW** — No tests exist → Full cycle (Phases 1, 2.1, 2.2, 2.3)  
+**Duration**: 8-14 hours | **Output**: Production-ready test suite from scratch
+
+**Scenario B: EXTEND** — Tests exist (score > 8) → Add tests for new features (Targeted 2.1 + 2.2)  
+**Duration**: 2-4 hours | **Output**: Extended coverage maintaining quality
+
+**Scenario C: REFACTOR** — Tests exist (score < 8) → Improve quality (Phases 2.2, 2.3)  
+**Duration**: 4-8 hours | **Output**: Improved to production-ready (score > 8/10)
+
+
+---
+
+## 🎯 SELF-ORCHESTRATION FRAMEWORK
+
+> **Built-in @run-task pattern**: No need for separate orchestration rule
+
+### **How It Works**
+
+```yaml
+single_rule_execution:
+  input: "@unit-test-build.mdc + task description"
+  
+  automatic_steps:
+    1. Context Detection → Determine scenario
+    2. ItemY Generation → Create phase-specific tasks
+    3. Progressive Execution → Run ItemY1 → ItemY2 → ... → Done
+    4. Quality Gates → Auto-trigger @test-qualification
+    5. ROI Analysis → Filter Phase 2.3 recommendations
+    6. Anti-pattern Detection → Continuous monitoring
+  
+  output: "Production-ready tests without additional orchestration"
+```
+
+### **ItemY Structure (Per Phase)**
+
+Each Phase = ListX with ItemY tasks following @run-task pattern:
+
+```yaml
+ItemY_Template:
+  understanding:
+    sub_rule: "@itemy-understanding.mdc (optional)"
+    actions:
+    - Analyze current state
+    - Identify what needs testing
+    - Check existing patterns
+  
+  knowledge_check:
+    sub_rule: "@itemy-knowledge-check.mdc (optional)"
+    actions:
+    - Review best practices
+    - Check integration requirements
+    - Identify critical paths
+  
+  acceptance_criteria:
+    sub_rule: "@itemy-acceptance.mdc (optional)"
+    actions:
+    - [ ] Specific, measurable criteria per phase
+    - [ ] Built-in quality thresholds
+    - [ ] Production-ready definitions
+  
+  planning:
+    sub_rule: "@itemy-planning.mdc (optional)"
+    actions:
+    - Break down into concrete steps
+    - Identify dependencies
+    - Estimate complexity
+  
+  implementation:
+    sub_rule: "@itemy-execution.mdc (optional)"
+    actions:
+    - Execute step-by-step
+    - Apply phase-specific patterns
+    - Use built-in templates
+  
+  validation:
+    sub_rule: "@itemy-validation.mdc (optional)"
+    actions:
+    - Run tests
+    - Check acceptance criteria
+    - Trigger quality gates if needed
+  
+  retrospective:
+    sub_rule: "@itemy-retrospective.mdc (optional)"
+    actions:
+    - Document learnings
+    - Identify improvements
+    - Update for next ItemY
+
+execution_note: |
+  AI can execute each step using embedded logic OR delegate to @itemy-*.mdc sub-rules.
+  Recommendation: Use sub-rules for complex phases (Phase 2.2), embedded for simple (Phase 1).
+```
+
+### **Phase-to-ItemY Mapping**
+
+```yaml
+Phase_1_Infrastructure:
+  itemY1:
+    name: "Setup Test Infrastructure"
+    understanding: "Analyze project, identify modules"
+    knowledge: "Test runner, mocks, helpers patterns"
+    acceptance:
+      - [ ] Test runner configured
+      - [ ] Helpers created
+      - [ ] 2-3 proof tests passing
+    execution: "Create structure, setup tools, write proof tests"
+    validation: "npm run test:unit works"
+    retrospective: "Document setup, note issues"
+
+Phase_2_1_Smoke:
+  itemY2:
+    name: "Create Smoke Tests"
+    understanding: "List all public methods per module"
+    knowledge: "Existence check patterns, GIVEN-WHEN-THEN"
+    acceptance:
+      - [ ] All modules have test files
+      - [ ] 60-100 tests total
+      - [ ] 100% passing
+      - [ ] < 5 seconds execution
+    execution: "Generate existence tests for all methods"
+    validation: "All tests passing, coverage breadth achieved"
+    retrospective: "Identify which methods are critical"
+
+Phase_2_2_Real:
+  itemY3:
+    name: "Quality Gate 3 Analysis"
+    understanding: "Current test quality state"
+    knowledge: "@test-qualification criteria"
+    acceptance:
+      - [ ] Score calculated
+      - [ ] Gaps identified
+      - [ ] P0 priorities clear
+    execution: "Run @test-qualification.mdc"
+    validation: "Analysis complete, decision documented"
+    retrospective: "Plan Phase 2.2 approach"
+  
+  itemY4_per_module:
+    name: "Real Tests for [Module]"
+    understanding: "Critical paths in module"
+    knowledge: "Real behavior validation patterns"
+    acceptance:
+      - [ ] Critical methods have real tests
+      - [ ] NO_FALSE_SUCCESSES passed
+      - [ ] Module score > 8/10
+    execution: "Transform smoke → real, add critical path tests"
+    validation: "Module tests validate real functionality"
+    retrospective: "Note patterns for next module"
+
+Phase_2_3_Strategic:
+  itemY_final:
+    name: "Strategic Enhancements"
+    understanding: "Remaining gaps vs ROI"
+    knowledge: "ROI framework, test level appropriateness"
+    acceptance:
+      - [ ] High-ROI tests implemented
+      - [ ] Low-ROI deferred
+      - [ ] Overall score > 8.5/10
+      - [ ] Production ready
+    execution: "Implement high-ROI only, document deferred"
+    validation: "Final quality check, anti-patterns avoided"
+    retrospective: "Document for integration/e2e phase"
+```
+
+---
+
+## 📖 SECTION 3: PHASED DEVELOPMENT PROCESS (Detailed)
+
+### **Phase 1: Infrastructure Setup**
+**Goal**: Enable test writing
+**Duration**: 1-2 hours
+**Cognitive Mode**: EXECUTION
+
+```yaml
+deliverables:
+  - Test directory structure (tests/unit/)
+  - Test runner configuration (framework-specific)
+  - Mock frameworks
+  - Test helpers and utilities
+  - Fixtures and test data
+  - Test execution scripts (parallel + coverage)
+  - Code coverage configuration
+
+validation:
+  - [ ] Can run tests with single command
+  - [ ] Tests pass with parallel execution flag (parallel-safe)
+  - [ ] Test harness works
+  - [ ] 2-3 proof-of-concept tests pass
+  - [ ] Coverage report generates successfully
+```
+
+**Framework Examples:**
+
+**JavaScript (Mocha + Sinon + NYC):**
+```json
+// package.json scripts
+{
+  "test:unit": "mocha 'tests/unit/**/*.test.js'",
+  "test:unit:parallel": "mocha --parallel 'tests/unit/**/*.test.js'",
+  "test:coverage": "nyc mocha 'tests/unit/**/*.test.js'"
+}
+
+// .nycrc.json (coverage config)
+{
+  "all": true,
+  "include": ["scripts/**/*.js"],
+  "exclude": ["tests/**"],
+  "reporter": ["text", "html", "lcov"],
+  "check-coverage": true,
+  "lines": 80,
+  "branches": 70
+}
+```
+
+**Python (pytest + pytest-cov + unittest.mock):**
+```ini
+# pytest.ini
+[pytest]
+testpaths = tests/unit
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = -v --strict-markers
+
+# With parallel
+addopts = -v --strict-markers -n auto
+
+# With coverage
+addopts = -v --cov=src --cov-report=html --cov-report=term --cov-fail-under=80
+```
+
+```bash
+# Setup commands
+pip install pytest pytest-cov pytest-xdist pytest-mock
+
+# Run commands
+pytest tests/unit/                    # Basic
+pytest tests/unit/ -n auto            # Parallel
+pytest tests/unit/ --cov=src          # Coverage
+```
+
+---
+
+### **Mocking Strategy Guide**
+
+**What to Mock:**
+```yaml
+mock_these:
+  - I/O operations: File system (fs), network (HTTP/HTTPS)
+  - External services: Web3 provider, Arweave client, external APIs
+  - Time-dependent: Date.now(), setTimeout, setInterval
+  - Random values: Math.random(), crypto.randomBytes()
+  - System calls: Process.env, child_process
+
+rationale: "Unreliable, slow, or non-deterministic in tests"
+```
+
+**What NOT to Mock:**
+```yaml
+dont_mock_these:
+  - Your own modules: Use real instances for isolation testing
+  - Simple data structures: Plain objects, arrays
+  - Pure functions: Deterministic, no side effects
+  - Constants: Configuration values, enums
+
+rationale: "Unit tests validate YOUR code, not mocks"
+```
+
+**How to Mock (Framework-Specific Patterns):**
+
+**JavaScript (Sinon):**
+```javascript
+// Pattern 1: Stub (control return value)
+const uploadStub = sinon.stub(arweaveClient, 'upload')
+  .resolves('fake-cid-123');
+
+// Pattern 2: Spy (track calls, real implementation)
+const logSpy = sinon.spy(console, 'log');
+expect(logSpy.calledWith('message')).to.be.true;
+
+// Pattern 3: Mock (complex expectations)
+const web3Mock = sinon.mock(web3Provider);
+web3Mock.expects('sendTransaction').once().withArgs({...});
+
+// Pattern 4: Fake (in-memory replacement)
+class FakeArweaveClient {
+  async upload(data) { return 'fake-cid'; }
+}
+
+// Cleanup (Critical)
+afterEach(() => {
+  sinon.restore(); // Restores ALL stubs/spies/mocks
+});
+```
+
+**Python (unittest.mock / pytest-mock):**
+```python
+from unittest.mock import Mock, patch, MagicMock
+import pytest
+
+# Pattern 1: Patch (control return value)
+@patch('module.arweave_client.upload')
+def test_upload(mock_upload):
+    mock_upload.return_value = 'fake-cid-123'
+    result = service.upload('data')
+    assert result == 'fake-cid-123'
+
+# Pattern 2: Spy (track calls with real implementation)
+with patch('module.logger.info', wraps=logger.info) as spy:
+    service.process()
+    spy.assert_called_with('message')
+
+# Pattern 3: Mock (complex expectations)
+mock_web3 = Mock()
+mock_web3.send_transaction.return_value = {'hash': '0x123'}
+assert mock_web3.send_transaction.call_count == 1
+
+# Pattern 4: Fake (in-memory replacement)
+class FakeArweaveClient:
+    async def upload(self, data):
+        return 'fake-cid'
+
+# Cleanup (automatic with pytest fixtures)
+@pytest.fixture
+def mock_arweave(mocker):
+    return mocker.patch('module.arweave_client')
+    # Auto-cleanup after test
+```
+
+---
+
+### **Test Data Management Patterns**
+
+**Pattern 1: Fixtures (Static Data)**
+
+**JavaScript:**
+```javascript
+// tests/fixtures/contracts.json
+{
+  "spiralEngine": "0x1234...abcd",
+  "productRegistry": "0x5678...efgh",
+  "testUser": "0x9abc...def0"
+}
+
+// Usage in tests
+const { spiralEngine, productRegistry } = require('../fixtures/contracts.json');
+```
+
+**Python:**
+```python
+# tests/fixtures/contracts.py
+@pytest.fixture
+def contract_addresses():
+    return {
+        'spiral_engine': '0x1234...abcd',
+        'product_registry': '0x5678...efgh',
+        'test_user': '0x9abc...def0'
+    }
+
+# Usage in tests
+def test_deploy(contract_addresses):
+    spiral = contract_addresses['spiral_engine']
+    assert spiral.startswith('0x')
+```
+
+**When to use**: Static, reusable data (addresses, constants, configurations)
+
+---
+
+**Pattern 2: Factories (Dynamic Generation)**
+
+**JavaScript:**
+```javascript
+// tests/helpers/factories.js
+function createTestUser(overrides = {}) {
+  return {
+    address: '0x' + Math.random().toString(16).slice(2, 42),
+    role: 'seller',
+    activated: true,
+    ...overrides
+  };
+}
+
+// Usage
+const seller = createTestUser({ role: 'seller' });
+const admin = createTestUser({ role: 'admin', activated: false });
+```
+
+**Python:**
+```python
+# tests/helpers/factories.py
+def create_test_user(**overrides):
+    defaults = {
+        'address': f"0x{secrets.token_hex(20)}",
+        'role': 'seller',
+        'activated': True
+    }
+    return {**defaults, **overrides}
+
+# Usage
+seller = create_test_user(role='seller')
+admin = create_test_user(role='admin', activated=False)
+```
+
+**When to use**: Dynamic data with variations, randomization, unique values
+
+---
+
+**Pattern 3: Builders (Fluent Complex Objects)**
+
+**JavaScript:**
+```javascript
+// tests/helpers/ContractBuilder.js
+class ContractBuilder {
+  constructor() {
+    this.config = { pausable: false, uups: false };
+  }
+  
+  withUUPS() { this.config.uups = true; return this; }
+  withPausable() { this.config.pausable = true; return this; }
+  build() { return new Contract(this.config); }
+}
+
+// Usage
+const contract = new ContractBuilder()
+  .withUUPS()
+  .withPausable()
+  .build();
+```
+
+**Python:**
+```python
+# tests/helpers/builders.py
+class ContractBuilder:
+    def __init__(self):
+        self.config = {'pausable': False, 'uups': False}
+    
+    def with_uups(self):
+        self.config['uups'] = True
+        return self
+    
+    def with_pausable(self):
+        self.config['pausable'] = True
+        return self
+    
+    def build(self):
+        return Contract(self.config)
+
+# Usage
+contract = (ContractBuilder()
+    .with_uups()
+    .with_pausable()
+    .build())
+```
+
+**When to use**: Complex objects with many optional properties, fluent API tests
+
+---
+
+### **Phase 2.1: Smoke Tests**
+**Goal**: Validate structure and existence
+**Duration**: 2-4 hours
+**Cognitive Mode**: EXECUTION
+**Expected Output**: 60-100 tests, all passing
+
+```yaml
+test_types:
+  - Existence checks (methods exist)
+  - Structure validation (correct initialization)
+  - Basic smoke tests (can be called without errors)
+
+characteristics:
+  coverage_type: "Breadth over depth"
+  test_complexity: "Low (existence checks)"
+  mock_usage: "Minimal"
+
+test_isolation_requirements:
+  - No shared state between tests
+  - Each test fully isolated in beforeEach/afterEach
+  - Sinon stubs/spies cleaned in afterEach (sinon.restore())
+  - No global variable mutations
+  - TestHarness creates fresh instance per test
+  - Parallel-safe by design
+
+acceptance_criteria:
+  - [ ] All modules have test files
+  - [ ] All public methods have existence tests
+  - [ ] All tests passing (100%)
+  - [ ] Tests pass with --parallel flag (parallel-safe validation)
+  - [ ] Execution time < 5 seconds
+  - [ ] No shared state between tests
+  - [ ] Proper cleanup in afterEach hooks
+```
+
+**Example Smoke Tests:**
+
+**JavaScript (Mocha + Chai):**
+```javascript
+describe('ContractManager', () => {
+  it('должен иметь метод deployUUPSContract', () => {
+    expect(contractManager.deployUUPSContract).to.be.a('function');
+  });
+  
+  it('должен инициализироваться с config', () => {
+    expect(contractManager.config).to.be.an('object');
+  });
+});
+```
+
+**Python (pytest):**
+```python
+class TestContractManager:
+    def test_has_deploy_uups_method(self, contract_manager):
+        assert hasattr(contract_manager, 'deploy_uups_contract')
+        assert callable(contract_manager.deploy_uups_contract)
+    
+    def test_initializes_with_config(self, contract_manager):
+        assert contract_manager.config is not None
+        assert isinstance(contract_manager.config, dict)
+```
+
+---
+
+### **Phase 2.2: Real Functionality Tests** 🔴 CRITICAL
+**Goal**: Validate actual behavior, not just existence
+**Duration**: 6-10 hours
+**Cognitive Mode**: CRITICAL ANALYSIS
+**Expected Output**: +30-50 real tests
+
+```yaml
+trigger: Apply @test-qualification.mdc analysis
+
+critical_pivot:
+  question: "Do tests VALIDATE or just PASS?"
+  method: NO_FALSE_SUCCESSES + VALIDATE_REAL_FUNCTIONALITY checks
+  
+test_transformation:
+  from: "Method exists"
+  to: "Method produces correct output for given input"
+
+focus_areas:
+  priority_p0:
+    - Critical path methods (deployment, activation, upload)
+    - Business logic core (seller activation, component checks)
+    - Transaction handling (retry logic, batch processing)
+    - Error handling (failures, edge cases)
+
+characteristics:
+  coverage_type: "Depth on critical paths"
+  test_complexity: "Medium-High (real behavior)"
+  mock_usage: "Strategic (external systems only)"
+
+acceptance_criteria:
+  - [ ] Critical methods have REAL tests (not just existence)
+  - [ ] Tests validate actual output, not just "no error"
+  - [ ] Error scenarios covered
+  - [ ] Critical path coverage > 80%
+  - [ ] Quality score > 8/10 (@test-qualification)
+  - [ ] Code coverage metrics:
+    - [ ] Run: npm run test:coverage
+    - [ ] Line coverage > 80% for critical modules
+    - [ ] Branch coverage > 70% for critical paths
+    - [ ] Review uncovered lines (defer to integration if not unit-testable)
+```
+
+**Example Real Tests:**
+
+**JavaScript (Mocha + Chai + Sinon):**
+```javascript
+describe('ContractManager - Real Tests', () => {
+  it('должен деплоить UUPS контракт с Logic и Proxy', async () => {
+    // GIVEN: Mock для deployContract
+    const deployStub = sinon.stub(contractManager, 'deployContract')
+      .onFirstCall().resolves({ options: { address: '0xLogic' } })
+      .onSecondCall().resolves({ options: { address: '0xProxy' } });
+    
+    // WHEN: deployUUPSContract вызывается
+    const result = await contractManager.deployUUPSContract('SpiralEngine', [], []);
+    
+    // THEN: Logic деплоится первым, затем Proxy
+    expect(deployStub.callCount).to.equal(2);
+    expect(deployStub.firstCall.args[0]).to.include('Logic');
+    expect(result.options.address).to.equal('0xProxy');
+  });
+});
+```
+
+**Python (pytest + unittest.mock):**
+```python
+from unittest.mock import patch, call
+
+class TestContractManager:
+    @patch('module.contract_manager.deploy_contract')
+    async def test_deploys_uups_with_logic_and_proxy(self, mock_deploy):
+        # GIVEN: Mock возвращает Logic, затем Proxy
+        mock_deploy.side_effect = [
+            {'options': {'address': '0xLogic'}},
+            {'options': {'address': '0xProxy'}}
+        ]
+        
+        # WHEN: deploy_uups_contract вызывается
+        result = await contract_manager.deploy_uups_contract('SpiralEngine', [], [])
+        
+        # THEN: Logic деплоится первым, затем Proxy
+        assert mock_deploy.call_count == 2
+        assert 'Logic' in mock_deploy.call_args_list[0][0][0]
+        assert result['options']['address'] == '0xProxy'
+```
+
+**Async Testing Patterns:**
+
+**JavaScript (Mocha + Chai):**
+```javascript
+// Pattern 1: Happy Path (async/await)
+it('должен загрузить на Arweave и вернуть CID', async () => {
+  const cid = await arweaveManager.upload('test data');
+  expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/);
+});
+
+// Pattern 2: Error Handling (rejectedWith)
+it('должен выбросить ошибку при невалидных данных', async () => {
+  await expect(
+    arweaveManager.upload(null)
+  ).to.be.rejectedWith('Invalid data');
+});
+
+// Pattern 3: Timeout Handling
+it('должен обработать длинную операцию', async function() {
+  this.timeout(5000); // Increase timeout for this test
+  const result = await slowOperation();
+  expect(result).to.exist;
+});
+
+// Pattern 4: Promise.all (Batch Operations)
+it('должен обработать batch upload', async () => {
+  const files = ['file1', 'file2', 'file3'];
+  const cids = await arweaveManager.uploadBatch(files);
+  
+  expect(cids).to.have.length(3);
+  cids.forEach(cid => {
+    expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/);
+  });
+});
+
+// Pattern 5: Async Error Propagation
+it('должен пробросить ошибку из async chain', async () => {
+  const errorStub = sinon.stub(externalService, 'call').rejects(new Error('Service down'));
+  
+  await expect(
+    myService.processWithExternal()
+  ).to.be.rejectedWith('Service down');
+  
+  expect(errorStub.calledOnce).to.be.true;
+});
+```
+
+**Python (pytest + pytest-asyncio):**
+```python
+import pytest
+import asyncio
+
+# Pattern 1: Happy Path (async/await)
+@pytest.mark.asyncio
+async def test_upload_returns_cid():
+    cid = await arweave_manager.upload('test data')
+    assert re.match(r'^[A-Za-z0-9_-]{43}$', cid)
+
+# Pattern 2: Error Handling (pytest.raises)
+@pytest.mark.asyncio
+async def test_upload_raises_on_invalid_data():
+    with pytest.raises(ValueError, match='Invalid data'):
+        await arweave_manager.upload(None)
+
+# Pattern 3: Timeout Handling
+@pytest.mark.asyncio
+@pytest.mark.timeout(5)  # 5 second timeout
+async def test_slow_operation():
+    result = await slow_operation()
+    assert result is not None
+
+# Pattern 4: asyncio.gather (Batch Operations)
+@pytest.mark.asyncio
+async def test_batch_upload():
+    files = ['file1', 'file2', 'file3']
+    cids = await arweave_manager.upload_batch(files)
+    
+    assert len(cids) == 3
+    for cid in cids:
+        assert re.match(r'^[A-Za-z0-9_-]{43}$', cid)
+
+# Pattern 5: Async Error Propagation
+@pytest.mark.asyncio
+async def test_error_propagation(mocker):
+    mock_service = mocker.patch('module.external_service.call')
+    mock_service.side_effect = Exception('Service down')
+    
+    with pytest.raises(Exception, match='Service down'):
+        await my_service.process_with_external()
+    
+    assert mock_service.call_count == 1
+```
+
+**Common Pitfalls:**
+- ❌ Forgetting `await` → test completes before async operation
+- ❌ Not setting timeout for slow operations → false failures
+- ❌ Using `.then()` (JS) or callbacks instead of `await` → harder to debug
+- ❌ Forgetting `@pytest.mark.asyncio` (Python) → test won't run async
+- ✅ Always use `async/await` for modern, readable tests
+
+---
+
+### **Phase 2.3: Strategic Enhancements** (OPTIONAL)
+**Goal**: High-ROI improvements only
+**Duration**: 30-60 minutes
+**Cognitive Mode**: STRATEGIC ANALYSIS
+
+```yaml
+trigger: ROI + Test Level Appropriateness analysis
+
+decision_framework:
+  dimensions:
+    - business_impact: "Affects production risks?"
+    - roi: "Time vs value ratio"
+    - test_level: "Unit vs Integration vs E2E?"
+    - diminishing_returns: "8.5 → 8.7 worth 4 hours?"
+
+decision_matrix:
+  high_impact + high_roi + right_level: ✅ IMPLEMENT
+  low_impact + low_roi + wrong_level: 🔴 SKIP (defer to integration)
+  medium + medium + borderline: 🟡 EVALUATE case-by-case
+
+examples:
+  implement:
+    - Facade delegation tests (30 min, validates critical pattern)
+    - Error boundary tests (1 hour, prevents production issues)
+  
+  skip:
+    - Router tests at unit level (integration test territory)
+    - Complex orchestration at unit level (e2e test territory)
+```
+
+**ROI Analysis Template**:
+```yaml
+test_proposal: "CoreManager delegation tests"
+estimate: 30 minutes
+impact: "Validates facade pattern integrity"
+test_level: "Unit (correct level)"
+business_risk: "Medium (API contract)"
+roi: "High (simple test, high value)"
+verdict: ✅ IMPLEMENT
+```
+
+---
+
+## 📖 SECTION 4: QUALITY GATES (Auto-Triggered Checkpoints)
+
+> **Self-Validating**: Gates automatically triggered at phase completion
+
+### **Gate 1: Existence (Post Phase 2.1)**
+```yaml
+auto_trigger: "After ItemY2 (Smoke Tests) completes"
+automatic: true
+
+question: "Do tests exist for all modules?"
+checks:
+  - [ ] All modules have test files
+  - [ ] All public methods referenced
+  - [ ] Tests can run without errors
+threshold: 100% modules covered
+
+next_action:
+  if_pass: "Continue to Gate 2"
+  if_fail: "Identify missing modules, extend Phase 2.1"
+```
+
+### **Gate 2: Passing (Post Phase 2.1)**
+```yaml
+auto_trigger: "After Gate 1 passes"
+automatic: true
+
+question: "Do all tests pass?"
+checks:
+  - [ ] 0 failing tests
+  - [ ] No syntax errors
+  - [ ] Execution time acceptable
+threshold: 100% passing
+
+next_action:
+  if_pass: "Trigger Gate 3 (Quality Analysis)"
+  if_fail: "Apply @test-to-success.mdc to fix failures"
+```
+
+### **Gate 3: Validation (Auto-triggered)** 🔴 CRITICAL
+```yaml
+auto_trigger: "After Gate 2 passes (all smoke tests green)"
+automatic: true
+method: "@test-qualification.mdc"
+
+question: "Do tests VALIDATE functionality?"
+analysis_criteria:
+  - [ ] NO_FALSE_SUCCESSES: Tests fail when functionality broken
+  - [ ] VALIDATE_REAL_FUNCTIONALITY: Check actual behavior
+  - [ ] NO_UNTESTED_CRITICAL_PATHS: Critical methods covered
+  - [ ] CORRECT_LOGIC: Valid assertions, not tautologies
+  - [ ] MINIMAL_MOCK_OVERUSE: Mocks only for external systems
+
+threshold:
+  minimum_score: 8.0
+  critical_coverage: "> 80%"
+  real_tests_ratio: "> 60%"
+
+automatic_actions:
+  if_score_below_6:
+    decision: "Execute Phase 2.2 (Full Refactoring)"
+    itemY_generated: "ItemY3-N for each critical module"
+    focus: "Transform ALL smoke → real tests"
+  
+  if_score_6_to_8:
+    decision: "Execute Phase 2.2 (Targeted Improvements)"
+    itemY_generated: "ItemY3-N for P0 gaps only"
+    focus: "Fix critical path coverage"
+  
+  if_score_above_8:
+    decision: "SKIP Phase 2.2, proceed to Gate 4"
+    reason: "Production ready, evaluate strategic enhancements"
+
+output:
+  - Quality score report
+  - Gap analysis (P0/P1/P2)
+  - Phase 2.2 plan (if needed)
+  - Automatic progression to next phase
+```
+
+### **Gate 4: Strategic (Auto-triggered)** 
+```yaml
+auto_trigger: "After Phase 2.2 completes OR Gate 3 score > 8"
+automatic: true
+method: "ROI + Test Level Appropriateness framework"
+
+question: "Are remaining gaps worth fixing at unit level?"
+
+roi_analysis:
+  for_each_recommendation:
+    evaluate:
+      - business_impact: "High/Medium/Low"
+      - time_estimate: "Hours"
+      - test_level: "Unit/Integration/E2E"
+      - roi_ratio: "Value / Time"
+    
+    decision_matrix:
+      high_roi + unit_level: ✅ "Implement (Phase 2.3)"
+      medium_roi + unit_level: 🟡 "Evaluate case-by-case"
+      low_roi OR wrong_level: 🔴 "SKIP, defer to integration/e2e"
+
+automatic_actions:
+  filter_recommendations:
+    - Remove low-ROI suggestions
+    - Remove wrong-level tests
+    - Prioritize high-ROI unit tests
+  
+  generate_phase_2_3_plan:
+    - Create ItemY(final) with filtered recommendations
+    - Set acceptance: "Only high-ROI tests implemented"
+  
+  anti_perfectionism_check:
+    if_score_above_8_5:
+      warning: "Diminishing returns threshold reached"
+      recommendation: "Consider production ready, defer rest"
+
+threshold:
+  production_ready: "Score 8.5+ AND critical coverage 85+"
+  perfectionism_alert: "Score 9+ (evaluate if more tests needed)"
+
+next_action:
+  if_high_roi_tests_exist: "Execute Phase 2.3 (ItemY final)"
+  if_no_high_roi_tests: "DONE - Production Ready"
+  if_score_9_plus: "DONE - Avoid perfectionism"
+```
+
+### **Continuous Anti-Pattern Detection**
+```yaml
+runs: "Throughout all phases"
+automatic: true
+
+monitors:
+  green_tests_syndrome:
+    trigger: "Gate 3 detects high smoke ratio"
+    action: "Force Phase 2.2 execution"
+  
+  test_all_things:
+    trigger: "Gate 4 detects wrong-level tests"
+    action: "Filter and defer to integration/e2e"
+  
+  perfectionism_paralysis:
+    trigger: "Score > 9 OR time spent > 16 hours"
+    action: "Force production ready decision"
+```
+
+---
+
+## 📖 SECTION 5: COGNITIVE MODE SWITCHING & ANTI-PATTERNS
+
+### **Mode 1: EXECUTION (Phases 1, 2.1)**
+```yaml
+mindset: "Create tests for coverage"
+focus: "Breadth, structure, smoke tests"
+metrics: "Test count, modules covered"
+danger: "Quantity over quality"
+```
+
+### **Mode 2: CRITICAL ANALYSIS (Phase 2.2 trigger)**
+```yaml
+mindset: "Do tests actually validate?"
+focus: "Depth, real behavior, edge cases"
+metrics: "Critical coverage, real tests ratio"
+tool: "@test-qualification.mdc"
+danger: "Analysis paralysis"
+```
+
+### **Mode 3: STRATEGIC (Phase 2.3)**
+```yaml
+mindset: "What's worth doing at this level?"
+focus: "ROI, test level appropriateness"
+metrics: "Time vs value, diminishing returns"
+tool: "ROI decision framework"
+danger: "Perfectionism, wrong test level"
+```
+
+---
+
+## 🚨 ANTI-PATTERNS TO AVOID
+
+### **Anti-Pattern 1: Green Tests Syndrome**
+```yaml
+symptom:
+  - ✅ All tests passing
+  - ✅ High test count
+  - ❌ Tests don't validate real behavior
+
+detection:
+  method: "@test-qualification.mdc"
+  red_flags:
+    - "Много existence checks, мало real tests"
+    - "Проверка побочных эффектов вместо core logic"
+    - "Тесты проходят даже с broken code"
+
+fix:
+  phase: "2.2 Real Functionality Tests"
+  approach: "Transform smoke tests to real validation"
+```
+
+**Code Example:**
+
+**❌ BEFORE (False Success — Green Tests Syndrome):**
+
+```javascript
+// JavaScript
+it('should upload to Arweave', () => {
+  expect(arweaveManager.upload).to.be.a('function'); // ❌ Only checks existence!
+});
+
+it('should activate seller', async () => {
+  const tx = await activateSeller(address);
+  expect(tx).to.not.be.undefined; // ❌ Too weak — what about actual activation?
+});
+```
+
+```python
+# Python
+def test_upload_to_arweave(arweave_manager):
+    assert hasattr(arweave_manager, 'upload')  # ❌ Only checks method exists!
+
+def test_activate_seller(seller_service):
+    result = seller_service.activate(address)
+    assert result is not None  # ❌ Too weak — what about actual state?
+```
+
+**✅ AFTER (Real Validation):**
+
+```javascript
+// JavaScript
+it('should upload to Arweave and return valid CID', async () => {
+  const cid = await arweaveManager.upload('test data');
+  expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/); // ✅ Validates actual result
+  expect(cid).to.have.length(43); // ✅ Checks real structure
+});
+
+it('should activate seller and update state', async () => {
+  const beforeState = await getSellerState(address);
+  expect(beforeState.activated).to.be.false;
+  
+  await activateSeller(address);
+  
+  const afterState = await getSellerState(address);
+  expect(afterState.activated).to.be.true; // ✅ Validates real state change
+  expect(afterState.activator).to.equal(activatorAddress); // ✅ Checks details
+});
+```
+
+```python
+# Python
+async def test_upload_to_arweave_returns_valid_cid(arweave_manager):
+    cid = await arweave_manager.upload('test data')
+    assert re.match(r'^[A-Za-z0-9_-]{43}$', cid)  # ✅ Validates actual result
+    assert len(cid) == 43  # ✅ Checks real structure
+
+async def test_activate_seller_updates_state(seller_service):
+    before_state = await seller_service.get_state(address)
+    assert before_state['activated'] is False
+    
+    await seller_service.activate(address)
+    
+    after_state = await seller_service.get_state(address)
+    assert after_state['activated'] is True  # ✅ Validates real state change
+    assert after_state['activator'] == activator_address  # ✅ Checks details
+```
+
+### **Anti-Pattern 2: Test All The Things**
+```yaml
+symptom:
+  - Mindset: "Every gap must be filled at unit level"
+  - Adding tests without ROI analysis
+  - Unit tests for integration logic
+
+detection:
+  red_flags:
+    - "Routing tests at unit level (integration territory)"
+    - "Orchestration tests at unit level (e2e territory)"
+    - "Mocks on mocks on mocks"
+
+fix:
+  method: "Test Level Appropriateness check"
+  approach: "Defer to integration/e2e where appropriate"
+  decision: "Unit for isolated logic, Integration for module interaction"
+```
+
+**Code Example:**
+
+**❌ BEFORE (Wrong Test Level):**
+
+```javascript
+// JavaScript — Unit test for ROUTING logic (should be integration)
+describe('API Router - Unit Tests', () => {
+  it('should route /deploy to deployController', () => {
+    const mockReq = { path: '/deploy', method: 'POST' };
+    const mockRes = { json: sinon.spy() };
+    const mockNext = sinon.spy();
+    
+    router.handle(mockReq, mockRes, mockNext); // ❌ Mocking entire HTTP layer at unit level!
+    expect(mockRes.json.called).to.be.true;
+  });
+});
+```
+
+```python
+# Python — Unit test for ORCHESTRATION (should be e2e)
+def test_full_deployment_flow():
+    # Mocking 5 different services ❌
+    mock_contract = Mock()
+    mock_arweave = Mock()
+    mock_registry = Mock()
+    mock_validator = Mock()
+    mock_logger = Mock()
+    
+    # This is e2e test disguised as unit test!
+    orchestrator = Orchestrator(mock_contract, mock_arweave, 
+                                 mock_registry, mock_validator, mock_logger)
+    result = orchestrator.deploy_full()
+    assert result['success'] is True
+```
+
+**✅ AFTER (Correct Test Level):**
+
+```javascript
+// JavaScript — Unit test for ISOLATED logic
+describe('DeployController - Unit Tests', () => {
+  it('should validate contract config correctly', () => {
+    const validConfig = { name: 'Test', pausable: true };
+    const result = deployController.validateConfig(validConfig);
+    expect(result.valid).to.be.true; // ✅ Unit-level isolated logic
+  });
+});
+
+// Defer routing to integration tests
+// See: tests/integration/api-routing.test.js
+```
+
+```python
+# Python — Unit test for SINGLE module
+def test_validates_contract_config():
+    valid_config = {'name': 'Test', 'pausable': True}
+    result = deploy_controller.validate_config(valid_config)
+    assert result['valid'] is True  # ✅ Unit-level isolated validation
+
+# Defer orchestration to e2e tests
+# See: tests/e2e/deployment-flow.test.py
+```
+
+### **Anti-Pattern 3: Perfectionism Paralysis**
+```yaml
+symptom:
+  - Mindset: "Not 100% = not done"
+  - Endless refactoring
+  - Never shipping
+
+detection:
+  red_flags:
+    - "8.5/10 but still adding tests"
+    - "Low-ROI improvements"
+    - "Diminishing returns ignored"
+
+fix:
+  method: "Strategic decision point"
+  threshold: "8.5/10 + 85% critical coverage = production ready"
+  decision: "Ship now, improve with integration tests"
+```
+
+**Decision Example:**
+
+**❌ BEFORE (Perfectionism Paralysis):**
+
+```yaml
+# After Phase 2.2 completion
+current_state:
+  quality_score: 8.5/10
+  critical_coverage: 85%
+  tests_passing: 100%
+  execution_time: 45 seconds
+
+developer_thinking:
+  - "But there's getConfig() without tests..."
+  - "And error handling for edge case X..."
+  - "Maybe add performance tests too..."
+  - "Not 100% coverage, can't ship"
+
+action: "Add 15 more tests for edge cases"
+time_spent: +4 hours
+result:
+  quality_score: 8.7/10 (only +0.2!)
+  diminishing_returns: "4 hours for 0.2 improvement"
+  status: Still not shipping ❌
+```
+
+**✅ AFTER (Strategic Shipping):**
+
+```yaml
+# After Phase 2.2 completion
+current_state:
+  quality_score: 8.5/10
+  critical_coverage: 85%
+  tests_passing: 100%
+  execution_time: 45 seconds
+
+strategic_analysis:
+  roi_check:
+    - getConfig() test: Low impact, 30 min → 🟡 Defer to integration
+    - Edge case X: Rare scenario, 2 hours → 🔴 Skip, document
+    - Performance tests: E2E territory → 🔴 Defer to e2e suite
+  
+  decision_framework:
+    threshold_met: "8.5/10 ✅ + 85% coverage ✅ = Production Ready"
+    gate_4_recommendation: "High-ROI only OR ship now"
+    diminishing_returns: "8.5 → 9.0 would cost 4+ hours for minimal gain"
+
+action: "SHIP v1.0, create backlog for integration tests"
+documentation:
+  - "Deferred items: getConfig (integration), edge case X (future)"
+  - "Next: Create @integration-test-build.mdc for module interactions"
+
+result:
+  shipped: ✅ v1.0 Production
+  time_saved: 4+ hours
+  team_velocity: Higher (shipping > perfecting)
+```
+
+---
+
+## 📖 SECTION 6: QUALITY CRITERIA & TEMPLATES
+
+> **Reference**: Test quality criteria from @test-qualification.mdc + code templates
+
+### **Test Quality Criteria (from @test-qualification.mdc)**
+
+#### **P0 - Critical (Must Pass)**
+```yaml
+NO_FALSE_SUCCESSES:
+  check: "Test fails when functionality is broken"
+  example: "Not just 'method exists', but 'method returns correct result'"
+
+VALIDATE_REAL_FUNCTIONALITY:
+  check: "Test validates core behavior, not side effects"
+  example: "Check seller activation result, not just 'transaction sent'"
+
+NO_UNTESTED_CRITICAL_PATHS:
+  check: "All critical business logic covered"
+  example: "UUPS deployment, seller activation, Arweave upload"
+```
+
+### **P1 - High (Should Pass)**
+```yaml
+CORRECT_LOGIC:
+  check: "Test assertions are valid, not tautologies"
+  example: "Not 'result !== undefined', but 'result.status === 'success''"
+```
+
+### **P2 - Medium (Nice to Have)**
+```yaml
+MINIMAL_MOCK_OVERUSE:
+  check: "Mocks only for external systems (Web3, Arweave, FS)"
+  example: "Mock Arweave client, but use real ContractManager"
+```
+
+---
+
+## 📖 SECTION 7: REFERENCE (Metrics, Integration, Definition of Done)
+
+### **TARGET METRICS**
+
+#### **Phase 2.1 (Smoke Tests)**
+```yaml
+test_count: 60-100
+passing: 100%
+execution_time: "< 5 seconds"
+smoke_ratio: "~80%"
+real_ratio: "~20%"
+score: "Unknown (need qualification)"
+```
+
+### **Phase 2.2 (After Refactoring)**
+```yaml
+test_count: 100-150
+passing: 100%
+execution_time: "< 60 seconds"
+smoke_ratio: "~40%"
+real_ratio: "~60%"
+critical_coverage: "> 80%"
+score: "> 8/10"
+status: "Production ready"
+```
+
+### **Phase 2.3 (Strategic Enhancement)**
+```yaml
+test_count: "+5-15 high-ROI tests"
+execution_time: "< 90 seconds"
+real_ratio: "> 65%"
+critical_coverage: "> 85%"
+score: "8.5-9/10"
+status: "Production ready + optimized"
+```
+
+---
+
+## ✅ SPECIALIZED ACCEPTANCE CRITERIA
+
+> **Phase-Specific**: Each phase has built-in, measurable acceptance criteria
+
+### **Phase 1: Infrastructure Setup**
+```yaml
+deliverables:
+  - [ ] tests/ directory structure created
+  - [ ] package.json updated with test dependencies
+  - [ ] Mocha/Jest configured with 30s timeout
+  - [ ] setup.js с global before/after hooks
+  - [ ] TestHarness class with setupTestEnvironment/teardownTestEnvironment
+  - [ ] MockContractManager for Web3 contract mocks
+  - [ ] MockArweaveManager for Arweave mocks
+  - [ ] MockWeb3 for blockchain mocks
+  - [ ] Fixtures directory with test data
+  - [ ] npm run test:unit works (даже без тестов)
+
+quality_checks:
+  - [ ] 2-3 proof-of-concept tests passing
+  - [ ] Test execution < 1 second (для proof tests)
+  - [ ] No errors in console
+  - [ ] All helpers importable
+
+production_ready: false
+reason: "Infrastructure only, no real tests yet"
+```
+
+### **Phase 2.1: Smoke Tests**
+```yaml
+deliverables:
+  - [ ] All modules have test files
+  - [ ] All public methods have existence tests
+  - [ ] GIVEN-WHEN-THEN structure used
+  - [ ] Proper describe/it organization
+  - [ ] beforeEach/afterEach for setup/cleanup
+
+quantitative_metrics:
+  - [ ] 60-100 tests total
+  - [ ] 100% passing (0 failing)
+  - [ ] Execution time < 5 seconds
+  - [ ] All modules covered
+
+qualitative_checks:
+  - [ ] Test descriptions in Russian (readable)
+  - [ ] No hardcoded values (use variables)
+  - [ ] Proper error messages in expectations
+  - [ ] Sinon stubs/spies cleaned in afterEach
+
+production_ready: false
+reason: "Smoke tests only, need quality validation (Gate 3)"
+```
+
+### **Phase 2.2: Real Functionality Tests** 
+```yaml
+deliverables:
+  - [ ] Critical methods have REAL tests (not just existence)
+  - [ ] Tests validate actual output/behavior
+  - [ ] Error scenarios covered
+  - [ ] Edge cases identified and tested
+  - [ ] Integration with mocks is realistic
+
+quality_gates_passed:
+  - [ ] NO_FALSE_SUCCESSES: Tests fail when code broken
+  - [ ] VALIDATE_REAL_FUNCTIONALITY: Core behavior checked
+  - [ ] NO_UNTESTED_CRITICAL_PATHS: Coverage > 80%
+  - [ ] CORRECT_LOGIC: Valid assertions, not tautologies
+  - [ ] MINIMAL_MOCK_OVERUSE: Mocks only external systems
+
+quantitative_metrics:
+  - [ ] Real tests ratio > 60% (из total tests)
+  - [ ] Critical path coverage > 80%
+  - [ ] Quality score > 8/10 (@test-qualification)
+  - [ ] Execution time < 60 seconds
+  - [ ] 100% passing
+
+production_ready: true
+reason: "Critical functionality validated, score 8+/10"
+decision_point: "Proceed to Phase 2.3 OR DONE (based on Gate 4)"
+```
+
+### **Phase 2.3: Strategic Enhancements**
+```yaml
+deliverables:
+  - [ ] High-ROI tests implemented
+  - [ ] Low-ROI tests deferred (documented)
+  - [ ] Wrong-level tests deferred to integration/e2e
+  - [ ] Anti-patterns avoided
+
+roi_validation:
+  - [ ] Each added test has business_impact documented
+  - [ ] Each added test has roi_ratio > 1.0
+  - [ ] Each added test is unit-level appropriate
+  - [ ] Perfectionism threshold not exceeded
+
+quantitative_metrics:
+  - [ ] Quality score 8.5-9/10
+  - [ ] Critical coverage > 85%
+  - [ ] Real tests ratio > 65%
+  - [ ] Execution time < 90 seconds
+  - [ ] +5-15 tests (high-ROI only)
+
+production_ready: true (optimized)
+reason: "Production ready + strategic improvements"
+decision: "SHIP - defer remaining to integration/e2e"
+```
+
+---
+
+## 🔧 PRACTICAL WORKFLOW
+
+### **Step 1: Infrastructure**
+```bash
+# Create structure
+mkdir -p tests/{unit,integration,e2e}/{config,utils,services,actions,core}
+mkdir -p tests/{fixtures,helpers}
+
+# Setup tools
+npm install --save-dev mocha chai sinon nyc
+
+# Create config
+echo '{ "require": ["./tests/setup.js"], "timeout": 30000 }' > tests/.mocharc.json
+
+# Verify
+npm run test:unit # Should run (even if 0 tests)
+```
+
+### **Step 2: Smoke Tests**
+```bash
+# For each module, create existence tests
+# Target: All public methods have tests
+# Expected: 60-100 tests, 100% passing, < 5 sec
+```
+
+### **Step 3: Quality Gate 3 (Critical)**
+```bash
+# Apply @test-qualification.mdc
+# Expected issues:
+#   - Many smoke tests
+#   - Critical paths not validated
+#   - Score: 6-7/10
+
+# Action: Phase 2.2 refactoring
+```
+
+### **Step 4: Real Tests**
+```bash
+# Transform critical smoke tests to real tests
+# Focus on P0 methods first
+# Expected: +30-50 tests, score > 8/10
+```
+
+### **Step 5: Strategic Decision**
+```bash
+# Analyze remaining gaps with ROI framework
+# Implement high-ROI unit tests
+# Defer low-ROI and wrong-level tests
+# Expected: Production ready (8.5+/10)
+```
+
+---
+
+## 📝 TEMPLATES
+
+### **Test File Templates**
+
+**JavaScript (Mocha + Chai + Sinon):**
+```javascript
+/**
+ * Unit Tests: ModuleName
+ * Tests for module description.
+ */
+
+const { expect } = require('chai');
+const sinon = require('sinon');
+const { TestHarness } = require('../../helpers');
+
+describe('ModuleName', () => {
+  let module;
+  let harness;
+
+  before(async () => {
+    harness = new TestHarness();
+    await harness.setupTestEnvironment();
+  });
+
+  after(async () => {
+    await harness.teardownTestEnvironment();
+  });
+
+  beforeEach(() => {
+    // Setup for each test
+  });
+
+  afterEach(() => {
+    sinon.restore(); // Clean up stubs/spies
+  });
+
+  describe('Initialization', () => {
+    it('should initialize correctly', () => {
+      expect(module).to.be.an('object');
+    });
+  });
+
+  describe('Critical Method - Real Tests', () => {
+    it('should execute core functionality', async () => {
+      // GIVEN: Setup
+      // WHEN: Execute
+      // THEN: Validate
+    });
+  });
+});
+```
+
+**Python (pytest + unittest.mock):**
+```python
+"""
+Unit Tests: ModuleName
+Tests for module description.
+"""
+
+import pytest
+from unittest.mock import Mock, patch
+from src.module_name import ModuleName
+
+class TestModuleName:
+    @pytest.fixture
+    def module(self):
+        """Setup module instance for each test"""
+        return ModuleName()
+    
+    @pytest.fixture(autouse=True)
+    def setup_teardown(self):
+        """Setup before each test, cleanup after"""
+        # Setup
+        yield
+        # Teardown (auto-cleanup)
+    
+    def test_initializes_correctly(self, module):
+        """Should initialize correctly"""
+        assert module is not None
+        assert isinstance(module, ModuleName)
+    
+    @pytest.mark.asyncio
+    async def test_core_functionality(self, module, mocker):
+        """Should execute core functionality"""
+        # GIVEN: Setup
+        mock_external = mocker.patch('module.external_service')
+        
+        # WHEN: Execute
+        result = await module.critical_method()
+        
+        # THEN: Validate
+        assert result is not None
+        mock_external.assert_called_once()
+```
+
+### **ROI Analysis Template**
+```yaml
+recommendation: "Add test X"
+estimate: "N hours"
+business_impact: "High/Medium/Low"
+roi: "High/Medium/Low"
+test_level: "Unit/Integration/E2E"
+current_coverage: "X% critical paths"
+verdict: "✅ Implement / 🟡 Defer / 🔴 Skip"
+reasoning: "Explanation"
+```
+
+---
+
+## 🚀 SINGLE-RULE USAGE EXAMPLES
+
+> **Self-Sufficient**: Just call @unit-test-build.mdc, no additional orchestration needed
+
+### **Example 1: Create Tests from Scratch**
+```
+USER PROMPT:
+"Создай production-ready unit tests для проекта scripts/
+Метод: @unit-test-build.mdc"
+
+AI AUTOMATIC EXECUTION:
+1. Context Detection → Scenario: NEW (no tests exist)
+2. Generate ItemY структуру:
+   - ItemY1: Infrastructure Setup
+   - ItemY2: Smoke Tests (все модули)
+   - ItemY3: Quality Gate 3 (@test-qualification auto-trigger)
+   - ItemY4-7: Real Tests (ContractManager, ArweaveManager, CoreLogic, Web3Utils)
+   - ItemY8: Gate 4 ROI Analysis
+   - ItemY9: Strategic Enhancements (high-ROI only)
+
+3. Execute progressively:
+   ✅ ItemY1 → Infrastructure ready
+   ✅ ItemY2 → 84 smoke tests (100% passing)
+   ✅ ItemY3 → Score 6.5/10 → Trigger Phase 2.2
+   ✅ ItemY4-7 → +29 real tests → Score 8.5/10
+   ✅ ItemY8 → Filter recommendations (skip low-ROI)
+   ✅ ItemY9 → +9 CoreManager delegation tests
+
+RESULT:
+- 122 tests total
+- Score 8.7/10
+- 87% critical coverage
+- Production ready
+```
+
+### **Example 2: Extend Tests for New Feature**
+```
+USER PROMPT:
+"Добавил метод uploadBatch в ArweaveManager. Обнови тесты.
+Метод: @unit-test-build.mdc"
+
+AI AUTOMATIC EXECUTION:
+1. Context Detection → Scenario: EXTEND
+   - Tests exist
+   - ArweaveManager.test.js found
+   - Quality score 8.5/10 (good)
+
+2. Generate targeted ItemY:
+   - ItemY1: Analyze ArweaveManager + uploadBatch signature
+   - ItemY2: Identify test patterns in existing tests
+   - ItemY3: Create smoke tests for uploadBatch
+   - ItemY4: Create real tests for uploadBatch
+   - ItemY5: Validate no regression in existing tests
+
+3. Execute:
+   ✅ ItemY1 → uploadBatch accepts array, returns array of CIDs
+   ✅ ItemY2 → Pattern: mock Arweave client, verify transaction
+   ✅ ItemY3 → +2 smoke tests (existence + type check)
+   ✅ ItemY4 → +5 real tests (batch logic, error handling, edge cases)
+   ✅ ItemY5 → All 25 existing tests still passing
+
+RESULT:
+- ArweaveManager.test.js: 18 → 25 tests
+- Quality score maintained: 8.5/10
+- uploadBatch fully covered
+- No regressions
+```
+
+### **Example 3: Improve Test Quality**
+```
+USER PROMPT:
+"Проверь качество тестов в scripts/tests/unit/
+Если < 8/10, доведи до production ready.
+Метод: @unit-test-build.mdc"
+
+AI AUTOMATIC EXECUTION:
+1. Context Detection → Run @test-qualification first
+   - Tests exist
+   - Score: 6.5/10 (below threshold)
+   - 70% smoke tests
+   - Critical paths not covered
+
+2. Scenario: REFACTOR
+   - Generate ItemY:
+     - ItemY1: Detailed gap analysis
+     - ItemY2: Prioritize P0 gaps
+     - ItemY3-6: Transform smoke → real (per critical module)
+     - ItemY7: Re-qualification
+     - ItemY8: Strategic enhancements (if needed)
+
+3. Execute:
+   ✅ ItemY1 → P0: ContractManager deployment, ArweaveManager upload, CoreLogic activation
+   ✅ ItemY2 → 4 critical modules identified
+   ✅ ItemY3-6 → +29 real tests transforming smoke tests
+   ✅ ItemY7 → Score 8.5/10 ✅ Production ready
+   ✅ ItemY8 → ROI analysis → Skip low-ROI, add delegation tests only
+
+RESULT:
+- 84 → 113 tests
+- 6.5/10 → 8.5/10
+- Critical coverage: 40% → 85%
+- Production ready achieved
+```
+
+### **Comparison: Before vs After**
+
+**BEFORE (with @run-task.mdc):**
+```
+USER: "Создай tests через @run-task.mdc используя @unit-test-build.mdc"
+
+Process:
+1. User/AI creates ListX → ItemY structure
+2. User defines acceptance criteria per ItemY
+3. User calls @unit-test-build for methodology
+4. User triggers @test-qualification manually
+5. User does ROI analysis manually
+6. User decides when "done"
+
+Time: ~8-10 hours
+Complexity: High (manual orchestration)
+Quality gates: Manual
+```
+
+**AFTER (only @unit-test-build.mdc):**
+```
+USER: "Создай tests методом @unit-test-build.mdc"
+
+Process:
+1. @unit-test-build AUTOMATICALLY:
+   - Detects context (new/extend/refactor)
+   - Generates ItemY structure
+   - Has built-in acceptance criteria
+   - Auto-triggers @test-qualification
+   - Auto-applies ROI analysis
+   - Auto-decides production ready
+
+Time: ~7-8 hours (same work, less overhead)
+Complexity: Low (self-orchestrating)
+Quality gates: Automatic
+```
+
+---
+
+## 🎓 INTEGRATION WITH OTHER RULES
+
+> **Integration Pattern**: Hybrid approach — specialized orchestration + @itemy-*.mdc sub-rule execution
+
+### **Architecture Decision: Hybrid Pattern**
+
+**How @unit-test-build.mdc works:**
+
+```yaml
+orchestration_level:
+  provided_by: "@unit-test-build.mdc (built-in)"
+  includes:
+    - Context detection (NEW/EXTEND/REFACTOR scenarios)
+    - ItemY generation (phase-specific tasks)
+    - Quality gates (auto-triggered at checkpoints)
+    - ROI framework (strategic decision-making)
+    - Anti-pattern monitoring
+  
+  result: "No need to manually call @run-task.mdc or @analysis.mdc"
+
+execution_level:
+  provided_by: "@itemy-*.mdc sub-rules (optional but recommended)"
+  structure_per_itemY:
+    1. @itemy-understanding.mdc → Analyze current state
+    2. @itemy-knowledge-check.mdc → Review best practices
+    3. @itemy-acceptance.mdc → Define measurable criteria (YAML)
+    4. @itemy-planning.mdc → Plan safe changes
+    5. @itemy-execution.mdc → Implement step-by-step
+    6. @itemy-validation.mdc → Validate against criteria
+    7. @itemy-retrospective.mdc → Document learnings
+  
+  flexibility: "Can execute without sub-rules (embedded logic) OR with sub-rules (DRY)"
+
+relationship_with_run_task:
+  status: "Specialized replacement for unit testing domain"
+  pattern: "Inherits @run-task ItemY structure, adds unit-test-specific logic"
+  benefit: "Domain knowledge + orchestration in single rule"
+```
+
+**Visual Flow:**
+```
+User: "Execute Phase 1 using @unit-test-build.mdc"
+  ↓
+@unit-test-build detects context → Generates ItemY1 (Infrastructure)
+  ↓
+For ItemY1 execution (OPTIONAL — AI can choose):
+  → @itemy-understanding: Analyze project structure
+  → @itemy-knowledge-check: Review test runner best practices
+  → @itemy-acceptance: Define AC (test runner works, helpers created)
+  → @itemy-planning: Plan directory structure, npm scripts
+  → @itemy-execution: Create files, install packages
+  → @itemy-validation: Run proof tests
+  → @itemy-retrospective: Document setup decisions
+  ↓
+ItemY1 complete → Auto-trigger Gate 1 → Continue to ItemY2
+```
+
+---
+
+### **Auto-Triggered Rules (No Manual Call Needed)**
+```yaml
+gate_3_auto_trigger:
+  rule: "@test-qualification.mdc"
+  when: "After Gate 2 passes (all smoke tests green)"
+  purpose: "Quality analysis and gap identification"
+  automatic: true
+
+gate_2_failure_trigger:
+  rule: "@test-to-success.mdc"
+  when: "If any tests fail during execution"
+  purpose: "Systematic test fixing"
+  automatic: true
+```
+
+### **Optional Sub-Rules (For ItemY Execution)**
+```yaml
+itemy_execution_pattern:
+  can_use_explicitly:
+    - @itemy-understanding.mdc
+    - @itemy-knowledge-check.mdc
+    - @itemy-acceptance.mdc
+    - @itemy-planning.mdc
+    - @itemy-execution.mdc
+    - @itemy-validation.mdc
+    - @itemy-retrospective.mdc
+  
+  when_to_use:
+    - For complex ItemY requiring deep analysis
+    - When following strict @run-task.mdc pattern
+    - For consistency across different rule types
+  
+  when_can_skip:
+    - For simple ItemY (e.g., Infrastructure setup)
+    - When @unit-test-build embedded logic sufficient
+    - For faster execution (less rule loading)
+  
+  recommendation: "Use for Phase 2.2 (Real Tests) — most complex phase"
+```
+
+### **Optional Manual Rules**
+```yaml
+before_testing:
+  - @analysis.mdc: "For initial test strategy planning (optional)"
+  - note: "@unit-test-build can start without @analysis"
+
+after_testing:
+  - @meta.extract.mdc: "Capture learnings from testing process"
+  - @meta.gap.mdc: "Identify process improvements"
+```
+
+### **Relationship with @run-task.mdc**
+```yaml
+comparison:
+  @run_task_mdc:
+    scope: "Universal task orchestration"
+    domain: "Any task (coding, refactoring, documentation)"
+    knowledge: "Generic task execution patterns"
+    
+  @unit_test_build_mdc:
+    scope: "Specialized unit test orchestration"
+    domain: "Unit testing ONLY"
+    knowledge: "Test-specific patterns (smoke, real, quality gates, ROI)"
+  
+relationship: "Specialized version, not replacement"
+
+when_to_use_which:
+  - Unit testing: "@unit-test-build.mdc (specialized)"
+  - Integration testing: "@integration-test-build.mdc (future, specialized)"
+  - Other tasks: "@run-task.mdc (universal)"
+  
+architecture: "Domain-specific rules inherit @run-task pattern, add domain knowledge"
+```
+
+---
+
+## 🔧 TROUBLESHOOTING
+
+### **Issue 1: Tests Pass Locally, Fail in CI**
+
+**Symptoms:**
+- ✅ All tests green on developer machine
+- ❌ Random failures in CI/CD pipeline
+
+**Common Causes:**
+1. **Environment differences**: Different Node.js/Python versions, missing dependencies
+2. **Timing issues**: Async operations complete faster/slower in CI
+3. **Parallel execution**: Tests have shared state, fail when run in parallel
+
+**Fixes:**
+```yaml
+fix_1_lock_versions:
+  - "Use exact versions in package.json (no ^1.0.0, use 1.0.0)"
+  - "Add .nvmrc or runtime.txt for version locking"
+  - "Document dependencies in README"
+
+fix_2_timing:
+  - "Increase timeouts for async operations"
+  - "Add explicit waits: await sleep(100) before assertions"
+  - "Mock time-dependent code (Date.now, setTimeout)"
+
+fix_3_isolation:
+  - "Run tests with --parallel locally to catch issues"
+  - "Check for global variables, shared state"
+  - "Ensure proper cleanup in afterEach/tearDown"
+```
+
+---
+
+### **Issue 2: Flaky Tests (Random Pass/Fail)**
+
+**Symptoms:**
+- Tests pass sometimes, fail other times
+- Same test, same code, different results
+
+**Common Causes:**
+1. **Race conditions**: Async operations complete in different order
+2. **Shared state**: Tests affect each other through global variables
+3. **External dependencies**: Network, file system, random values
+
+**Fixes:**
+```yaml
+fix_1_race_conditions:
+  - "Use await for ALL async operations"
+  - "Don't rely on operation order: Promise.all → Promise.allSettled"
+  - "Add explicit synchronization points"
+
+fix_2_shared_state:
+  - "Isolate each test: beforeEach creates fresh instances"
+  - "No global variables — use test-scoped variables"
+  - "Check for singleton pattern abuse"
+
+fix_3_external_deps:
+  - "Mock ALL external systems (network, fs, random)"
+  - "Use deterministic test data (no Math.random, Date.now)"
+  - "Stub time-dependent functions"
+```
+
+**Example Fix:**
+```javascript
+// ❌ BEFORE: Flaky (depends on Date.now)
+it('should set creation timestamp', () => {
+  const obj = create();
+  expect(obj.created).to.equal(Date.now()); // ❌ Flaky!
+});
+
+// ✅ AFTER: Stable (mocked time)
+it('should set creation timestamp', () => {
+  const clock = sinon.useFakeTimers(new Date('2025-01-01'));
+  const obj = create();
+  expect(obj.created).to.equal(new Date('2025-01-01').getTime());
+  clock.restore();
+});
+```
+
+---
+
+### **Issue 3: Slow Test Execution**
+
+**Symptoms:**
+- Test suite takes minutes instead of seconds
+- Developers avoid running tests
+
+**Common Causes:**
+1. **Real I/O operations**: Actual file system, network calls
+2. **Database operations**: Real DB instead of in-memory
+3. **Too many integration tests at unit level**
+
+**Fixes:**
+```yaml
+fix_1_mock_io:
+  - "Mock fs operations: sinon.stub(fs, 'readFile')"
+  - "Mock network: nock (HTTP), stub (Web3)"
+  - "Target: < 1 second per test"
+
+fix_2_in_memory:
+  - "Use in-memory DB for tests (SQLite :memory:)"
+  - "Mock external services completely"
+  - "Avoid real infrastructure in unit tests"
+
+fix_3_test_level:
+  - "Move integration tests to tests/integration/"
+  - "Unit tests: < 60 seconds total"
+  - "Integration tests: separate, can be slower"
+```
+
+---
+
+### **Issue 4: Mock Hell (Too Many Mocks)**
+
+**Symptoms:**
+- Test setup longer than test itself
+- 10+ mock objects per test
+- Mocks breaking when implementation changes
+
+**Common Causes:**
+1. **Wrong test level**: Testing integration at unit level
+2. **Tight coupling**: Module depends on too many others
+3. **Missing facades**: No abstraction layer
+
+**Fixes:**
+```yaml
+fix_1_test_level:
+  - "If > 3 mocks → probably integration test"
+  - "Move to tests/integration/"
+  - "Unit test the isolated logic only"
+
+fix_2_refactor_code:
+  - "Introduce facade pattern"
+  - "Dependency injection for easier mocking"
+  - "Reduce coupling between modules"
+
+fix_3_use_fakes:
+  - "Create simple fake implementations"
+  - "Better than complex mock expectations"
+  - "Example: FakeDB class vs mocking 10 DB methods"
+```
+
+---
+
+### **Issue 5: Test Pollution (State Leaks)**
+
+**Symptoms:**
+- Tests pass individually, fail when run together
+- Test order matters
+- Mysterious failures
+
+**Common Causes:**
+1. **Incomplete cleanup**: Stubs not restored, files not deleted
+2. **Global state mutation**: Process.env, singleton state
+3. **Async leaks**: Promises/timers continue after test
+
+**Fixes:**
+```yaml
+fix_1_cleanup:
+  javascript:
+    - "afterEach(() => { sinon.restore(); })"
+    - "Use sinon.useFakeTimers and restore in afterEach"
+    - "Delete created files: fs.unlinkSync in afterEach"
+  
+  python:
+    - "Use pytest fixtures with yield (auto-cleanup)"
+    - "Restore mocks: mocker auto-cleans"
+    - "Use tmp_path fixture for file tests"
+
+fix_2_isolate_globals:
+  - "Don't mutate process.env — use env snapshots"
+  - "Reset singletons in beforeEach"
+  - "Avoid global test state"
+
+fix_3_async_cleanup:
+  - "Ensure all promises resolve/reject before test ends"
+  - "Clear all timers: clearTimeout, clearInterval"
+  - "Use test framework's async handling (await in tests)"
+```
+
+**Example Fix:**
+```javascript
+// ❌ BEFORE: State leak
+let cachedData; // ❌ Shared across tests!
+
+it('test 1', () => {
+  cachedData = { value: 1 };
+  expect(cachedData.value).to.equal(1);
+});
+
+it('test 2', () => {
+  expect(cachedData).to.be.undefined; // ❌ FAILS — cachedData still set!
+});
+
+// ✅ AFTER: Proper isolation
+describe('Module', () => {
+  let cachedData;
+  
+  beforeEach(() => {
+    cachedData = undefined; // ✅ Reset before each test
+  });
+  
+  it('test 1', () => {
+    cachedData = { value: 1 };
+    expect(cachedData.value).to.equal(1);
+  });
+  
+  it('test 2', () => {
+    expect(cachedData).to.be.undefined; // ✅ PASSES — clean slate
+  });
+});
+```
+
+---
+
+## ✅ DEFINITION OF DONE
+
+### **Unit Test Suite is Production Ready when:**
+```yaml
+functional:
+  - [ ] All modules have test files
+  - [ ] Critical paths covered (> 80%)
+  - [ ] Real functionality validated (not just existence)
+  - [ ] All tests passing (100%)
+  - [ ] Quality score > 8/10 (@test-qualification)
+
+non_functional:
+  - [ ] Execution time < 60 seconds
+  - [ ] Tests pass with --parallel flag (parallel-safe)
+  - [ ] No flaky tests
+  - [ ] Clear test descriptions
+  - [ ] Proper mocking strategy
+
+coverage:
+  - [ ] Line coverage > 80% for critical modules
+  - [ ] Branch coverage > 70% for critical paths
+  - [ ] Uncovered lines reviewed and justified
+
+strategic:
+  - [ ] High-ROI gaps implemented
+  - [ ] Low-ROI gaps documented for future
+  - [ ] Wrong-level tests deferred to integration/e2e
+  - [ ] Team agrees: "This is production ready"
+```
+
+---
+
+## 🚀 EXPECTED OUTCOMES
+
+### **After Phase 2.1 (Smoke)**
+```
+- Structure validated
+- Modules mapped
+- But not production ready (many smoke tests)
+```
+
+### **After Phase 2.2 (Real)**
+```
+- Critical paths validated
+- Real functionality tested
+- Production ready
+```
+
+### **After Phase 2.3 (Strategic)**
+```
+- High-ROI improvements added
+- Clear roadmap to integration/e2e
+- Perfectionism avoided
+- Ship with confidence
+```
+
+---
+
+**Version**: 2.1  
+**Last Updated**: 2025-10-15  
+**Based On**: Successful Amanita scripts/ refactoring (6.5 → 8.7/10 in 7 hours)  
+**Compatibility**: Language-agnostic (JavaScript/Node.js, Python, other languages with unit test frameworks)  
+**Framework Support**: 
+- JavaScript: Mocha, Jest, Sinon, NYC/Istanbul
+- Python: pytest, unittest.mock, pytest-cov, pytest-xdist  
+**Related Rules**: @test-qualification.mdc, @test-to-success.mdc, @analysis.mdc, @run-task.mdc
+
+**Changelog**:
+
+**v2.1** (2025-10-15):
+- ✅ Context Detection: Compressed from 145 → 37 lines (74% reduction, clearer)
+- ✅ Section Structure: Fixed naming (6 → 7 sections, consistent)
+- ✅ Scope Boundaries: Added explicit "covers/not-covers" to Quick Start
+- ✅ Lines optimized: 2365 → 2277 (-88 lines, 3.7% reduction)
+
+**v2.0** (2025-10-15):
+- ✅ Language-agnostic: Added Python examples alongside JavaScript
+- ✅ Quick Start: 60-line progressive disclosure (5.3x cognitive load improvement)
+- ✅ Core Principles: Consolidated with Success Patterns (5 principles)
+- ✅ QA Practices: Added parallel execution, coverage metrics, mocking strategy, test data patterns, async patterns
+- ✅ Anti-Patterns: Added code examples (7 BEFORE/AFTER)
+- ✅ Troubleshooting: Added 5 common issues with fixes
+- ✅ Integration: Hybrid pattern with @itemy-*.mdc sub-rules
+- ✅ Code Examples: 40+ examples for both JavaScript and Python
+- ✅ Production Ready: QA alignment 9.4/10
