@@ -1,0 +1,3787 @@
+---
+alwaysApply: false
+description: "Systematic methodology for building production-ready E2E test suites with real infrastructure and workflow validation"
+---
+
+# @e2e-test-build: End-to-End Test Development
+
+> **Purpose**: Guide AI through systematic E2E test development focusing on complete workflows, real infrastructure, and critical user journeys
+
+---
+
+## ⚡ QUICK START
+
+### Scope & Boundaries
+
+**This rule covers:**
+- ✅ E2E tests (complete user workflows from start to finish)
+- ✅ Real infrastructure (blockchain nodes, databases, external services)
+- ✅ Critical journeys (deployment pipelines, user onboarding, regulatory scenarios)
+- ✅ JavaScript: Mocha + Hardhat, Playwright (web apps)
+- ✅ Python: pytest + Brownie/Ape, Playwright (web apps)
+
+**This rule does NOT cover (use other rules):**
+- ❌ Unit tests (isolated modules) → @unit-test-build.mdc
+- ❌ Integration tests (module interactions) → @integration-test-build.mdc
+- ❌ Performance/Load tests → Use specialized tools (k6, JMeter, Artillery)
+- ❌ Security audits → Use specialized tools (Slither, MythX, manual audit)
+
+---
+
+### When to Use
+- **NEW_E2E**: No E2E tests exist → Full cycle (Infrastructure + 4 Phases)
+- **EXTEND_E2E**: Tests exist (score > 8.5) → Add tests for new workflows
+- **FIX_E2E**: Tests exist (score < 8.5) → Fix flaky/failing tests, stabilize infrastructure
+- **VALIDATE_WORKFLOWS**: Integration OK → Add E2E validation for critical journeys only
+
+### Default Execution Flow
+```
+Phase 1: Infrastructure (3-4h) → Node, E2E harness, snapshots, proof tests
+    ↓
+Gate 1: Infrastructure Validation → Real node + harness work reliably
+    ↓
+Phase 2: Deploy Workflows (8-10h) → Contract deployment E2E (Actions 0, 1, 2)
+    ↓
+Phase 3: Component Workflows (6-8h) → Component management E2E (Actions 555, 777)
+    ↓
+Gate 2: Workflow Passing → All E2E tests pass (100%)
+    ↓
+Phase 4: Catalog + Full Pipeline (10-12h) → Catalog E2E + Action 888
+    ↓
+Gate 3: Real E2E Validation → @test-qualification (adapted for E2E)
+    ↓
+Gate 4: ROI Analysis → Ship at 8.5+/10
+    ↓
+Production Ready (> 8.5/10)
+```
+
+### Start Immediately
+```
+"Execute Phase 1 using @e2e-test-build.mdc method"
+
+AI will automatically:
+✓ Detect scenario (NEW_E2E/EXTEND/FIX/VALIDATE)
+✓ Setup real infrastructure (Hardhat node, test environment)
+✓ Create E2E harness with snapshot management
+✓ Generate infrastructure proof tests (3 tests)
+✓ Guide through 4-phase E2E development (27-34 hours total)
+```
+
+### Success Threshold
+```yaml
+production_ready:
+  score: "> 8.5/10 (@test-qualification adapted for E2E, higher than integration 8.0)"
+  workflow_coverage: "> 70% (critical user journeys covered)"
+  infrastructure: "Real node + real contracts (not heavily mocked)"
+  execution_time: "< 30 minutes (entire E2E suite)"
+  flakiness: "< 5% (very low flaky test rate)"
+
+ship_decision: "Critical workflows validated + infrastructure stable → SHIP"
+```
+
+---
+
+## 📚 DETAILED SECTIONS
+
+### Section 1: Core Principles (Inherited + E2E-Specific)
+### Section 2: Context Detection & Scenarios
+### Section 3: E2E Harness Pattern (Infrastructure Lifecycle)
+### Section 4: Phases (Deploy, Component, Catalog, Workflows)
+### Section 5: Quality Gates (Adapted for E2E)
+### Section 6: Examples & Templates
+### Section 7: Reference (Anti-Patterns, Troubleshooting, DoD)
+
+---
+
+## 🎯 CORE PRINCIPLES
+
+### Universal Principles (Inherited)
+
+**Principles 1-5: See @unit-test-build.mdc Section 1 for:**
+1. Progressive Complexity Over Big Bang
+2. Quality Gates Over Quantity Metrics
+3. Test Level Appropriateness
+4. ROI-Driven Over Perfectionism
+5. Evidence-Based Decisions Over Gut Feelings
+
+**Principles 6-9: See @integration-test-build.mdc Section 1 for:**
+6. Contract Validation First
+7. Real Dependencies Over Mocks
+8. Flow Testing Focus
+9. Database-Aware Testing
+
+These 9 principles apply to E2E testing as foundation. See referenced rules for detailed descriptions.
+
+---
+
+### E2E-Specific Principles
+
+### 10. **Infrastructure First (E2E Prerequisite)**
+```yaml
+anti_pattern: Start writing E2E tests before infrastructure ready
+success_pattern: Validate infrastructure first, then build E2E tests
+
+implementation:
+  phase_1_priority: "Create E2E harness (node, env, snapshots) before any workflow tests"
+  proof_tests: "3 infrastructure proof tests validate setup works"
+  only_after_proof: "Proceed to workflow tests only after infrastructure validated"
+  
+  reasoning: "E2E tests require complex infrastructure — validate foundation first"
+
+key_rule: "E2E without stable infrastructure = flaky tests guaranteed"
+
+example:
+  correct: "Phase 1 → Harness validated → 3 proof tests pass → Phase 2 (workflow tests)"
+  incorrect: "Write workflow tests → Infrastructure fails → Rewrite all tests (waste 10h)"
+
+comparison:
+  unit_tests: "No infrastructure needed (mocked dependencies)"
+  integration_tests: "Simple infrastructure (test DB, multi-module harness)"
+  e2e_tests: "Complex infrastructure (real node, contracts, snapshots) ← Must validate first"
+```
+
+### 11. **Workflow Completeness Over Partial Flows**
+```yaml
+anti_pattern: Test partial workflows (only happy path)
+success_pattern: Test complete user journey (happy + error scenarios + edge cases + cleanup)
+
+implementation:
+  complete_workflow_structure:
+    - Setup: Prepare initial state (contracts deployed, users activated)
+    - Happy Path: Full workflow succeeds (Deploy → Activate → Upload → Validate)
+    - Error Scenarios: Failure at EACH step with proper handling
+    - Edge Cases: Boundary conditions (max values, special characters)
+    - Cleanup: State reset (snapshot revert) for next test
+  
+  coverage_requirement: "Each critical workflow = 1 happy path + 2-3 error scenarios + 1 edge case"
+
+key_rule: "E2E = test complete user journey, not just success path"
+
+example:
+  correct: |
+    Workflow: User Onboarding E2E
+    - Happy: Deploy → Activate user → Upload component → Validate on-chain (success)
+    - Error 1: Deploy fails (insufficient gas) → Validate rollback
+    - Error 2: Activate fails (invalid invite) → Validate error handling
+    - Error 3: Upload fails (Arweave down) → Validate cleanup
+    - Edge: Max components (boundary test)
+  
+  incorrect: |
+    Workflow: User Onboarding E2E
+    - Happy: Deploy → Activate → Upload (success only)
+    # Missing: Error scenarios, edge cases, cleanup validation
+
+comparison:
+  unit_tests: "Test method behavior (isolated, many edge cases)"
+  integration_tests: "Test module contracts (data flow validation)"
+  e2e_tests: "Test complete workflows (realistic user journeys with error handling)"
+```
+
+### 12. **Selective Coverage Over Exhaustive**
+```yaml
+anti_pattern: Test everything at E2E level (duplicates unit/integration, wastes resources)
+success_pattern: Test only critical workflows that unit/integration cannot cover
+
+implementation:
+  roi_framework: "E2E expensive (infrastructure, execution time) → selective coverage"
+  
+  defer_to_integration:
+    - Module boundary contracts (ContractManager → ArweaveManager)
+    - Data flow validation between modules
+    - API request/response format validation
+  
+  defer_to_unit:
+    - Method logic and edge cases
+    - Input validation
+    - Error handling within single module
+  
+  e2e_only:
+    - Full user journeys (login → purchase → checkout)
+    - Deployment pipelines (registry → deploy all → initialize)
+    - Regulatory scenarios (KYC → verification → approval)
+    - Multi-action orchestration (Action 888: full pipeline)
+
+key_rule: "E2E = critical workflows only (10-30 tests), defer rest to cheaper test levels"
+
+example:
+  high_roi_e2e: |
+    - User onboarding (activate → seller → first product) ← Business critical
+    - Deployment pipeline (registry → deploy → init) ← System critical
+    - Full catalog workflow (CSV → Arweave → Contract) ← End-to-end value
+  
+  low_roi_e2e: |
+    - Input validation for single field ← Unit test
+    - ContractManager output format ← Integration test
+    - Edge case: Max string length ← Unit test
+    # Don't waste E2E infrastructure on these
+
+decision_tree:
+  question_1: "Does this require full system (frontend + backend + blockchain + external)?"
+  if_no: "❌ Defer to @integration-test-build or @unit-test-build"
+  if_yes: "→ Continue to question 2"
+  
+  question_2: "Is this a critical user journey or regulatory requirement?"
+  if_no: "❌ Low ROI — defer or document"
+  if_yes: "→ Continue to question 3"
+  
+  question_3: "Can this be validated with integration tests (module contracts)?"
+  if_yes: "❌ Defer to @integration-test-build (cheaper)"
+  if_no: "✅ HIGH ROI — Add E2E test"
+```
+
+### 13. **Snapshot-Driven Isolation**
+```yaml
+anti_pattern: Recreate full state for each test (slow, flaky, wastes time)
+success_pattern: Use EVM snapshots aggressively for test isolation
+
+implementation:
+  snapshot_pattern:
+    step_1: "Setup expensive state ONCE (deploy all contracts, activate users, upload components)"
+    step_2: "Create initial snapshot (EVM state saved)"
+    step_3: "Each test: Revert to snapshot → Execute workflow → Validate"
+    step_4: "Cleanup: Automatic (snapshot revert clears state)"
+  
+  performance_impact:
+    without_snapshots: "Each test: Redeploy 10 contracts (~30s) + activate users (~10s) = 40s overhead"
+    with_snapshots: "Each test: Revert snapshot (~1s) = 40x faster"
+    
+    for_30_tests: "Without: 20 minutes overhead | With: 30 seconds overhead (40x improvement)"
+
+key_rule: "E2E performance = aggressive snapshot usage"
+
+example:
+  correct: |
+    before(async () => {
+      // Expensive setup ONCE
+      await harness.deployAllContracts();  // ~30s
+      await harness.activateSellers();      // ~10s
+      await harness.uploadComponents();     // ~15s
+      
+      // Create snapshot (cheap ~1s)
+      await harness.createInitialSnapshot();
+    });
+    
+    beforeEach(async () => {
+      // Revert to snapshot (very fast ~1s)
+      await harness.resetNetwork();
+    });
+    
+    it('Test 1', async () => { /* runs from fresh snapshot */ });
+    it('Test 2', async () => { /* runs from fresh snapshot */ });
+    // Each test: 1s overhead (snapshot) vs 55s (redeploy)
+  
+  incorrect: |
+    beforeEach(async () => {
+      // Recreate EVERYTHING for each test (slow!)
+      await harness.deployAllContracts();  // ~30s per test ❌
+      await harness.activateSellers();      // ~10s per test ❌
+      await harness.uploadComponents();     // ~15s per test ❌
+    });
+    
+    it('Test 1', async () => { /* 55s setup overhead */ });
+    it('Test 2', async () => { /* 55s setup overhead */ });
+    // 30 tests = 27.5 minutes wasted on setup
+
+comparison:
+  unit_tests: "No snapshots needed (no state, tests isolated)"
+  integration_tests: "DB transactions for isolation (or fresh in-memory DB)"
+  e2e_tests: "EVM snapshots critical (expensive state setup, fast reset)"
+```
+
+---
+
+## 📖 SECTION 2: CONTEXT DETECTION & SCENARIOS
+
+> **Self-Orchestrating**: Rule automatically detects context and selects appropriate execution path
+
+### **Detection Logic**
+
+```yaml
+step_1_check_infrastructure:
+  question: "Does tests/e2e/ directory exist with E2E harness?"
+  check_files: ["tests/e2e/helpers/E2EHarness.js", "tests/e2e/helpers/e2e_harness.py"]
+  if_no: → SCENARIO: NEW_E2E (Full cycle)
+  if_yes: → Continue to step 2
+
+step_2_check_existing_tests:
+  question: "Do E2E workflow tests exist?"
+  check_pattern: "tests/e2e/**/*.e2e.test.{js,py}"
+  if_no: → SCENARIO: NEW_E2E (Create E2E infrastructure + tests)
+  if_yes: → Continue to step 3
+
+step_3_check_quality:
+  question: "What is E2E test quality score?"
+  method: "@test-qualification.mdc (adapted for E2E level)"
+  if_score_below_8.5: → SCENARIO: FIX_E2E (fix flaky/failing tests)
+  if_score_above_8.5: → Continue to step 4
+
+step_4_check_coverage:
+  question: "Are new workflows added to the system?"
+  check_method: "Compare current workflows with existing E2E test coverage"
+  if_yes: → SCENARIO: EXTEND_E2E (add E2E for new workflows)
+  if_no: → SCENARIO: VALIDATE_WORKFLOWS (selective E2E for critical paths)
+```
+
+### **Scenarios**
+
+**Scenario A: NEW_E2E** — No E2E tests exist → Full cycle (Phases 1, 2, 3, 4)  
+**Duration**: 27-34 hours | **Output**: Production-ready E2E suite with infrastructure from scratch
+
+```yaml
+triggers:
+  - No tests/e2e/ directory exists
+  - No E2E harness (E2EHarness.js/e2e_harness.py) found
+  - No E2E tests exist (*.e2e.test.js/py pattern)
+
+execution_path:
+  - Phase 1: Infrastructure (3-4h) → Node + Harness + Snapshots + 3 proof tests
+  - Phase 2: Deploy Workflows (8-10h) → Actions 0, 1, 2 (40-50 tests)
+  - Phase 3: Component Workflows (6-8h) → Actions 555, 777 (28-34 tests)
+  - Phase 4: Catalog + Pipeline (10-12h) → Actions 41-43, 444, 888 (104-129 tests)
+
+deliverables:
+  - E2E harness (infrastructure management class)
+  - 172-212 E2E tests (all phases)
+  - Real node integration (Hardhat/Ganache)
+  - Snapshot management (fast test isolation)
+  - Production-ready E2E suite (score > 8.5/10)
+```
+
+**Scenario B: EXTEND_E2E** — Tests exist (score > 8.5) → Add E2E for new workflows  
+**Duration**: 3-6 hours per workflow | **Output**: Extended E2E coverage for new features
+
+```yaml
+triggers:
+  - E2E infrastructure exists and works
+  - Quality score > 8.5/10
+  - New workflows added to system (new actions, new features)
+
+execution_path:
+  - Identify new workflows needing E2E coverage
+  - Determine relevant phase (Deploy/Component/Catalog/Pipeline)
+  - Add E2E tests following existing patterns
+  - Validate against quality gates
+
+deliverables:
+  - E2E tests for new workflows (10-20 tests per workflow)
+  - Maintained quality score (> 8.5/10)
+  - Execution time still < 30 minutes
+```
+
+**Scenario C: FIX_E2E** — Tests exist (score < 8.5) → Fix flaky/failing tests  
+**Duration**: 4-8 hours | **Output**: Stable E2E tests, score > 8.5/10
+
+```yaml
+triggers:
+  - E2E tests exist but quality score < 8.5/10
+  - Flaky tests detected (intermittent failures)
+  - Infrastructure instability (node crashes, timeout issues)
+
+execution_path:
+  - Apply @test-to-success.mdc for systematic debugging
+  - Focus on infrastructure stability (harness, node, snapshots)
+  - Fix flaky patterns (hard-coded timeouts, state pollution)
+  - Re-validate quality score
+
+deliverables:
+  - Stable E2E tests (< 5% flakiness)
+  - Fixed infrastructure issues
+  - Quality score > 8.5/10
+```
+
+**Scenario D: VALIDATE_WORKFLOWS** — Integration OK → Selective E2E for critical paths  
+**Duration**: 8-16 hours | **Output**: Critical workflows validated E2E
+
+```yaml
+triggers:
+  - Integration tests exist with score > 8.0/10
+  - Unit tests comprehensive
+  - Need E2E validation for critical workflows only (selective coverage)
+
+execution_path:
+  - Identify critical workflows (high business value, regulatory, deployment)
+  - Create E2E infrastructure (Phase 1)
+  - Add E2E tests for critical workflows only (defer rest to integration)
+  - Apply ROI framework aggressively
+
+deliverables:
+  - E2E tests for 10-30 critical workflows only
+  - Infrastructure optimized for selective coverage
+  - Clear documentation: which workflows have E2E, which don't (and why)
+```
+
+---
+
+## 🎯 SELF-ORCHESTRATION FRAMEWORK
+
+> **Built-in orchestration**: No need for separate @run-task.mdc or @analysis.mdc
+
+### **How It Works**
+
+```yaml
+single_rule_execution:
+  input: "@e2e-test-build.mdc + task description"
+  
+  automatic_steps:
+    1. Context Detection → Determine scenario (NEW/EXTEND/FIX/VALIDATE)
+    2. ItemY Generation → Create phase-specific tasks
+    3. Progressive Execution → Phase 1 → Gate 1 → Phase 2-4 → Gates 2-4 → Done
+    4. Quality Gates → Auto-trigger @test-qualification (adapted for E2E)
+    5. ROI Analysis → Ship at 8.5+/10, defer low-value E2E to integration
+    6. Anti-pattern Detection → Continuous monitoring (flaky tests, scope violations)
+  
+  output: "Production-ready E2E tests without additional orchestration"
+```
+
+### **ItemY Structure (Per Phase)**
+
+Each Phase = ListX with ItemY tasks following @run-task pattern:
+
+```yaml
+ItemY_Template:
+  understanding:
+    sub_rule: "@itemy-understanding.mdc (optional)"
+    actions:
+      - Analyze current E2E state (infrastructure, existing tests)
+      - Identify critical workflows needing E2E coverage
+      - Check infrastructure readiness
+  
+  knowledge_check:
+    sub_rule: "@itemy-knowledge-check.mdc (optional)"
+    actions:
+      - Review E2E testing best practices
+      - Check workflow patterns (blockchain, web, API)
+      - Identify anti-flaky patterns
+  
+  acceptance_criteria:
+    sub_rule: "@itemy-acceptance.mdc (optional)"
+    actions:
+      - [ ] Specific, measurable criteria per phase
+      - [ ] Infrastructure validation thresholds
+      - [ ] Workflow coverage targets
+  
+  planning:
+    sub_rule: "@itemy-planning.mdc (optional)"
+    actions:
+      - Break down into concrete steps
+      - Plan infrastructure setup (node strategy, snapshot approach)
+      - Identify workflow dependencies
+  
+  implementation:
+    sub_rule: "@itemy-execution.mdc (optional)"
+    actions:
+      - Execute step-by-step
+      - Setup real infrastructure (node, harness, env)
+      - Create workflow tests with complete coverage
+  
+  validation:
+    sub_rule: "@itemy-validation.mdc (optional)"
+    actions:
+      - Run E2E tests (100% passing required)
+      - Check infrastructure stability
+      - Validate workflow completeness
+  
+  retrospective:
+    sub_rule: "@itemy-retrospective.mdc (optional)"
+    actions:
+      - Document E2E learnings
+      - Identify infrastructure improvements
+      - Note workflow testing insights
+
+execution_note: |
+  AI can execute each step using embedded logic OR delegate to @itemy-*.mdc sub-rules.
+  Recommendation: Use sub-rules for complex infrastructure setup (Phase 1).
+```
+
+---
+
+## 📖 SECTION 3: E2E HARNESS PATTERN (Infrastructure Lifecycle)
+
+> **Reference**: Full E2EHarness implementation provided in Phase 1 (Section 4, lines 550-888). This section documents usage patterns and strategies.
+
+### **3.1 Node Lifecycle Management Strategies**
+
+**Strategy 1: Hardhat Network (In-Process)** ⭐ Recommended for CI/CD
+
+**Tools**: Hardhat built-in node  
+**Setup Time**: < 1 second (starts with test suite)  
+**Pros**: Fast, integrated, no external dependencies, perfect for CI/CD  
+**Cons**: In-process (node crashes kill test suite)  
+**When to Use**: Development, automated CI/CD pipelines, quick iteration
+
+**JavaScript Setup:**
+```javascript
+// hardhat.config.js
+module.exports = {
+  networks: {
+    hardhat: {
+      chainId: 31337,
+      mining: {
+        auto: true,
+        interval: 0 // Instant mining
+      },
+      accounts: {
+        count: 20,
+        accountsBalance: "10000000000000000000000" // 10000 ETH
+      }
+    }
+  }
+};
+
+// E2E test uses in-process node
+describe('E2E with In-Process Node', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode(); // Uses Hardhat in-process
+    // Node started automatically, no external process
+  });
+  
+  // Tests run against in-process node
+});
+```
+
+**Python Setup:**
+```python
+# brownie-config.yaml
+networks:
+  development:
+    name: Hardhat
+    host: http://127.0.0.1
+    port: 8545
+    chain_id: 31337
+
+# E2E test uses Brownie network
+@pytest.fixture(scope='module')
+async def harness():
+    h = E2EHarness()
+    await h.start_node()  # Connects to Brownie development network
+    yield h
+```
+
+---
+
+**Strategy 2: Standalone Node (Background Process)**
+
+**Tools**: Hardhat standalone (`npx hardhat node`), Ganache  
+**Setup Time**: 2-5 seconds (starts in background before tests)  
+**Pros**: Isolated (crashes don't kill tests), debuggable (persistent logs), can inspect state manually  
+**Cons**: Manual start/stop, port conflicts possible, requires process management  
+**When to Use**: Manual debugging, inspecting state between tests, complex debugging scenarios
+
+**JavaScript Setup:**
+```javascript
+// Start node manually before tests
+// Terminal 1: npx hardhat node --port 8545
+
+// E2E test connects to standalone node
+describe('E2E with Standalone Node', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode(useExisting: true); // Connects to existing node
+    
+    // Node already running on port 8545
+  });
+  
+  after(async () => {
+    // Don't stop node (manual management)
+    // Can inspect state in Hardhat console after tests
+  });
+});
+```
+
+**NPM Script (Automated):**
+```json
+{
+  "scripts": {
+    "e2e:node": "hardhat node --port 8545",
+    "e2e:test": "wait-on tcp:8545 && mocha 'tests/e2e/**/*.e2e.test.js'"
+  }
+}
+```
+
+---
+
+**Strategy 3: Cloud DevNets (Tenderly, Alchemy)** ☁️ Production-Like
+
+**Tools**: Tenderly DevNets, Alchemy Sandbox, QuickNode  
+**Setup Time**: 5-10 seconds (API call to provision)  
+**Pros**: Production-like environment, no local setup, team collaboration (shared DevNet), fork mainnet state  
+**Cons**: Network latency (~100-500ms), API rate limits, cost ($), requires internet  
+**When to Use**: Production-like testing, mainnet fork testing, team collaboration, CI/CD with cloud infrastructure
+
+**JavaScript Setup (Tenderly DevNets):**
+```javascript
+// hardhat.config.js
+module.exports = {
+  networks: {
+    tenderly: {
+      url: process.env.TENDERLY_DEVNET_URL,
+      accounts: [process.env.PRIVATE_KEY]
+    }
+  }
+};
+
+// E2E test with Tenderly DevNet
+describe('E2E with Tenderly DevNet', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(30000); // API call to provision DevNet
+    
+    harness = new E2EHarness();
+    
+    // Connect to Tenderly DevNet (cloud)
+    await harness.startNode();
+    harness.loadTestEnv({
+      NETWORK: 'tenderly',
+      TENDERLY_DEVNET_URL: process.env.TENDERLY_DEVNET_URL
+    });
+  });
+  
+  // Tests run against cloud DevNet (production-like)
+});
+```
+
+---
+
+**Decision Matrix: Which Node Strategy?**
+
+| Factor | In-Process (Hardhat) | Standalone (Hardhat/Ganache) | Cloud (Tenderly/Alchemy) |
+|--------|---------------------|------------------------------|--------------------------|
+| **Speed** | ⚡⚡⚡ Instant | ⚡⚡ 2-5s startup | ⚡ 5-10s + latency |
+| **Isolation** | ⚠️ In-process | ✅ Separate process | ✅ Cloud isolated |
+| **Debugging** | ⚠️ Logs in test output | ✅ Persistent logs | ✅ Web UI (Tenderly) |
+| **CI/CD** | ✅ Perfect | ⚠️ Needs setup | ✅ Good (if API keys) |
+| **Cost** | ✅ Free | ✅ Free | 💰 Paid (API limits) |
+| **State Inspection** | ❌ Disappears after | ✅ Manual inspection | ✅ Web dashboard |
+| **Production-Like** | ⚠️ Basic | ⚠️ Basic | ✅ Fork mainnet |
+
+**Recommendation:**
+- **Development + CI/CD**: Use In-Process (Hardhat) — fastest, zero setup
+- **Debugging**: Use Standalone — inspect state manually after tests
+- **Production Testing**: Use Cloud DevNets — fork mainnet, realistic environment
+
+---
+
+### **3.2 Snapshot & State Management Patterns**
+
+> **Critical**: EVM snapshots provide 40x performance improvement for E2E tests (1s vs 40s per test)
+
+**Concept: EVM Snapshots**
+
+```yaml
+what: "Point-in-time blockchain state capture (all contracts, balances, storage)"
+why: "Fast test isolation without redeploying contracts"
+how: "evm_snapshot → test runs → evm_revert → repeat"
+
+performance_impact:
+  without_snapshots:
+    - Each test: Redeploy 10 contracts (~30s) + activate users (~10s) = 40s overhead
+    - 30 E2E tests: 20 minutes wasted on setup
+  
+  with_snapshots:
+    - Setup once: Deploy + activate (~55s)
+    - Each test: Revert snapshot (~1s) = 40x faster
+    - 30 E2E tests: 30 seconds setup overhead (vs 20 minutes)
+  
+  recommendation: "Use snapshots aggressively — create after ANY expensive operation"
+```
+
+**Pattern 1: Initial Snapshot (Setup Once, Reuse Many)**
+
+Most common pattern for E2E tests.
+
+**JavaScript:**
+```javascript
+describe('E2E: Component Upload (with snapshots)', () => {
+  let harness, deployedContracts;
+  
+  before(async function() {
+    this.timeout(120000); // Allow time for expensive setup
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv();
+    
+    // EXPENSIVE SETUP (do once)
+    const registry = await deployRegistry();           // ~10s
+    deployedContracts = await deployAllContracts({     // ~30s
+      registryAddress: registry.proxy
+    });
+    await initializeSystem({                           // ~10s
+      registry: registry.proxy,
+      contracts: deployedContracts
+    });
+    await activateSellers(deployedContracts);          // ~5s
+    
+    // Total setup: ~55s (done ONCE)
+    
+    // CREATE SNAPSHOT (save this expensive state)
+    await harness.createInitialSnapshot(); // ~1s
+    
+    console.log('✓ Expensive setup complete, snapshot created');
+  });
+  
+  beforeEach(async () => {
+    // REVERT TO SNAPSHOT (very fast ~1s)
+    await harness.resetNetwork();
+    // Each test starts from same expensive state (contracts deployed, sellers activated)
+  });
+  
+  it('Test 1: Upload component', async () => {
+    // Starts from snapshot (1s overhead)
+    // ... test logic ...
+  });
+  
+  it('Test 2: Upload another component', async () => {
+    // Starts from snapshot (1s overhead)
+    // ... test logic ...
+  });
+  
+  // 30 tests = 30s overhead (vs 27.5 minutes without snapshots)
+});
+```
+
+**Python:**
+```python
+@pytest.fixture(scope='module')
+async def harness_with_deployed_contracts():
+    """E2E harness with expensive setup (once per module)"""
+    h = E2EHarness()
+    await h.start_node()
+    h.load_test_env()
+    
+    # EXPENSIVE SETUP (once)
+    registry = await deploy_registry()
+    contracts = await deploy_all_contracts(registry.address)
+    await initialize_system(registry, contracts)
+    await activate_sellers(contracts)
+    
+    # CREATE SNAPSHOT
+    await h.create_initial_snapshot()
+    
+    yield h, contracts
+    
+    await h.stop_node()
+
+@pytest.fixture
+async def clean_state(harness_with_deployed_contracts):
+    """Reset to clean state before each test"""
+    harness, contracts = harness_with_deployed_contracts
+    
+    # REVERT TO SNAPSHOT (fast)
+    await harness.reset_network()
+    
+    yield harness, contracts
+
+async def test_component_upload_1(clean_state):
+    """Test runs from clean snapshot"""
+    harness, contracts = clean_state
+    # ... test logic ...
+
+async def test_component_upload_2(clean_state):
+    """Another test from clean snapshot"""
+    harness, contracts = clean_state
+    # ... test logic ...
+```
+
+---
+
+**Pattern 2: Named Snapshots (Multi-State Testing)**
+
+Test workflows from different starting states.
+
+**JavaScript:**
+```javascript
+describe('E2E: Testing from Multiple States', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(180000);
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    
+    // STATE 1: Only contracts deployed
+    const registry = await deployRegistry();
+    const contracts = await deployAllContracts({ registryAddress: registry.proxy });
+    await harness.saveState('contracts-deployed'); // Named snapshot
+    
+    // STATE 2: + Sellers activated
+    await activateSellers(contracts);
+    await harness.saveState('sellers-activated'); // Named snapshot
+    
+    // STATE 3: + Components uploaded
+    await uploadComponents(contracts);
+    await harness.saveState('components-uploaded'); // Named snapshot
+  });
+  
+  it('should test from "contracts-deployed" state', async () => {
+    await harness.restoreState('contracts-deployed');
+    
+    // Test starts from state: contracts deployed, NO sellers, NO components
+    const state = await harness.getBlockchainState();
+    // ... test activation workflow from this state ...
+  });
+  
+  it('should test from "sellers-activated" state', async () => {
+    await harness.restoreState('sellers-activated');
+    
+    // Test starts from state: contracts + sellers, NO components yet
+    // ... test component upload from this state ...
+  });
+  
+  it('should test from "components-uploaded" state', async () => {
+    await harness.restoreState('components-uploaded');
+    
+    // Test starts from state: contracts + sellers + components
+    // ... test catalog upload from this state ...
+  });
+});
+```
+
+---
+
+**Pattern 3: Dynamic Snapshots (Test-Specific State)**
+
+Create snapshots on-the-fly for specific test scenarios.
+
+**JavaScript:**
+```javascript
+describe('E2E: Custom State Scenarios', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode();
+    await harness.createInitialSnapshot(); // Clean node
+  });
+  
+  beforeEach(async () => {
+    await harness.resetNetwork(); // Back to clean
+  });
+  
+  it('should test workflow with 5 sellers (custom state)', async () => {
+    // Setup custom state: 5 sellers activated
+    const sellers = [];
+    for (let i = 0; i < 5; i++) {
+      const seller = await activateSeller();
+      sellers.push(seller);
+    }
+    
+    // Create snapshot of this custom state
+    await harness.saveState('five-sellers');
+    
+    // Test from this state
+    // ... catalog upload with 5 sellers ...
+    
+    // Can reuse this state later
+    await harness.restoreState('five-sellers');
+    // ... another test from same state ...
+  });
+});
+```
+
+**Performance Comparison:**
+
+```yaml
+scenario: "30 E2E tests, each needs deployed contracts + activated sellers"
+
+approach_1_no_snapshots:
+  setup_per_test:
+    - Deploy contracts: ~30s
+    - Activate sellers: ~10s
+    - Total: ~40s per test
+  
+  total_overhead: "30 tests × 40s = 20 minutes (1200s)"
+  actual_test_time: "30 tests × 10s = 5 minutes (300s)"
+  total_time: "25 minutes (1500s)"
+
+approach_2_with_snapshots:
+  setup_once:
+    - Deploy contracts: ~30s
+    - Activate sellers: ~10s
+    - Create snapshot: ~1s
+    - Total: ~41s (once)
+  
+  per_test_overhead:
+    - Revert snapshot: ~1s per test
+    - Total: 30 tests × 1s = 30s
+  
+  total_overhead: "41s (setup) + 30s (revert) = 71s"
+  actual_test_time: "30 tests × 10s = 5 minutes"
+  total_time: "~6.2 minutes (vs 25 minutes without snapshots)"
+  
+  speedup: "4x faster (25 min → 6.2 min)"
+
+recommendation: "Always use snapshots for E2E tests with expensive setup"
+```
+
+**Best Practices:**
+
+```yaml
+when_to_create_snapshots:
+  - ✅ After deploying all contracts (~30s saved per test)
+  - ✅ After activating users/sellers (~10s saved per test)
+  - ✅ After uploading components (~15s saved per test)
+  - ✅ After any operation taking > 5s
+  
+  - ❌ After cheap operations (< 1s) — overhead not worth it
+  - ❌ Too many snapshots — memory usage, complexity
+
+snapshot_naming:
+  good:
+    - 'initial' (clean node)
+    - 'contracts-deployed' (after Action 1)
+    - 'sellers-activated' (after seller setup)
+    - 'system-ready' (fully initialized)
+  
+  bad:
+    - 'snapshot1', 'snapshot2' (not descriptive)
+    - 'test-state' (which test?)
+    - No name (always use descriptive names)
+
+cleanup:
+  - Snapshots auto-deleted when node stops (in-process)
+  - For standalone node: manual cleanup or restart
+  - For cloud: DevNet disposal handles cleanup
+```
+
+---
+
+### **3.3 Validation Helpers (Usage Patterns)**
+
+> **Implementation**: Validation helpers already implemented in E2EHarness (lines 647-690). This section shows usage in E2E tests.
+
+**Helper 1: validateDeployment(address)**
+
+**Purpose**: Verify contract deployed on-chain (not mocked)
+
+**JavaScript Usage:**
+```javascript
+it('should deploy and validate Registry contract', async () => {
+  // Deploy contract
+  const result = await deployRegistry();
+  
+  // VALIDATE: Contract deployed on-chain (E2E harness helper)
+  const validation = await harness.validateDeployment(result.proxy);
+  
+  expect(validation.deployed).to.be.true;
+  expect(validation.codeSize).to.be.greaterThan(0);
+  
+  // Helper checks:
+  // - Code exists at address (not 0x)
+  // - Bytecode length > 0
+  // - Logs deployment confirmation
+});
+```
+
+**Python Usage:**
+```python
+async def test_deploy_and_validate_registry(harness):
+    """Deploy and validate contract on-chain"""
+    result = await deploy_registry()
+    
+    # VALIDATE: Contract deployed (E2E harness helper)
+    validation = await harness.validate_deployment(result['proxy'])
+    
+    assert validation['deployed'] is True
+    assert validation['code_size'] > 0
+```
+
+---
+
+**Helper 2: validateContractState(contract, method, expectedValue)**
+
+**Purpose**: Verify on-chain state matches expected (real contract call)
+
+**JavaScript Usage:**
+```javascript
+it('should validate on-chain state after initialization', async () => {
+  // Deploy and initialize
+  const registry = await deployRegistry();
+  await initializeSystem({ registry: registry.proxy });
+  
+  // Get contract instance
+  const Registry = await ethers.getContractAt('AmanitaRegistry', registry.proxy);
+  
+  // VALIDATE: On-chain state (E2E harness helper)
+  await harness.validateContractState(Registry, 'initialized', true);
+  await harness.validateContractState(Registry, 'getContractCount', 0);
+  
+  // Helper calls contract methods on-chain, compares with expected
+});
+```
+
+---
+
+**Helper 3: validateTransaction(txHash)**
+
+**Purpose**: Verify transaction succeeded on-chain
+
+**JavaScript Usage:**
+```javascript
+it('should validate transaction succeeded on-chain', async () => {
+  const Registry = await ethers.getContractAt('AmanitaRegistry', registryAddress);
+  
+  // Execute transaction
+  const tx = await Registry.registerContract('SpiralEngine', spiralEngineAddress);
+  
+  // VALIDATE: Transaction succeeded (E2E harness helper)
+  const receipt = await harness.validateTransaction(tx.hash);
+  
+  expect(receipt.status).to.equal(1);
+  expect(receipt.logs).to.have.length.greaterThan(0);
+  
+  // Helper checks:
+  // - Transaction found on-chain
+  // - Status = 1 (success)
+  // - Logs confirmation
+});
+```
+
+---
+
+**Helper 4: getOnChainData(contract, method, args)**
+
+**Purpose**: Read on-chain data for assertions
+
+**JavaScript Usage:**
+```javascript
+it('should read and validate on-chain data', async () => {
+  const Registry = await ethers.getContractAt('AmanitaRegistry', registryAddress);
+  
+  // Register contract
+  await Registry.registerContract('SpiralEngine', spiralEngineAddress);
+  
+  // READ: On-chain data (E2E harness helper)
+  const contractAddress = await harness.getOnChainData(
+    Registry,
+    'getContractAddress',
+    ['SpiralEngine']
+  );
+  
+  expect(contractAddress).to.equal(spiralEngineAddress);
+  
+  // Helper calls contract method, returns decoded result
+});
+```
+
+**Validation Helpers Usage Summary:**
+
+```yaml
+validateDeployment:
+  when: "After any contract deployment"
+  checks: "Bytecode exists on-chain"
+  use_case: "Verify deployment succeeded (not just transaction confirmed)"
+
+validateContractState:
+  when: "After state-changing operations"
+  checks: "On-chain state matches expected"
+  use_case: "Verify contract initialized, configured correctly"
+
+validateTransaction:
+  when: "After important transactions"
+  checks: "Transaction succeeded, events emitted"
+  use_case: "Verify state change transaction completed"
+
+getOnChainData:
+  when: "Need to read contract state for assertions"
+  checks: "Returns decoded on-chain data"
+  use_case: "Read mappings, arrays, complex state for validation"
+```
+
+---
+
+---
+
+## 📖 SECTION 4: PHASES (Deploy, Component, Catalog, Workflows)
+
+### **Phase 1: E2E Infrastructure & Harness** 🔴 CRITICAL
+**Goal**: Enable E2E testing with real blockchain infrastructure  
+**Duration**: 3-4 hours  
+**Cognitive Mode**: EXECUTION
+
+```yaml
+deliverables:
+  - tests/e2e/ directory structure
+  - E2E harness class (manages node lifecycle, snapshots, validation)
+  - Real blockchain node (Hardhat Network, Ganache, or Tenderly DevNets)
+  - Environment isolation (e2e.test.env file, NOT production .env)
+  - EVM snapshot management (create, revert, restore for test isolation)
+  - E2E test runner configuration (Mocha/pytest with extended timeouts)
+  - Scripts: test:e2e, test:e2e:parallel, test:e2e:workflows
+  - 3 infrastructure proof tests (validate setup works before workflow tests)
+
+validation:
+  - [ ] Real node starts successfully (< 30 seconds)
+  - [ ] EVM snapshots work (create, revert, restore)
+  - [ ] Test environment isolated (e2e.test.env loaded, not .env)
+  - [ ] 3 proof tests pass (node responsive, snapshot functional, deployment works)
+  - [ ] E2E harness operational (all methods work)
+```
+
+**Infrastructure Components:**
+
+**1. Directory Structure:**
+```
+tests/e2e/
+├── helpers/
+│   ├── E2EHarness.js (or e2e_harness.py)
+│   ├── validation.js (on-chain validation helpers)
+│   └── fixtures.js (test data)
+├── config/
+│   └── e2e.test.env (isolated environment variables)
+├── workflows/
+│   ├── deploy.e2e.test.js
+│   ├── components.e2e.test.js
+│   └── catalog.e2e.test.js
+└── proof.e2e.test.js (infrastructure validation)
+```
+
+**2. E2E Harness Structure:**
+
+**JavaScript (E2EHarness.js):**
+```javascript
+// tests/e2e/helpers/E2EHarness.js
+const hre = require("hardhat");
+const fs = require('fs');
+const path = require('path');
+
+class E2EHarness {
+  constructor() {
+    this.provider = null;
+    this.snapshots = {};
+    this.deployments = {};
+    this.originalEnv = {};
+  }
+  
+  // ===== STARTUP =====
+  
+  async startNode(useExisting = false) {
+    if (useExisting && await this.isNodeRunning()) {
+      console.log('Using existing Hardhat node');
+      this.provider = hre.ethers.provider;
+      return;
+    }
+    
+    // Start Hardhat node (in-process)
+    console.log('Starting Hardhat node...');
+    this.provider = hre.ethers.provider;
+    
+    // Verify node responsive
+    const blockNumber = await this.provider.getBlockNumber();
+    console.log(`Node started. Current block: ${blockNumber}`);
+  }
+  
+  loadTestEnv(overrides = {}) {
+    // Load e2e.test.env (isolated environment)
+    const envPath = path.join(__dirname, '../config/e2e.test.env');
+    
+    if (fs.existsSync(envPath)) {
+      const envConfig = require('dotenv').config({ path: envPath });
+      
+      // Save original env for restore
+      Object.keys(envConfig.parsed || {}).forEach(key => {
+        this.originalEnv[key] = process.env[key];
+        process.env[key] = overrides[key] || envConfig.parsed[key];
+      });
+      
+      console.log('Test environment loaded (isolated from production)');
+    }
+  }
+  
+  async createInitialSnapshot() {
+    const snapshotId = await this.provider.send('evm_snapshot', []);
+    this.snapshots['initial'] = snapshotId;
+    console.log(`Initial snapshot created: ${snapshotId}`);
+    return snapshotId;
+  }
+  
+  // ===== STATE MANAGEMENT =====
+  
+  async resetNetwork(snapshotName = 'initial') {
+    const snapshotId = this.snapshots[snapshotName];
+    if (!snapshotId) {
+      throw new Error(`Snapshot '${snapshotName}' not found`);
+    }
+    
+    await this.provider.send('evm_revert', [snapshotId]);
+    
+    // Recreate snapshot for next revert
+    const newSnapshotId = await this.provider.send('evm_snapshot', []);
+    this.snapshots[snapshotName] = newSnapshotId;
+    
+    return newSnapshotId;
+  }
+  
+  async getBlockchainState() {
+    const blockNumber = await this.provider.getBlockNumber();
+    const accounts = await this.provider.listAccounts();
+    
+    return {
+      blockNumber,
+      accountCount: accounts.length,
+      deployments: Object.keys(this.deployments).length
+    };
+  }
+  
+  async saveState(name) {
+    const snapshotId = await this.provider.send('evm_snapshot', []);
+    this.snapshots[name] = snapshotId;
+    console.log(`State saved: ${name} (snapshot: ${snapshotId})`);
+    return snapshotId;
+  }
+  
+  async restoreState(name) {
+    return await this.resetNetwork(name);
+  }
+  
+  // ===== VALIDATION =====
+  
+  async validateDeployment(address) {
+    const code = await this.provider.getCode(address);
+    
+    if (code === '0x' || code === '0x0') {
+      throw new Error(`Contract not deployed at ${address}`);
+    }
+    
+    console.log(`✓ Contract deployed at ${address} (${code.length} bytes)`);
+    return { deployed: true, codeSize: code.length };
+  }
+  
+  async validateContractState(contract, method, expectedValue) {
+    const actualValue = await contract[method]();
+    
+    if (actualValue !== expectedValue) {
+      throw new Error(
+        `Contract state mismatch: ${method}() = ${actualValue}, expected ${expectedValue}`
+      );
+    }
+    
+    console.log(`✓ Contract state validated: ${method}() = ${expectedValue}`);
+    return true;
+  }
+  
+  async validateTransaction(txHash) {
+    const receipt = await this.provider.getTransactionReceipt(txHash);
+    
+    if (!receipt) {
+      throw new Error(`Transaction not found: ${txHash}`);
+    }
+    
+    if (receipt.status !== 1) {
+      throw new Error(`Transaction failed: ${txHash}`);
+    }
+    
+    console.log(`✓ Transaction successful: ${txHash} (block ${receipt.blockNumber})`);
+    return receipt;
+  }
+  
+  async getOnChainData(contract, method, args = []) {
+    const result = await contract[method](...args);
+    return result;
+  }
+  
+  // ===== PERFORMANCE =====
+  
+  measureExecutionTime(actionName) {
+    const startTime = Date.now();
+    
+    return {
+      end: () => {
+        const duration = Date.now() - startTime;
+        console.log(`⏱️ ${actionName}: ${duration}ms`);
+        return duration;
+      }
+    };
+  }
+  
+  async measureGasUsage(txHash) {
+    const receipt = await this.provider.getTransactionReceipt(txHash);
+    const gasUsed = receipt.gasUsed.toString();
+    console.log(`⛽ Gas used: ${gasUsed}`);
+    return gasUsed;
+  }
+  
+  // ===== CLEANUP =====
+  
+  async stopNode() {
+    // For in-process Hardhat: no action needed (handled by test framework)
+    // For standalone node: would need to kill process
+    console.log('Node cleanup (in-process Hardhat)');
+  }
+  
+  restoreOriginalEnv() {
+    // Restore original environment variables
+    Object.keys(this.originalEnv).forEach(key => {
+      if (this.originalEnv[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = this.originalEnv[key];
+      }
+    });
+    
+    console.log('Environment restored');
+  }
+  
+  // ===== UTILITIES =====
+  
+  async isNodeRunning() {
+    try {
+      await this.provider.getBlockNumber();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+module.exports = { E2EHarness };
+```
+
+**Python (e2e_harness.py):**
+```python
+# tests/e2e/helpers/e2e_harness.py
+import os
+from web3 import Web3
+from brownie import network, accounts
+from dotenv import load_dotenv
+
+class E2EHarness:
+    def __init__(self):
+        self.provider = None
+        self.snapshots = {}
+        self.deployments = {}
+        self.original_env = {}
+    
+    # ===== STARTUP =====
+    
+    async def start_node(self, use_existing=False):
+        """Start blockchain node (Hardhat/Ganache)"""
+        if use_existing and self.is_node_running():
+            print('Using existing node')
+            self.provider = Web3(Web3.HTTPProvider('http://localhost:8545'))
+            return
+        
+        # Start Hardhat node (via Brownie network)
+        network.connect('development')
+        self.provider = Web3(Web3.HTTPProvider(network.show_active()))
+        
+        # Verify node responsive
+        block_number = self.provider.eth.block_number
+        print(f'Node started. Current block: {block_number}')
+    
+    def load_test_env(self, overrides=None):
+        """Load e2e.test.env (isolated environment)"""
+        env_path = os.path.join(os.path.dirname(__file__), '../config/e2e.test.env')
+        
+        if os.path.exists(env_path):
+            # Save original env
+            env_vars = load_dotenv(env_path)
+            
+            for key, value in (overrides or {}).items():
+                self.original_env[key] = os.environ.get(key)
+                os.environ[key] = value
+            
+            print('Test environment loaded (isolated)')
+    
+    async def create_initial_snapshot(self):
+        """Create initial EVM snapshot"""
+        snapshot_id = self.provider.provider.make_request('evm_snapshot', [])['result']
+        self.snapshots['initial'] = snapshot_id
+        print(f'Initial snapshot created: {snapshot_id}')
+        return snapshot_id
+    
+    # ===== STATE MANAGEMENT =====
+    
+    async def reset_network(self, snapshot_name='initial'):
+        """Revert to snapshot"""
+        snapshot_id = self.snapshots.get(snapshot_name)
+        if not snapshot_id:
+            raise ValueError(f"Snapshot '{snapshot_name}' not found")
+        
+        self.provider.provider.make_request('evm_revert', [snapshot_id])
+        
+        # Recreate snapshot
+        new_snapshot = self.provider.provider.make_request('evm_snapshot', [])['result']
+        self.snapshots[snapshot_name] = new_snapshot
+        
+        return new_snapshot
+    
+    async def get_blockchain_state(self):
+        """Get current blockchain state"""
+        return {
+            'block_number': self.provider.eth.block_number,
+            'account_count': len(accounts),
+            'deployments': len(self.deployments)
+        }
+    
+    async def save_state(self, name):
+        """Save named snapshot"""
+        snapshot_id = self.provider.provider.make_request('evm_snapshot', [])['result']
+        self.snapshots[name] = snapshot_id
+        print(f'State saved: {name} (snapshot: {snapshot_id})')
+        return snapshot_id
+    
+    async def restore_state(self, name):
+        """Restore named snapshot"""
+        return await self.reset_network(name)
+    
+    # ===== VALIDATION =====
+    
+    async def validate_deployment(self, address):
+        """Verify contract deployed on-chain"""
+        code = self.provider.eth.get_code(address)
+        
+        if code == b'' or code == b'\x00':
+            raise ValueError(f'Contract not deployed at {address}')
+        
+        print(f'✓ Contract deployed at {address} ({len(code)} bytes)')
+        return {'deployed': True, 'code_size': len(code)}
+    
+    async def validate_contract_state(self, contract, method, expected):
+        """Verify on-chain state matches expected"""
+        actual = getattr(contract, method)()
+        
+        if actual != expected:
+            raise ValueError(f'State mismatch: {method}() = {actual}, expected {expected}')
+        
+        print(f'✓ Contract state validated: {method}() = {expected}')
+        return True
+    
+    async def validate_transaction(self, tx_hash):
+        """Verify transaction succeeded"""
+        receipt = self.provider.eth.get_transaction_receipt(tx_hash)
+        
+        if not receipt:
+            raise ValueError(f'Transaction not found: {tx_hash}')
+        
+        if receipt['status'] != 1:
+            raise ValueError(f'Transaction failed: {tx_hash}')
+        
+        print(f'✓ Transaction successful: {tx_hash} (block {receipt["blockNumber"]})')
+        return receipt
+    
+    # ===== CLEANUP =====
+    
+    async def stop_node(self):
+        """Stop node (for standalone nodes)"""
+        if network.is_connected():
+            network.disconnect()
+        print('Node cleanup')
+    
+    def restore_original_env(self):
+        """Restore original environment variables"""
+        for key, value in self.original_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+        print('Environment restored')
+```
+
+**Framework Setup:**
+
+**JavaScript (package.json):**
+```json
+{
+  "scripts": {
+    "test:e2e": "mocha 'tests/e2e/**/*.e2e.test.js' --timeout 60000 --slow 10000",
+    "test:e2e:workflows": "mocha 'tests/e2e/workflows/*.e2e.test.js' --timeout 60000",
+    "test:e2e:parallel": "mocha --parallel 'tests/e2e/**/*.e2e.test.js' --timeout 60000",
+    "test:e2e:watch": "mocha 'tests/e2e/**/*.e2e.test.js' --watch"
+  },
+  "devDependencies": {
+    "hardhat": "^2.19.0",
+    "mocha": "^10.0.0",
+    "chai": "^4.3.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "dotenv": "^16.0.0"
+  }
+}
+```
+
+**Python (pytest.ini):**
+```ini
+# pytest.ini
+[pytest]
+testpaths = tests/e2e
+timeout = 120
+addopts = -v --tb=short -m e2e
+
+markers =
+    e2e: End-to-end tests requiring full infrastructure
+    slow: Slow tests (> 30 seconds)
+    workflows: Multi-action workflow tests
+
+# Run only E2E tests
+# pytest -m e2e
+
+# Run E2E in parallel
+# pytest -m e2e -n auto
+```
+
+**3. Proof Tests (Infrastructure Validation):**
+
+**JavaScript:**
+```javascript
+// tests/e2e/proof.e2e.test.js
+const { expect } = require('chai');
+const { E2EHarness } = require('./helpers/E2EHarness');
+
+describe('E2E Infrastructure Proof Tests', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(60000); // 60s for infrastructure setup
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  it('Proof 1: Node is running and responsive', async () => {
+    const state = await harness.getBlockchainState();
+    
+    expect(state.blockNumber).to.be.a('number');
+    expect(state.accountCount).to.be.greaterThan(0);
+    
+    console.log(`✓ Node responsive (block: ${state.blockNumber}, accounts: ${state.accountCount})`);
+  });
+  
+  it('Proof 2: EVM snapshots work (create, revert, restore)', async () => {
+    // Get initial block
+    const initialBlock = await harness.provider.getBlockNumber();
+    
+    // Create snapshot
+    const snapshotId = await harness.saveState('test-snapshot');
+    expect(snapshotId).to.exist;
+    
+    // Mine blocks (change state)
+    await harness.provider.send('evm_mine', []);
+    await harness.provider.send('evm_mine', []);
+    const changedBlock = await harness.provider.getBlockNumber();
+    expect(changedBlock).to.equal(initialBlock + 2);
+    
+    // Revert to snapshot
+    await harness.restoreState('test-snapshot');
+    const revertedBlock = await harness.provider.getBlockNumber();
+    
+    // State reverted
+    expect(revertedBlock).to.equal(initialBlock);
+    console.log('✓ Snapshot mechanism works (create, revert, restore)');
+  });
+  
+  it('Proof 3: Contract deployment works on real node', async () => {
+    const [deployer] = await ethers.getSigners();
+    
+    // Deploy simple contract
+    const SimpleContract = await ethers.getContractFactory('SimpleStorage', deployer);
+    const contract = await SimpleContract.deploy();
+    await contract.waitForDeployment();
+    
+    const address = await contract.getAddress();
+    
+    // Validate deployment
+    const validation = await harness.validateDeployment(address);
+    expect(validation.deployed).to.be.true;
+    expect(validation.codeSize).to.be.greaterThan(0);
+    
+    console.log(`✓ Contract deployed successfully at ${address}`);
+  });
+});
+```
+
+**Python:**
+```python
+# tests/e2e/test_proof.py
+import pytest
+from tests.e2e.helpers.e2e_harness import E2EHarness
+from brownie import SimpleStorage, accounts
+
+@pytest.fixture(scope='module')
+async def harness():
+    """E2E harness for proof tests"""
+    h = E2EHarness()
+    await h.start_node()
+    h.load_test_env()
+    
+    yield h
+    
+    await h.stop_node()
+    h.restore_original_env()
+
+@pytest.mark.e2e
+async def test_proof_1_node_responsive(harness):
+    """Proof 1: Node is running and responsive"""
+    state = await harness.get_blockchain_state()
+    
+    assert isinstance(state['block_number'], int)
+    assert state['account_count'] > 0
+    
+    print(f"✓ Node responsive (block: {state['block_number']}, accounts: {state['account_count']})")
+
+@pytest.mark.e2e
+async def test_proof_2_snapshots_work(harness):
+    """Proof 2: EVM snapshots work"""
+    # Get initial block
+    initial_state = await harness.get_blockchain_state()
+    initial_block = initial_state['block_number']
+    
+    # Create snapshot
+    snapshot_id = await harness.save_state('test-snapshot')
+    assert snapshot_id is not None
+    
+    # Mine blocks
+    harness.provider.provider.make_request('evm_mine', [])
+    harness.provider.provider.make_request('evm_mine', [])
+    
+    changed_state = await harness.get_blockchain_state()
+    assert changed_state['block_number'] == initial_block + 2
+    
+    # Revert to snapshot
+    await harness.restore_state('test-snapshot')
+    reverted_state = await harness.get_blockchain_state()
+    
+    # State reverted
+    assert reverted_state['block_number'] == initial_block
+    print('✓ Snapshot mechanism works')
+
+@pytest.mark.e2e
+async def test_proof_3_deployment_works(harness):
+    """Proof 3: Contract deployment works"""
+    deployer = accounts[0]
+    
+    # Deploy contract
+    contract = SimpleStorage.deploy({'from': deployer})
+    
+    # Validate deployment
+    validation = await harness.validate_deployment(contract.address)
+    assert validation['deployed'] is True
+    assert validation['code_size'] > 0
+    
+    print(f"✓ Contract deployed at {contract.address}")
+```
+
+### **Phase 2: Deploy Actions E2E Tests**
+**Goal**: Validate deployment actions end-to-end on real blockchain  
+**Duration**: 8-10 hours  
+**Cognitive Mode**: CRITICAL  
+**Expected Output**: 40-50 E2E tests
+
+```yaml
+trigger: After Phase 1 (infrastructure validated via proof tests)
+
+scope:
+  - Action 0: Deploy Registry (AmanitaRegistry.sol)
+  - Action 1: Deploy All Contracts (UUPS pattern, 8-10 contracts)
+  - Action 2: Initialize System (roles, permissions, initial state)
+
+characteristics:
+  infrastructure: "Real Hardhat node (from Phase 1)"
+  contracts: "Real deployments (not mocked)"
+  validation: "On-chain state checks (not stubbed)"
+  isolation: "EVM snapshots (reset between tests)"
+
+acceptance_criteria:
+  - [ ] All deploy actions tested (0, 1, 2)
+  - [ ] Happy path workflows complete
+  - [ ] Error scenarios validated (insufficient gas, invalid params)
+  - [ ] On-chain state validated (real contract calls)
+  - [ ] Tests pass with real node (100% passing)
+```
+
+**E2E Test Patterns:**
+
+**Pattern 1: Single Action E2E**
+
+Structure: Setup harness → Execute action → Validate on-chain → Cleanup (snapshot reset)
+
+**JavaScript Example (Action 0: Deploy Registry):**
+```javascript
+// tests/e2e/workflows/deploy.e2e.test.js
+const { expect } = require('chai');
+const { E2EHarness } = require('../helpers/E2EHarness');
+const { deployRegistry } = require('../../../scripts/actions/action0');
+
+describe('E2E: Action 0 - Deploy Registry', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(60000);
+    
+    // Setup E2E infrastructure
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv({ MODE: 'test' });
+    await harness.createInitialSnapshot();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  beforeEach(async () => {
+    // Reset to clean state
+    await harness.resetNetwork();
+  });
+  
+  it('should deploy Registry contract successfully', async () => {
+    const timer = harness.measureExecutionTime('Deploy Registry');
+    
+    // EXECUTE: Action 0 (real deployment)
+    const result = await deployRegistry();
+    
+    expect(result.proxy).to.exist;
+    expect(result.logic).to.exist;
+    
+    // VALIDATE: On-chain deployment
+    const proxyValidation = await harness.validateDeployment(result.proxy);
+    expect(proxyValidation.deployed).to.be.true;
+    
+    const logicValidation = await harness.validateDeployment(result.logic);
+    expect(logicValidation.deployed).to.be.true;
+    
+    // VALIDATE: Contract initialized
+    const Registry = await ethers.getContractAt('AmanitaRegistry', result.proxy);
+    const initialized = await Registry.initialized();
+    expect(initialized).to.be.true;
+    
+    timer.end();
+  });
+  
+  it('should fail with invalid parameters (error scenario)', async () => {
+    // Error: Deploy with invalid init data
+    await expect(
+      deployRegistry({ invalidParam: true })
+    ).to.be.rejected;
+    
+    // VALIDATE: No contract deployed (state clean)
+    const state = await harness.getBlockchainState();
+    expect(state.deployments).to.equal(0);
+  });
+});
+```
+
+**Pattern 2: Sequential Actions E2E**
+
+Multi-action workflow with dependencies.
+
+**JavaScript Example (Actions 0 → 1 → 2):**
+```javascript
+describe('E2E Workflow: Registry → Deploy All → Initialize', () => {
+  let harness, registry;
+  
+  before(async function() {
+    this.timeout(120000); // 2 min for multi-action setup
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv();
+    await harness.createInitialSnapshot();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  beforeEach(async () => {
+    await harness.resetNetwork();
+  });
+  
+  it('should execute deployment pipeline (Actions 0 → 1 → 2)', async () => {
+    // STEP 1: Deploy Registry (Action 0)
+    const registryResult = await deployRegistry();
+    await harness.validateDeployment(registryResult.proxy);
+    
+    // STEP 2: Deploy All Contracts (Action 1, depends on Registry)
+    const deployAllResult = await deployAllContracts({
+      registryAddress: registryResult.proxy
+    });
+    
+    expect(deployAllResult.contracts).to.have.length.greaterThan(5);
+    
+    // Validate each contract deployed
+    for (const contract of deployAllResult.contracts) {
+      await harness.validateDeployment(contract.address);
+    }
+    
+    // STEP 3: Initialize System (Action 2, depends on Step 1 + 2)
+    const initResult = await initializeSystem({
+      registry: registryResult.proxy,
+      contracts: deployAllResult.contracts
+    });
+    
+    expect(initResult.initialized).to.be.true;
+    
+    // VALIDATE: Complete workflow state
+    const Registry = await ethers.getContractAt('AmanitaRegistry', registryResult.proxy);
+    const contractCount = await Registry.getContractCount();
+    expect(contractCount).to.equal(deployAllResult.contracts.length);
+  });
+});
+```
+
+---
+
+### **Phase 3: Component Actions E2E Tests**
+**Goal**: Validate component management workflows end-to-end  
+**Duration**: 6-8 hours  
+**Cognitive Mode**: STRATEGIC  
+**Expected Output**: 28-34 E2E tests
+
+```yaml
+trigger: After Phase 2 (contracts deployed and initialized)
+
+scope:
+  - Action 555: Component Upload (CSV → JSON → Arweave → Contract)
+  - Action 777: Root Invite Distribution (admin workflow)
+
+dependencies:
+  - Contracts deployed (from Phase 2)
+  - Sellers activated (prerequisite for component upload)
+  - SpiralEngine operational (for invite system)
+
+characteristics:
+  infrastructure: "Real node + deployed contracts + activated sellers"
+  workflows: "Multi-step (CSV processing → external upload → on-chain registration)"
+  validation: "Data flow + on-chain state + Arweave CID validation"
+
+acceptance_criteria:
+  - [ ] Component upload workflow E2E tested
+  - [ ] Invite distribution workflow E2E tested
+  - [ ] Dependencies validated (seller activation required for 555)
+  - [ ] Multi-step workflows complete (CSV → Arweave → Contract)
+  - [ ] Real Arweave uploads (QUICK mode) OR mocked external API
+```
+
+**E2E Workflow Pattern (Multi-Step):**
+
+**JavaScript Example (Action 555: Component Upload):**
+```javascript
+describe('E2E: Action 555 - Component Upload Workflow', () => {
+  let harness, deployedContracts;
+  
+  before(async function() {
+    this.timeout(180000); // 3 min for setup + contract deployment
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv();
+    
+    // Deploy contracts (prerequisite)
+    const registry = await deployRegistry();
+    deployedContracts = await deployAllContracts({ registryAddress: registry.proxy });
+    await initializeSystem({ registry: registry.proxy, contracts: deployedContracts });
+    
+    // Activate seller (prerequisite for component upload)
+    await activateSeller(deployedContracts.spiralEngine);
+    
+    // Create snapshot (expensive setup done)
+    await harness.createInitialSnapshot();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  beforeEach(async () => {
+    await harness.resetNetwork(); // Fast reset (~1s)
+  });
+  
+  it('should complete component upload workflow E2E', async () => {
+    const timer = harness.measureExecutionTime('Component Upload E2E');
+    
+    // STEP 1: CSV → JSON transformation
+    const csvPath = 'tests/e2e/fixtures/components.csv';
+    const jsonResult = await transformCSVToJSON(csvPath);
+    expect(jsonResult.components).to.have.length.greaterThan(0);
+    
+    // STEP 2: Upload to Arweave (QUICK mode for E2E speed)
+    const arweaveResult = await uploadToArweave(jsonResult, { mode: 'QUICK' });
+    expect(arweaveResult.cid).to.match(/^[A-Za-z0-9_-]{43}$/);
+    
+    // STEP 3: Register on-chain (ComponentRegistry contract)
+    const ComponentRegistry = await ethers.getContractAt(
+      'OrganicComponentRegistryLogic',
+      deployedContracts.componentRegistry
+    );
+    
+    const tx = await ComponentRegistry.registerComponents(
+      jsonResult.components.map(c => c.id),
+      arweaveResult.cid
+    );
+    await tx.wait();
+    
+    // VALIDATE: On-chain state
+    const componentCount = await ComponentRegistry.getComponentCount();
+    expect(componentCount).to.equal(jsonResult.components.length);
+    
+    // VALIDATE: CID stored on-chain
+    const storedCID = await ComponentRegistry.getMetadataCID();
+    expect(storedCID).to.equal(arweaveResult.cid);
+    
+    timer.end();
+  });
+});
+```
+
+---
+
+### **Phase 4: Catalog + Full Pipeline E2E**
+**Goal**: Validate catalog management + complete pipeline end-to-end  
+**Duration**: 10-12 hours  
+**Cognitive Mode**: HOLISTIC  
+**Expected Output**: 104-129 E2E tests
+
+```yaml
+trigger: After Phase 3 (components uploaded, invite system operational)
+
+scope:
+  catalog_actions:
+    - Action 41: CSV Transform (products.csv → products.json)
+    - Action 42: Arweave Upload (products.json → CID, QUICK + FULL modes)
+    - Action 43: Contract Registration (CID → on-chain, ProductRegistry)
+    - Action 444: Auto Workflow (41 → 42 → 43 orchestrated)
+  
+  full_pipeline:
+    - Action 888: Complete Pipeline (Deploy → Activate → Components → Catalog)
+    - Multi-action orchestration (10+ actions in sequence)
+    - State consistency validation across entire system
+
+characteristics:
+  complexity: "Highest (multi-step workflows, external dependencies)"
+  infrastructure: "Full system (all contracts deployed, sellers active, components uploaded)"
+  validation: "End-to-end data flow (CSV → Arweave → Contract → On-chain state)"
+  performance: "Critical (workflow execution < 5 minutes per test)"
+
+acceptance_criteria:
+  - [ ] All catalog actions tested (41, 42, 43, 444)
+  - [ ] Full pipeline validated (Action 888: complete system flow)
+  - [ ] Multi-action orchestration works (dependencies handled)
+  - [ ] Data consistency validated (CSV → Arweave → Contract → On-chain)
+  - [ ] Performance acceptable (< 5 minutes per workflow)
+  - [ ] Error handling at each step (rollback, cleanup)
+```
+
+**Full Pipeline E2E Pattern:**
+
+**JavaScript Example (Action 888: Complete Pipeline):**
+```javascript
+describe('E2E: Action 888 - Full Deployment Pipeline', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(300000); // 5 min for complete setup
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv();
+    
+    // Initial snapshot (clean node)
+    await harness.createInitialSnapshot();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  beforeEach(async () => {
+    await harness.resetNetwork();
+  });
+  
+  it('should execute complete pipeline E2E (10+ actions)', async function() {
+    this.timeout(180000); // 3 min for full pipeline
+    
+    const timer = harness.measureExecutionTime('Full Pipeline E2E');
+    
+    // PHASE 1: Deploy (Actions 0, 1, 2)
+    const registry = await deployRegistry();
+    await harness.validateDeployment(registry.proxy);
+    
+    const contracts = await deployAllContracts({ registryAddress: registry.proxy });
+    expect(contracts.contracts).to.have.length.greaterThan(5);
+    
+    await initializeSystem({ registry: registry.proxy, contracts: contracts.contracts });
+    
+    // PHASE 2: Activate Seller (prerequisite for components)
+    const sellerResult = await activateSeller(contracts.spiralEngine);
+    expect(sellerResult.activated).to.be.true;
+    
+    // PHASE 3: Upload Components (Action 555)
+    const componentResult = await uploadComponents({
+      seller: sellerResult.sellerAddress,
+      componentRegistry: contracts.componentRegistry
+    });
+    expect(componentResult.uploaded).to.be.true;
+    
+    // PHASE 4: Upload Catalog (Actions 41 → 42 → 43)
+    const csvPath = 'tests/e2e/fixtures/products.csv';
+    
+    // 41: Transform
+    const jsonResult = await transformProductsCSV(csvPath);
+    expect(jsonResult.products).to.have.length.greaterThan(0);
+    
+    // 42: Upload to Arweave (QUICK mode)
+    const arweaveResult = await uploadToArweave(jsonResult, { mode: 'QUICK' });
+    expect(arweaveResult.cid).to.exist;
+    
+    // 43: Register on-chain
+    const ProductRegistry = await ethers.getContractAt(
+      'ProductRegistryLogic',
+      contracts.productRegistry
+    );
+    
+    const tx = await ProductRegistry.registerCatalog(
+      jsonResult.products.map(p => p.id),
+      arweaveResult.cid
+    );
+    await tx.wait();
+    
+    // VALIDATE: Complete pipeline state
+    
+    // 1. Registry has all contracts
+    const Registry = await ethers.getContractAt('AmanitaRegistry', registry.proxy);
+    const contractCount = await Registry.getContractCount();
+    expect(contractCount).to.equal(contracts.contracts.length);
+    
+    // 2. Seller activated
+    const SpiralEngine = await ethers.getContractAt('SpiralEngineLogic', contracts.spiralEngine);
+    const isActivated = await SpiralEngine.isUserActivated(sellerResult.sellerAddress);
+    expect(isActivated).to.be.true;
+    
+    // 3. Components uploaded
+    const ComponentRegistry = await ethers.getContractAt(
+      'OrganicComponentRegistryLogic',
+      contracts.componentRegistry
+    );
+    const componentCount = await ComponentRegistry.getComponentCount();
+    expect(componentCount).to.be.greaterThan(0);
+    
+    // 4. Catalog registered
+    const productCount = await ProductRegistry.getProductCount();
+    expect(productCount).to.equal(jsonResult.products.length);
+    
+    // 5. CID stored
+    const storedCID = await ProductRegistry.getCatalogCID();
+    expect(storedCID).to.equal(arweaveResult.cid);
+    
+    const duration = timer.end();
+    expect(duration).to.be.lessThan(180000); // < 3 minutes
+    
+    console.log('✓ Complete pipeline validated E2E');
+  });
+  
+  it('should handle error at each phase with proper cleanup', async () => {
+    // Error scenario 1: Deploy fails
+    await expect(deployRegistry({ invalidParam: true })).to.be.rejected;
+    
+    // Verify state clean
+    let state = await harness.getBlockchainState();
+    expect(state.deployments).to.equal(0);
+    
+    // Reset for next scenario
+    await harness.resetNetwork();
+    
+    // Error scenario 2: Initialization fails
+    const registry = await deployRegistry();
+    await deployAllContracts({ registryAddress: registry.proxy });
+    
+    await expect(
+      initializeSystem({ registry: '0xinvalid', contracts: [] })
+    ).to.be.rejected;
+    
+    // Validate partial state (registry deployed, init failed)
+    await harness.validateDeployment(registry.proxy);
+  });
+});
+```
+
+---
+
+**Phase 2-4 Summary:**
+
+```yaml
+phase_progression:
+  Phase_2_Deploy:
+    - Actions: 0, 1, 2
+    - Tests: 40-50
+    - Focus: Contract deployment workflows
+    - Validation: On-chain deployment state
+  
+  Phase_3_Component:
+    - Actions: 555, 777
+    - Tests: 28-34
+    - Focus: Component + invite workflows
+    - Validation: Multi-step data flow
+  
+  Phase_4_Catalog:
+    - Actions: 41, 42, 43, 444, 888
+    - Tests: 104-129
+    - Focus: Catalog management + full pipeline
+    - Validation: Complete system state
+
+total_e2e_tests: 172-213 (comprehensive coverage)
+```
+
+---
+
+## 📖 SECTION 5: QUALITY GATES (Adapted for E2E)
+
+> **Framework**: Uses same 4-gate progressive validation as @unit-test-build.mdc and @integration-test-build.mdc, adapted for E2E context.  
+> **Reference**: See @unit-test-build.mdc Section 4 for detailed gate architecture and philosophy.
+
+**E2E-Specific Adaptations:**
+- **Higher Quality Threshold**: 8.5/10 (vs 8.0 integration, 8.0 unit) due to E2E cost
+- **Infrastructure Focus**: Gate 1 validates infrastructure before workflow tests
+- **Workflow Completeness**: Emphasis on complete user journeys (not partial flows)
+- **ROI Emphasis**: Strong focus on E2E cost (infrastructure, execution time, maintenance)
+
+---
+
+### **Gate 1: Infrastructure Validation** 🔴 CRITICAL
+
+**Auto-Trigger**: After Phase 1 (Infrastructure + E2E Harness created)  
+**Question**: "Does E2E infrastructure work reliably?"  
+**Method**: Automated infrastructure checks + proof tests
+
+```yaml
+gate_1_checks:
+  node_startup:
+    question: "Does real node start successfully?"
+    validation:
+      - Check: Node starts within 30 seconds
+      - Check: Node responsive (can query block number)
+      - Check: Accounts available (20 test accounts)
+    
+    threshold: "Node starts reliably (< 30s, 100% success rate)"
+  
+  snapshot_functionality:
+    question: "Do EVM snapshots work correctly?"
+    validation:
+      - Check: Can create snapshot (evm_snapshot)
+      - Check: Can revert to snapshot (evm_revert)
+      - Check: State actually reverts (block number resets)
+    
+    threshold: "All snapshot operations work (create, revert, restore)"
+  
+  environment_isolation:
+    question: "Is test environment isolated from production?"
+    validation:
+      - Check: e2e.test.env loaded (not production .env)
+      - Check: Test network used (chainId 31337, not mainnet)
+      - Check: Test accounts used (not production wallets)
+    
+    threshold: "Complete isolation (zero production environment leakage)"
+  
+  proof_tests:
+    question: "Do 3 infrastructure proof tests pass?"
+    validation:
+      - Proof 1: Node responsive (getBlockNumber, listAccounts)
+      - Proof 2: Snapshots work (create, revert, restore)
+      - Proof 3: Deployment works (deploy simple contract, validate on-chain)
+    
+    threshold: "3/3 proof tests passing (100%)"
+
+pass_criteria:
+  - [ ] Node starts reliably (< 30s, no crashes)
+  - [ ] Snapshots functional (create, revert, restore validated)
+  - [ ] Environment isolated (e2e.test.env loaded, not production)
+  - [ ] All 3 proof tests passing
+  - [ ] E2E harness operational (all methods work)
+
+next_steps:
+  if_pass: "✅ Continue to Phase 2 (Deploy Actions E2E Tests)"
+  if_fail: "❌ Fix infrastructure before proceeding to workflow tests"
+  
+  failure_actions:
+    - "Debug node startup (check Hardhat config, port conflicts)"
+    - "Validate snapshot mechanism (check provider support)"
+    - "Verify environment isolation (check .env files)"
+    - "Review E2EHarness implementation (check all methods)"
+```
+
+**Infrastructure Validation Script (Auto-run after Phase 1):**
+
+```javascript
+// Auto-triggered after Phase 1
+async function validateInfrastructure(harness) {
+  const checks = {
+    node: false,
+    snapshots: false,
+    environment: false,
+    proofTests: false
+  };
+  
+  // Check 1: Node startup
+  try {
+    const state = await harness.getBlockchainState();
+    checks.node = state.blockNumber >= 0 && state.accountCount > 0;
+  } catch (error) {
+    console.error('❌ Node check failed:', error.message);
+  }
+  
+  // Check 2: Snapshots
+  try {
+    const snapshotId = await harness.saveState('validation-test');
+    await harness.provider.send('evm_mine', []);
+    await harness.restoreState('validation-test');
+    checks.snapshots = true;
+  } catch (error) {
+    console.error('❌ Snapshot check failed:', error.message);
+  }
+  
+  // Check 3: Environment
+  checks.environment = process.env.NETWORK === 'test' && !process.env.PRODUCTION_KEY;
+  
+  // Check 4: Proof tests (run proof.e2e.test.js)
+  // Assumes proof tests already executed
+  
+  const allPassed = Object.values(checks).every(c => c === true);
+  
+  if (!allPassed) {
+    throw new Error(`Gate 1 FAILED: Infrastructure validation failed\n${JSON.stringify(checks, null, 2)}`);
+  }
+  
+  console.log('✅ Gate 1 PASSED: Infrastructure validated');
+  return checks;
+}
+```
+
+---
+
+### **Gate 2: Workflow Passing Check**
+
+**Auto-Trigger**: After Phases 2-4 complete (all E2E tests written)  
+**Question**: "Do all E2E workflows execute successfully?"  
+**Method**: E2E test execution results
+
+```yaml
+gate_2_checks:
+  all_tests_passing:
+    question: "Are all E2E tests passing?"
+    threshold: "100% passing (zero failures)"
+    rationale: "E2E tests validate critical workflows — no failures allowed"
+  
+  workflows_complete:
+    question: "Do workflows complete end-to-end?"
+    validation:
+      - Check: Deploy pipeline completes (Registry → Deploy All → Initialize)
+      - Check: Component workflow completes (CSV → Arweave → Contract)
+      - Check: Catalog workflow completes (Transform → Upload → Register)
+      - Check: Full pipeline completes (Action 888: all phases)
+      - Check: No hangs or timeouts
+    
+    threshold: "All critical workflows complete within timeout"
+  
+  execution_time:
+    question: "Is E2E suite execution time acceptable?"
+    validation:
+      - Check: Total suite time < 30 minutes
+      - Check: Individual workflow < 5 minutes
+      - Check: Infrastructure startup < 30 seconds
+    
+    threshold: "Performance targets met (< 30 min total)"
+  
+  no_flaky_tests:
+    question: "Are there flaky tests (intermittent failures)?"
+    validation:
+      - Check: Run suite 3 times, same results
+      - Check: Tests pass in any order (--parallel works)
+      - Check: Snapshot isolation working (no state leaks)
+    
+    threshold: "< 5% flakiness rate (very stable)"
+
+pass_criteria:
+  - [ ] 100% E2E tests passing
+  - [ ] All workflows complete end-to-end (no timeouts)
+  - [ ] Execution time < 30 minutes
+  - [ ] Flakiness < 5% (stable infrastructure)
+
+next_steps:
+  if_pass: "✅ Continue to Gate 3 (Real E2E Validation)"
+  if_fail: "❌ Apply @test-to-success.mdc to fix failing tests"
+  
+  common_failures:
+    - "Infrastructure instability → Review Gate 1, fix harness"
+    - "Timeout errors → Increase timeouts or optimize workflows"
+    - "Flaky tests → Check snapshot isolation, remove hard-coded timeouts"
+```
+
+---
+
+### **Gate 3: Real E2E Validation** 🔴 CRITICAL
+
+**Auto-Trigger**: After Gate 2 passes  
+**Method**: @test-qualification.mdc (adapted for E2E level)  
+**Question**: "Are tests validating REAL end-to-end workflows (not disguised integration tests)?"
+
+**E2E-Specific Quality Criteria:**
+
+**P0 - Critical (Must Pass):**
+
+**P0-1: NO_INTEGRATION_AT_E2E_LEVEL**
+```yaml
+anti_pattern: "Testing module contracts at E2E level (waste of expensive infrastructure)"
+detection:
+  - Only 2 modules involved (integration-level test)
+  - Testing data format compatibility (contract validation)
+  - No complete user journey (partial workflow)
+
+correct_pattern: "Test complete workflows only, defer contracts to @integration-test-build"
+validation:
+  - [ ] Each E2E test covers complete workflow (3+ actions)
+  - [ ] Tests validate user journeys (not module interactions)
+  - [ ] Module contracts deferred to integration tests
+
+example_violation:
+  # ❌ WRONG: This is integration test, not E2E
+  it('E2E: ContractManager → ArweaveManager', async () => {
+    const deployment = await contractManager.deploy('Test');
+    const cid = await arweaveManager.upload(deployment);
+    // Only 2 modules, no complete workflow — this is integration test!
+  });
+
+example_correct:
+  # ✅ RIGHT: Complete E2E workflow
+  it('E2E: Full Deployment Pipeline', async () => {
+    // Complete workflow: 5+ modules, multiple actions
+    await deployRegistry();           // Action 0
+    await deployAllContracts();       // Action 1
+    await initializeSystem();         // Action 2
+    await activateSellers();          // User workflow
+    await uploadComponents();         // Action 555
+    await uploadCatalog();            // Actions 41-43
+    // This is complete E2E workflow
+  });
+```
+
+**P0-2: VALIDATE_REAL_WORKFLOWS**
+```yaml
+anti_pattern: "Testing artificial sequences that don't happen in production"
+detection:
+  - Workflow doesn't match production user journey
+  - Testing only happy path (missing error scenarios)
+  - Partial workflows (incomplete user journey)
+
+correct_pattern: "Test realistic production workflows with complete coverage"
+validation:
+  - [ ] Workflows match production scenarios
+  - [ ] Complete user journeys (setup → execute → validate → cleanup)
+  - [ ] Error scenarios included (failure at each step)
+  - [ ] State consistency validated across workflow
+
+example_violation:
+  # ❌ WRONG: Partial workflow, not realistic
+  it('E2E: Random operations', async () => {
+    await deployContract('A');
+    await uploadData('X');
+    await validateState('Y');
+    // This sequence never happens in production
+  });
+
+example_correct:
+  # ✅ RIGHT: Realistic production workflow
+  it('E2E: User Onboarding Flow', async () => {
+    // Realistic production workflow
+    // 1. Deploy system (admin action)
+    await deployAllContracts();
+    
+    // 2. User activates with invite (user action)
+    const user = await activateUser('INVITE-CODE');
+    
+    // 3. Grant seller role (admin action)
+    await grantSellerRole(user.address);
+    
+    // 4. Seller uploads first component (user action)
+    await uploadComponent(user.address, componentData);
+    
+    // This matches actual user onboarding flow
+  });
+```
+
+**P0-3: REAL_INFRASTRUCTURE**
+```yaml
+anti_pattern: "Heavily mocking infrastructure (defeats E2E purpose)"
+detection:
+  - Blockchain node mocked (not real Hardhat node)
+  - Contracts not deployed (stubs used)
+  - External services all mocked (> 3 mocks)
+
+correct_pattern: "Use real infrastructure, minimal mocking (external APIs only)"
+validation:
+  - [ ] Real blockchain node used (Hardhat, Ganache, or DevNet)
+  - [ ] Real contracts deployed on-chain (not mocked)
+  - [ ] Validation via on-chain calls (not stubbed)
+  - [ ] Minimal external mocks (≤ 3: Arweave, IPFS, etc.)
+
+example_violation:
+  # ❌ WRONG: Mocking blockchain
+  it('E2E with mocked blockchain', async () => {
+    const mockProvider = {
+      getBlockNumber: () => 123,
+      getCode: () => '0x60806040...'
+    };
+    // Not E2E — blockchain is mocked!
+  });
+
+example_correct:
+  # ✅ RIGHT: Real infrastructure
+  it('E2E with real node', async () => {
+    // Real Hardhat node
+    harness = new E2EHarness();
+    await harness.startNode(); // Real node starts
+    
+    // Real contract deployment
+    const contract = await deployContract();
+    
+    // Real on-chain validation
+    await harness.validateDeployment(contract.address);
+    // Contract actually deployed on Hardhat node
+  });
+```
+
+**P0-4: CORRECT_WORKFLOW_LOGIC**
+```yaml
+anti_pattern: "Workflows don't match production action sequences"
+detection:
+  - Action order doesn't match production
+  - Missing prerequisite actions
+  - Testing workflows that can't happen in production
+
+correct_pattern: "Workflows exactly match production scenarios"
+validation:
+  - [ ] Action sequence matches production deployment
+  - [ ] Prerequisites validated (can't upload without activation)
+  - [ ] State transitions realistic (production-like)
+
+example_violation:
+  # ❌ WRONG: Invalid action sequence
+  it('E2E: Upload before deploy', async () => {
+    await uploadComponent();  // ❌ Can't upload without contracts!
+    await deployContracts();  // ❌ Wrong order
+    // This can't happen in production
+  });
+
+example_correct:
+  # ✅ RIGHT: Correct action sequence
+  it('E2E: Production deployment sequence', async () => {
+    // 1. Deploy (prerequisite)
+    await deployAllContracts();
+    
+    // 2. Activate seller (prerequisite for upload)
+    await activateSeller();
+    
+    // 3. Upload component (now possible)
+    await uploadComponent();
+    
+    // This matches production workflow
+  });
+```
+
+**Scoring Formula (E2E-Specific):**
+
+```javascript
+function calculateE2EQualityScore(tests) {
+  let score = 10.0;
+  
+  // P0 violations (critical)
+  const integrationAtE2ELevel = countPartialWorkflows(tests); // < 3 actions
+  score -= integrationAtE2ELevel * 2.5; // -2.5 per violation (higher penalty)
+  
+  const artificialWorkflows = countUnrealisticWorkflows(tests);
+  score -= artificialWorkflows * 2.0; // -2 per unrealistic workflow
+  
+  const mockedInfrastructure = countMockedNodes(tests);
+  score -= mockedInfrastructure * 3.0; // -3 per mocked node (defeats E2E purpose)
+  
+  const wrongSequence = countInvalidActionSequence(tests);
+  score -= wrongSequence * 1.5; // -1.5 per wrong sequence
+  
+  // Performance penalties
+  const slowTests = countSlowTests(tests); // > 5 min per workflow
+  score -= slowTests * 0.5; // -0.5 per slow test
+  
+  const flakyTests = countFlakyTests(tests); // > 5% flakiness
+  score -= flakyTests * 1.0; // -1 per flaky test
+  
+  return Math.max(0, score);
+}
+```
+
+**Pass Criteria:**
+```yaml
+e2e_quality_threshold: "> 8.5/10"
+
+scoring:
+  9.5_to_10.0: "Excellent — production-ready E2E tests, exemplary"
+  8.5_to_9.4: "Good — production-ready, minor optimizations possible"
+  7.5_to_8.4: "Acceptable — fix P0 issues before shipping"
+  below_7.5: "Poor — significant refactoring needed"
+
+higher_threshold_rationale: |
+  E2E tests are expensive (infrastructure, execution time, maintenance).
+  Higher quality bar (8.5 vs 8.0 integration) ensures ROI justified.
+```
+
+**Next Steps:**
+```yaml
+if_score_above_8.5:
+  action: "✅ Continue to Gate 4 (ROI Analysis)"
+  message: "E2E tests validated for production"
+
+if_score_8.0_to_8.5:
+  action: "⚠️ Acceptable but below E2E threshold"
+  recommendation: "Fix P0 issues to reach 8.5+ OR defer some tests to integration"
+
+if_score_below_8.0:
+  action: "❌ Major refactoring required"
+  recommendations:
+    - "Review workflow completeness (complete user journeys required)"
+    - "Check infrastructure usage (real node, not mocked)"
+    - "Validate action sequences (must match production)"
+    - "Consider deferring to @integration-test-build if not true E2E"
+```
+
+---
+
+### **Gate 4: ROI Analysis (E2E-Specific)** 💰
+
+**Auto-Trigger**: After Gate 3 passes (score > 8.5/10)  
+**Question**: "Should we add more E2E tests OR ship current suite?"  
+**Method**: ROI framework from @unit-test-build.mdc (adapted for E2E cost)
+
+```yaml
+roi_framework_reference:
+  source: "@unit-test-build.mdc Section 4.4"
+  adaptation: "E2E tests = highest cost → most selective coverage required"
+
+e2e_cost_factors:
+  infrastructure_cost:
+    - Setup time: 3-4 hours (E2E harness, node, snapshots)
+    - Maintenance: High (infrastructure complexity, node updates)
+    - CI/CD impact: Significant (30 min suite execution blocks pipeline)
+  
+  execution_cost:
+    - Per test: 10-60 seconds (vs 0.1s unit, 1-10s integration)
+    - Suite total: 10-30 minutes (vs < 1min unit, 1-5min integration)
+    - Parallelization: Limited (shared node, state dependencies)
+  
+  maintenance_cost:
+    - Flakiness risk: 20% (vs 5% integration, 1% unit)
+    - Infrastructure updates: Frequent (node versions, provider changes)
+    - Debugging difficulty: High (many moving parts)
+
+e2e_value_factors:
+  high_value:
+    - Critical user journeys (login → purchase → checkout)
+    - Deployment pipelines (system initialization)
+    - Regulatory compliance (KYC → verification → approval)
+    - Multi-system integration (blockchain + backend + external services)
+  
+  medium_value:
+    - Complex workflows (4-6 actions)
+    - Cross-module data flows (already covered by integration?)
+  
+  low_value:
+    - Module contracts (defer to integration)
+    - Method logic (defer to unit)
+    - Simple workflows (< 3 actions)
+
+decision_framework:
+  high_roi_e2e:
+    criteria:
+      - Critical business workflow (cannot fail in production)
+      - Regulatory requirement (compliance mandate)
+      - Multi-system integration (blockchain + backend + external)
+      - Cannot be validated at integration level (requires full system)
+    
+    action: "✅ ADD E2E TEST — ROI justified"
+    example: "Full deployment pipeline (Action 888), User onboarding (activate → seller → product)"
+  
+  medium_roi_e2e:
+    criteria:
+      - Important workflow (but not critical)
+      - Can be partially validated at integration level
+      - Complex but not regulatory-required
+    
+    action: "⚠️ CONSIDER — evaluate if integration sufficient"
+    example: "Component upload variants, Catalog update workflows"
+  
+  low_roi_e2e:
+    criteria:
+      - Already covered by integration tests
+      - Simple workflows (< 3 actions)
+      - Edge cases (unit test level)
+      - Nice-to-have features (not critical)
+    
+    action: "❌ DEFER — move to @integration-test-build or @unit-test-build"
+    example: "Module data format validation, Input validation, Edge case testing"
+
+defer_to_integration:
+  when:
+    - Test covers module contracts (< 3 modules)
+    - Can mock external services without loss of coverage
+    - Workflow complexity low (< 3 actions)
+  
+  action: "Move to @integration-test-build.mdc (cheaper, faster, easier to maintain)"
+
+defer_to_unit:
+  when:
+    - Test covers single module logic
+    - Edge cases, input validation
+    - Method behavior
+  
+  action: "Move to @unit-test-build.mdc (cheapest, fastest)"
+
+ship_decision:
+  threshold: "Score > 8.5/10 AND critical workflows covered (> 70%)"
+  
+  if_met:
+    action: "✅ SHIP E2E TESTS"
+    message: "Production-ready E2E test suite (critical workflows validated)"
+  
+  if_not_met:
+    options:
+      - "Add high-ROI E2E tests (critical workflows missing)"
+      - "Fix quality issues (if score 8.0-8.5)"
+      - "Defer low-value tests to @integration-test-build"
+      - "Document deferred workflows (why not E2E)"
+```
+
+**ROI Decision Tree (E2E Tests):**
+
+```yaml
+proposed_test: "New E2E test idea"
+
+question_1: "Does this test require complete user journey (> 3 actions)?"
+  if_no: "❌ Defer to @integration-test-build (module interactions) or @unit-test-build (single module)"
+  if_yes: "→ Continue to question 2"
+
+question_2: "Does this test require real blockchain node + deployed contracts?"
+  if_no: "❌ Defer to @integration-test-build (can use test DB + mocks)"
+  if_yes: "→ Continue to question 3"
+
+question_3: "Is this a critical business workflow or regulatory requirement?"
+  if_no: "→ Continue to question 4"
+  if_yes: "✅ HIGH ROI — Add E2E test"
+
+question_4: "Can this be validated with integration tests (module contracts + flows)?"
+  if_yes: "❌ MEDIUM ROI — Defer to @integration-test-build (cheaper, faster)"
+  if_no: "✅ MEDIUM-HIGH ROI — Consider adding (if score < 8.5, add strategic tests)"
+```
+
+---
+
+**Quality Gates Summary:**
+
+```yaml
+gate_flow:
+  Gate_1_Infrastructure_Validation:
+    trigger: "After Phase 1 (Infrastructure + Harness)"
+    threshold: "All infrastructure checks pass (node, snapshots, env, proof tests)"
+    next: "Phase 2 OR fix infrastructure"
+  
+  Gate_2_Workflow_Passing:
+    trigger: "After Phases 2-4 complete"
+    threshold: "100% tests passing, execution < 30 min"
+    next: "Gate 3 OR @test-to-success"
+  
+  Gate_3_Real_E2E_Validation:
+    trigger: "After Gate 2 passes"
+    method: "@test-qualification.mdc (adapted)"
+    threshold: "Score > 8.5/10 (higher than integration 8.0)"
+    next: "Gate 4 OR refactor"
+  
+  Gate_4_ROI_Analysis:
+    trigger: "After Gate 3 passes"
+    decision: "Ship at 8.5+ OR add high-ROI workflows"
+    defer: "Integration tests to @integration-test-build, unit to @unit-test-build"
+
+production_ready_criteria:
+  - [ ] All 4 gates passed
+  - [ ] Score > 8.5/10 (E2E threshold)
+  - [ ] Critical workflows covered (> 70%)
+  - [ ] Execution time < 30 minutes
+  - [ ] Flakiness < 5% (stable infrastructure)
+  - [ ] Real infrastructure validated (not mocked)
+```
+
+---
+
+---
+
+## 📖 SECTION 6: EXAMPLES & TEMPLATES
+
+> **Quick Reference**: Most E2E examples are embedded in Section 4 (Phases). This section provides references + Web E2E pattern + copy-paste ready templates.
+
+### **6.1 Example Library (References)**
+
+**Infrastructure & Proof Tests** (See Section 4, Phase 1):
+- **E2EHarness Implementation**: Lines 550-888 (JS ~200 lines, Python ~140 lines)
+- **Framework Setup**: Lines 890-929 (package.json, pytest.ini)
+- **Proof Tests**: Lines 933-1076 (3 infrastructure validation tests, both languages)
+
+**Deployment Workflows** (See Section 4, Phase 2):
+- **Single Action E2E**: Lines 1108-1177 (Action 0: Deploy Registry)
+- **Sequential Actions E2E**: Lines 1179-1237 (Actions 0 → 1 → 2)
+- **Error Scenarios**: Lines 1491-1512 (Error handling at each phase)
+
+**Component Workflows** (See Section 4, Phase 3):
+- **Component Upload E2E**: Lines 1274-1342 (CSV → Arweave → Contract)
+- **Multi-Step Workflow**: Complete example with snapshot management
+
+**Full Pipeline** (See Section 4, Phase 4):
+- **Action 888 E2E**: Lines 1385-1514 (Complete deployment pipeline, 10+ actions)
+- **Holistic Validation**: 5-point state validation across entire system
+
+---
+
+### **6.2 Web App E2E Pattern (Universal)**
+
+> **Extension**: E2E testing beyond blockchain — web applications with Playwright
+
+**Infrastructure: Browser Automation**
+
+**Tools**: Playwright (JS/Python), Cypress (JS), Selenium (legacy)  
+**Harness**: WebE2EHarness (manages browser, server, database)  
+**Pattern**: Launch app → Navigate → Interact → Assert → Cleanup
+
+**Comparison: Blockchain vs Web E2E**
+
+| Aspect | Blockchain E2E | Web E2E |
+|--------|----------------|---------|
+| **Infrastructure** | Hardhat node + contracts | Browser + web server + DB |
+| **State Management** | EVM snapshots | DB transactions + browser storage clear |
+| **Validation** | On-chain contract calls | DOM assertions + API responses |
+| **Isolation** | Snapshot revert (~1s) | DB rollback + clear cookies (~2s) |
+| **Execution Speed** | 10-60s per test | 5-30s per test |
+| **Flakiness Risk** | 5-10% (node stability) | 10-20% (browser timing, network) |
+
+**Web E2E Example (Playwright, JavaScript):**
+
+```javascript
+// tests/e2e/web/login-checkout.e2e.test.js
+const { test, expect } = require('@playwright/test');
+
+test.describe('E2E: User Journey - Login → Product → Checkout', () => {
+  let page;
+  
+  test.beforeAll(async ({ browser }) => {
+    // Setup: Launch app (backend + frontend)
+    page = await browser.newPage();
+    
+    // Navigate to app
+    await page.goto('http://localhost:3000');
+  });
+  
+  test.afterAll(async () => {
+    await page.close();
+  });
+  
+  test.beforeEach(async ({ context }) => {
+    // Clear state between tests
+    await context.clearCookies();
+    await page.evaluate(() => localStorage.clear());
+  });
+  
+  test('should complete purchase workflow E2E', async () => {
+    // STEP 1: Login
+    await page.fill('input[name="email"]', 'test@example.com');
+    await page.fill('input[name="password"]', 'test123');
+    await page.click('button[type="submit"]');
+    
+    // Validate: Login successful
+    await expect(page.locator('.user-profile')).toBeVisible();
+    
+    // STEP 2: Browse products
+    await page.click('a[href="/products"]');
+    await page.waitForSelector('.product-card');
+    
+    // STEP 3: Add to cart
+    await page.click('.product-card:first-child .add-to-cart');
+    
+    // Validate: Cart updated
+    const cartCount = await page.locator('.cart-count').textContent();
+    expect(cartCount).toBe('1');
+    
+    // STEP 4: Checkout
+    await page.click('.cart-icon');
+    await page.click('button:has-text("Checkout")');
+    
+    // STEP 5: Payment
+    await page.fill('input[name="cardNumber"]', '4242424242424242');
+    await page.fill('input[name="expiry"]', '12/25');
+    await page.fill('input[name="cvc"]', '123');
+    await page.click('button:has-text("Pay Now")');
+    
+    // Validate: Order complete
+    await expect(page.locator('.order-success')).toBeVisible();
+    const orderNumber = await page.locator('.order-number').textContent();
+    expect(orderNumber).toMatch(/^ORD-\d+$/);
+  });
+});
+```
+
+**Web E2E Example (Playwright, Python):**
+
+```python
+# tests/e2e/web/test_login_checkout.py
+import pytest
+from playwright.async_api import async_playwright
+
+@pytest.fixture(scope='module')
+async def browser():
+    """Launch browser for E2E tests"""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        yield browser
+        await browser.close()
+
+@pytest.fixture
+async def page(browser):
+    """Create page with clean state"""
+    page = await browser.new_page()
+    await page.goto('http://localhost:3000')
+    
+    yield page
+    
+    # Cleanup
+    await page.context.clear_cookies()
+    await page.evaluate('localStorage.clear()')
+    await page.close()
+
+@pytest.mark.e2e
+async def test_complete_purchase_workflow(page):
+    """E2E: Login → Product → Checkout"""
+    
+    # STEP 1: Login
+    await page.fill('input[name="email"]', 'test@example.com')
+    await page.fill('input[name="password"]', 'test123')
+    await page.click('button[type="submit"]')
+    
+    # Validate: Login successful
+    await page.wait_for_selector('.user-profile')
+    
+    # STEP 2: Browse products
+    await page.click('a[href="/products"]')
+    await page.wait_for_selector('.product-card')
+    
+    # STEP 3: Add to cart
+    await page.click('.product-card:first-child .add-to-cart')
+    
+    # Validate: Cart updated
+    cart_count = await page.locator('.cart-count').text_content()
+    assert cart_count == '1'
+    
+    # STEP 4: Checkout
+    await page.click('.cart-icon')
+    await page.click('button:has-text("Checkout")')
+    
+    # STEP 5: Payment
+    await page.fill('input[name="cardNumber"]', '4242424242424242')
+    await page.fill('input[name="expiry"]', '12/25')
+    await page.fill('input[name="cvc"]', '123')
+    await page.click('button:has-text("Pay Now")')
+    
+    # Validate: Order complete
+    await page.wait_for_selector('.order-success')
+    order_number = await page.locator('.order-number').text_content()
+    assert order_number.startswith('ORD-')
+```
+
+---
+
+### **6.3 Copy-Paste Ready Templates**
+
+**Template 1: Single Action E2E (Blockchain)**
+
+```javascript
+// tests/e2e/workflows/ACTION_NAME.e2e.test.js
+const { expect } = require('chai');
+const { E2EHarness } = require('../helpers/E2EHarness');
+const { executeAction } = require('../../../scripts/actions/actionX'); // TODO: Import your action
+
+describe('E2E: Action X - [ACTION NAME]', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(60000);
+    
+    // Setup E2E infrastructure
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv({ MODE: 'test' }); // TODO: Add your env overrides
+    await harness.createInitialSnapshot();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  beforeEach(async () => {
+    await harness.resetNetwork(); // Reset to clean state
+  });
+  
+  describe('Infrastructure Validation', () => {
+    it('should have infrastructure ready', async () => {
+      const state = await harness.getBlockchainState();
+      expect(state.blockNumber).to.be.a('number');
+      expect(state.accountCount).to.be.greaterThan(0);
+    });
+  });
+  
+  describe('[ACTION NAME] Execution', () => {
+    it('should execute action successfully (happy path)', async () => {
+      const timer = harness.measureExecutionTime('[ACTION NAME]');
+      
+      // EXECUTE: Your action
+      const result = await executeAction({ /* TODO: params */ });
+      
+      // TODO: Add your validations
+      expect(result.success).to.be.true;
+      
+      // VALIDATE: On-chain state
+      // TODO: Validate deployment/transaction/state
+      // await harness.validateDeployment(result.address);
+      
+      timer.end();
+    });
+  });
+  
+  describe('Error Scenarios', () => {
+    it('should handle error gracefully', async () => {
+      // TODO: Test error scenario
+      await expect(
+        executeAction({ invalidParam: true })
+      ).to.be.rejected;
+    });
+  });
+});
+```
+
+**Template 1: Single Action E2E (Python)**
+
+```python
+# tests/e2e/workflows/test_action_X.py
+import pytest
+from tests.e2e.helpers.e2e_harness import E2EHarness
+from scripts.actions.actionX import execute_action  # TODO: Import your action
+
+@pytest.fixture(scope='module')
+async def harness():
+    """E2E harness for Action X"""
+    h = E2EHarness()
+    await h.start_node()
+    h.load_test_env({'MODE': 'test'})  # TODO: Add your env overrides
+    await h.create_initial_snapshot()
+    
+    yield h
+    
+    await h.stop_node()
+    h.restore_original_env()
+
+@pytest.fixture
+async def clean_state(harness):
+    """Reset to clean state before each test"""
+    await harness.reset_network()
+    yield harness
+
+@pytest.mark.e2e
+class TestActionX:
+    """E2E: Action X - [ACTION NAME]"""
+    
+    async def test_infrastructure_ready(self, harness):
+        """Infrastructure validation"""
+        state = await harness.get_blockchain_state()
+        assert isinstance(state['block_number'], int)
+        assert state['account_count'] > 0
+    
+    async def test_action_execution_happy_path(self, clean_state):
+        """Execute action successfully"""
+        harness = clean_state
+        
+        # EXECUTE: Your action
+        result = await execute_action()  # TODO: Add params
+        
+        # TODO: Add validations
+        assert result['success'] is True
+        
+        # VALIDATE: On-chain state
+        # await harness.validate_deployment(result['address'])
+    
+    async def test_action_error_handling(self, clean_state):
+        """Handle errors gracefully"""
+        harness = clean_state
+        
+        # TODO: Test error scenario
+        with pytest.raises(Exception):
+            await execute_action(invalid_param=True)
+```
+
+---
+
+**Template 2: Sequential Workflow E2E (Blockchain)**
+
+```javascript
+// tests/e2e/workflows/WORKFLOW_NAME.e2e.test.js
+const { expect } = require('chai');
+const { E2EHarness } = require('../helpers/E2EHarness');
+// TODO: Import your actions
+const { actionA } = require('../../../scripts/actions/actionA');
+const { actionB } = require('../../../scripts/actions/actionB');
+const { actionC } = require('../../../scripts/actions/actionC');
+
+describe('E2E Workflow: [WORKFLOW NAME]', () => {
+  let harness;
+  
+  before(async function() {
+    this.timeout(120000); // 2 min for multi-action setup
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    harness.loadTestEnv();
+    await harness.createInitialSnapshot();
+  });
+  
+  after(async () => {
+    await harness.stopNode();
+    harness.restoreOriginalEnv();
+  });
+  
+  beforeEach(async () => {
+    await harness.resetNetwork();
+  });
+  
+  it('should execute complete workflow: A → B → C', async function() {
+    this.timeout(180000); // 3 min for full workflow
+    
+    const timer = harness.measureExecutionTime('[WORKFLOW NAME]');
+    
+    // STEP 1: Action A
+    const resultA = await actionA({ /* TODO: params */ });
+    expect(resultA.success).to.be.true;
+    
+    // TODO: Validate Action A result
+    await harness.validateDeployment(resultA.address);
+    
+    // STEP 2: Action B (depends on A)
+    const resultB = await actionB({
+      prerequisite: resultA.output // Use output from A
+    });
+    expect(resultB.success).to.be.true;
+    
+    // TODO: Validate Action B result
+    
+    // STEP 3: Action C (depends on B)
+    const resultC = await actionC({
+      prerequisite: resultB.output
+    });
+    expect(resultC.success).to.be.true;
+    
+    // VALIDATE: Complete workflow state
+    // TODO: Add end-to-end validation
+    // Example: Check all contracts deployed, state consistent
+    
+    const duration = timer.end();
+    expect(duration).to.be.lessThan(180000); // < 3 min
+  });
+  
+  it('should handle failure at each step', async () => {
+    // Error scenario 1: Action A fails
+    await expect(actionA({ invalid: true })).to.be.rejected;
+    
+    // Error scenario 2: Action B fails (A succeeded)
+    const resultA = await actionA();
+    await expect(actionB({ invalid: true })).to.be.rejected;
+    
+    // Validate: Partial state handled correctly
+    await harness.validateDeployment(resultA.address);
+  });
+});
+```
+
+**Template 2: Sequential Workflow E2E (Python)**
+
+```python
+# tests/e2e/workflows/test_workflow_name.py
+import pytest
+from tests.e2e.helpers.e2e_harness import E2EHarness
+# TODO: Import your actions
+from scripts.actions.actionA import action_a
+from scripts.actions.actionB import action_b
+from scripts.actions.actionC import action_c
+
+@pytest.fixture(scope='module')
+async def harness():
+    """E2E harness for workflow"""
+    h = E2EHarness()
+    await h.start_node()
+    h.load_test_env()
+    await h.create_initial_snapshot()
+    
+    yield h
+    
+    await h.stop_node()
+    h.restore_original_env()
+
+@pytest.fixture
+async def clean_state(harness):
+    """Clean state for each test"""
+    await harness.reset_network()
+    yield harness
+
+@pytest.mark.e2e
+@pytest.mark.slow
+async def test_complete_workflow_a_b_c(clean_state):
+    """E2E Workflow: A → B → C"""
+    harness = clean_state
+    
+    # STEP 1: Action A
+    result_a = await action_a()  # TODO: Add params
+    assert result_a['success'] is True
+    
+    # Validate Action A
+    await harness.validate_deployment(result_a['address'])
+    
+    # STEP 2: Action B (depends on A)
+    result_b = await action_b(prerequisite=result_a['output'])
+    assert result_b['success'] is True
+    
+    # STEP 3: Action C (depends on B)
+    result_c = await action_c(prerequisite=result_b['output'])
+    assert result_c['success'] is True
+    
+    # VALIDATE: Complete workflow state
+    # TODO: Add end-to-end validation
+
+@pytest.mark.e2e
+async def test_workflow_error_handling(clean_state):
+    """Error handling at each step"""
+    harness = clean_state
+    
+    # Error scenario 1: A fails
+    with pytest.raises(Exception):
+        await action_a(invalid=True)
+    
+    # Error scenario 2: B fails (A succeeded)
+    result_a = await action_a()
+    with pytest.raises(Exception):
+        await action_b(invalid=True)
+    
+    # Validate: Partial state
+    await harness.validate_deployment(result_a['address'])
+```
+
+---
+
+**Template 3: Web App E2E (Playwright)**
+
+```javascript
+// tests/e2e/web/USER_JOURNEY.e2e.test.js
+const { test, expect } = require('@playwright/test');
+
+test.describe('E2E Web: [USER JOURNEY NAME]', () => {
+  let page;
+  
+  test.beforeAll(async ({ browser }) => {
+    page = await browser.newPage();
+    
+    // TODO: Navigate to your app
+    await page.goto('http://localhost:3000');
+  });
+  
+  test.afterAll(async () => {
+    await page.close();
+  });
+  
+  test.beforeEach(async ({ context }) => {
+    // Clear state
+    await context.clearCookies();
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+    
+    // TODO: Navigate to starting point
+    await page.goto('http://localhost:3000');
+  });
+  
+  test('should complete [USER JOURNEY] E2E', async () => {
+    // STEP 1: [First action]
+    // TODO: Fill form, click button, navigate
+    await page.fill('input[name="field"]', 'value');
+    await page.click('button[type="submit"]');
+    
+    // Validate: Step 1 complete
+    await expect(page.locator('.success-indicator')).toBeVisible();
+    
+    // STEP 2: [Second action]
+    // TODO: Add your steps
+    
+    // STEP 3: [Final action]
+    // TODO: Add final step
+    
+    // VALIDATE: Complete journey
+    // TODO: Check final state (URL, DOM, API responses)
+    expect(page.url()).toContain('/success');
+  });
+  
+  test('should handle errors during journey', async () => {
+    // TODO: Test error scenarios
+    await page.fill('input[name="field"]', 'invalid');
+    await page.click('button[type="submit"]');
+    
+    // Validate: Error shown
+    await expect(page.locator('.error-message')).toBeVisible();
+  });
+});
+```
+
+### **6.4 E2E-Specific Anti-Patterns**
+
+> **Critical**: These anti-patterns are unique to E2E testing. Different from unit/integration anti-patterns.
+
+---
+
+**Anti-Pattern 1: Integration Tests at E2E Level (Scope Violation)**
+
+**Symptom**: Testing module contracts or simple flows at E2E level (wastes expensive infrastructure)  
+**Detection**: Workflow < 3 actions, only module interaction tested, no complete user journey
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ This is INTEGRATION test, not E2E (wastes E2E infrastructure)
+describe('E2E: ContractManager → ArweaveManager', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode(); // Expensive infrastructure for simple test!
+  });
+  
+  it('should validate data contract', async () => {
+    // Only 2 modules, testing contract compatibility
+    const deployment = await contractManager.deploy('Test');
+    const cid = await arweaveManager.upload(deployment);
+    
+    expect(deployment.proxy).to.equal(cid.metadata.address);
+    // This is integration test — defer to @integration-test-build!
+  });
+});
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ INTEGRATION test (moved to tests/integration/)
+describe('Integration: ContractManager → ArweaveManager', () => {
+  let contractManager, arweaveManager, testDB;
+  
+  beforeEach(async () => {
+    // Use simple test infrastructure (no blockchain node)
+    testDB = new sqlite3.Database(':memory:');
+    contractManager = new ContractManager(testDB);
+    arweaveManager = new ArweaveManager();
+  });
+  
+  it('should validate data contract', async () => {
+    // Test module interaction (cheaper, faster)
+    const deployment = await contractManager.deploy('Test');
+    const cid = await arweaveManager.upload(deployment);
+    
+    expect(deployment.proxy).to.equal(cid.metadata.address);
+    // Run with @integration-test-build (10s vs 60s E2E overhead)
+  });
+});
+
+// ✅ E2E test (complete workflow, 5+ actions)
+describe('E2E: Full Deployment Pipeline', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode(); // Justified — complete workflow needs real node
+  });
+  
+  it('should execute complete deployment E2E', async () => {
+    // Complete workflow (10+ actions)
+    await deployRegistry();        // Action 0
+    await deployAllContracts();    // Action 1
+    await initializeSystem();      // Action 2
+    await activateSellers();       // User workflow
+    await uploadComponents();      // Action 555
+    await uploadCatalog();         // Actions 41-43
+    
+    // This justifies E2E infrastructure (complete system validation)
+  });
+});
+```
+
+**Fix**: Move module contract tests to `tests/integration/`, keep only complete workflows (3+ actions) in `tests/e2e/`
+
+---
+
+**Anti-Pattern 2: Hard-Coded Timeouts (Flaky Tests)**
+
+**Symptom**: Tests fail randomly with "timeout exceeded" errors  
+**Detection**: Hard-coded `timeout(5000)`, tests pass sometimes, fail others
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ Hard-coded timeout → flaky tests
+describe('E2E: Deploy Workflow', () => {
+  it('should deploy contracts', async () => {
+    const result = await deployAllContracts();
+    
+    // ❌ Hard-coded wait (brittle)
+    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5s
+    
+    // Check deployment (might not be ready yet → flaky!)
+    const deployed = await harness.validateDeployment(result.proxy);
+    expect(deployed).to.be.true;
+  });
+});
+```
+
+**Python:**
+```python
+# ❌ Hard-coded sleep → flaky tests
+async def test_deploy_workflow(harness):
+    result = await deploy_all_contracts()
+    
+    # ❌ Hard-coded sleep
+    await asyncio.sleep(5)  # Wait 5s (might not be enough!)
+    
+    # Check deployment (flaky if takes > 5s)
+    deployed = await harness.validate_deployment(result['proxy'])
+    assert deployed is True
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ Event-based waiting (reliable)
+describe('E2E: Deploy Workflow', () => {
+  it('should deploy contracts', async () => {
+    const result = await deployAllContracts();
+    
+    // ✅ Wait for transaction confirmation (event-based)
+    const tx = result.transaction;
+    await tx.wait(); // Waits for actual confirmation
+    
+    // ✅ Retry pattern for validation (robust)
+    let deployed = false;
+    for (let i = 0; i < 10; i++) {
+      try {
+        await harness.validateDeployment(result.proxy);
+        deployed = true;
+        break;
+      } catch {
+        await new Promise(r => setTimeout(r, 1000)); // Retry after 1s
+      }
+    }
+    
+    expect(deployed).to.be.true;
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ Event-based waiting with retry (reliable)
+async def test_deploy_workflow(harness):
+    result = await deploy_all_contracts()
+    
+    # ✅ Wait for transaction confirmation
+    await result['transaction'].wait()
+    
+    # ✅ Retry pattern (robust)
+    deployed = False
+    for _ in range(10):
+        try:
+            await harness.validate_deployment(result['proxy'])
+            deployed = True
+            break
+        except:
+            await asyncio.sleep(1)  # Retry after 1s
+    
+    assert deployed is True
+```
+
+**Fix**: Use event-based waiting (transaction confirmations) + retry patterns instead of hard-coded timeouts
+
+---
+
+**Anti-Pattern 3: No State Isolation (Test Pollution)**
+
+**Symptom**: Tests pass individually, fail when run together; execution order matters  
+**Detection**: Different results when running `--grep "Test A"` vs full suite
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ No snapshot reset → tests pollute each other
+describe('E2E: Component Upload', () => {
+  let harness, deployedContracts;
+  
+  before(async function() {
+    this.timeout(120000);
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    
+    // Deploy contracts (expensive)
+    deployedContracts = await deployAllContracts();
+    
+    // ❌ NO SNAPSHOT CREATED!
+  });
+  
+  // ❌ NO beforeEach reset!
+  
+  it('Test 1: Upload component A', async () => {
+    await uploadComponent('A', deployedContracts);
+    // State: Component A uploaded
+  });
+  
+  it('Test 2: Upload component B', async () => {
+    await uploadComponent('B', deployedContracts);
+    // State: Components A + B uploaded (from Test 1!)
+    // ❌ Test 2 depends on Test 1 state (pollution)
+  });
+  
+  it('Test 3: Expect 1 component', async () => {
+    const count = await getComponentCount(deployedContracts);
+    expect(count).to.equal(1); // ❌ FAILS! Count is 2 (A + B from previous tests)
+  });
+});
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ Snapshot isolation → tests independent
+describe('E2E: Component Upload', () => {
+  let harness, deployedContracts;
+  
+  before(async function() {
+    this.timeout(120000);
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    
+    // Deploy contracts (expensive, once)
+    deployedContracts = await deployAllContracts();
+    
+    // ✅ CREATE SNAPSHOT (save clean state)
+    await harness.createInitialSnapshot();
+  });
+  
+  beforeEach(async () => {
+    // ✅ RESET TO SNAPSHOT (each test starts clean)
+    await harness.resetNetwork();
+  });
+  
+  it('Test 1: Upload component A', async () => {
+    await uploadComponent('A', deployedContracts);
+    // State: Component A uploaded (reverted after test)
+  });
+  
+  it('Test 2: Upload component B', async () => {
+    // Starts from clean snapshot (A not uploaded)
+    await uploadComponent('B', deployedContracts);
+    // State: Only component B uploaded ✅
+  });
+  
+  it('Test 3: Expect 0 components', async () => {
+    // Starts from clean snapshot (no uploads)
+    const count = await getComponentCount(deployedContracts);
+    expect(count).to.equal(0); // ✅ PASSES! Clean state
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ Fixture with snapshot reset (tests independent)
+@pytest.fixture(scope='module')
+async def harness_with_contracts():
+    """Setup with snapshot"""
+    h = E2EHarness()
+    await h.start_node()
+    
+    # Expensive setup (once)
+    contracts = await deploy_all_contracts()
+    
+    # ✅ CREATE SNAPSHOT
+    await h.create_initial_snapshot()
+    
+    yield h, contracts
+    await h.stop_node()
+
+@pytest.fixture
+async def clean_state(harness_with_contracts):
+    """Reset before each test"""
+    h, contracts = harness_with_contracts
+    
+    # ✅ RESET TO SNAPSHOT
+    await h.reset_network()
+    
+    yield h, contracts
+
+async def test_upload_component_a(clean_state):
+    h, contracts = clean_state
+    await upload_component('A', contracts)
+    # Reverted after test
+
+async def test_upload_component_b(clean_state):
+    h, contracts = clean_state
+    # Starts clean (A not uploaded)
+    await upload_component('B', contracts)
+
+async def test_expect_zero_components(clean_state):
+    h, contracts = clean_state
+    count = await get_component_count(contracts)
+    assert count == 0  # ✅ Clean state
+```
+
+**Fix**: Always use `beforeEach` with `resetNetwork()` for E2E test isolation
+
+---
+
+## 📖 SECTION 7: REFERENCE (Quick Reference + Definition of Done)
+
+### **7.1 Quick Reference: Unit vs Integration vs E2E**
+
+| Aspect | Unit Tests | Integration Tests | E2E Tests |
+|--------|------------|-------------------|-----------|
+| **Scope** | Single module | 2-4 modules | Entire system (full workflows) |
+| **Dependencies** | Mocked (heavy) | Real modules + mocked external | Real everything + minimal external mocks |
+| **Infrastructure** | None (mocked) | Test DB (in-memory/Docker) | Real node + contracts + DB |
+| **State Management** | No state | DB transactions | EVM snapshots (blockchain) / DB + cookies (web) |
+| **Speed** | ⚡⚡⚡ Very fast (< 1s) | ⚡⚡ Fast (1-10s) | ⚡ Slow (10-60s per test) |
+| **Isolation** | ✅ Perfect | ✅ High (test DB) | ✅ High (snapshots/reset) |
+| **Focus** | Method behavior | Module contracts | Complete user journeys |
+| **Execution** | Every commit | Every PR | Nightly/pre-deploy |
+| **Cost** | Minimal | Medium | High (infrastructure, time, maintenance) |
+| **Flakiness** | ~1% | ~5% | ~5-10% (infrastructure complexity) |
+| **Rule** | @unit-test-build.mdc | @integration-test-build.mdc | @e2e-test-build.mdc |
+
+---
+
+### **7.2 Troubleshooting (E2E-Specific Issues)**
+
+**Issue 1: Node Won't Start**
+- **Symptom**: `Error: Cannot connect to network` or timeout during node startup
+- **Causes**: Port conflict (8545 already in use), Hardhat config errors, missing dependencies
+- **Fix**:
+  ```bash
+  # Check port usage
+  lsof -i :8545  # Kill process if found
+  
+  # Verify Hardhat config
+  npx hardhat node --network hardhat  # Test standalone
+  
+  # Check dependencies
+  npm list hardhat @nomicfoundation/hardhat-ethers
+  ```
+
+**Issue 2: Snapshots Not Working**
+- **Symptom**: `Error: Snapshot not found` or state not reverting
+- **Causes**: Provider doesn't support snapshots, snapshot ID invalid, using wrong network
+- **Fix**:
+  - Verify network supports snapshots (Hardhat ✅, some RPCs ❌)
+  - Check snapshot ID stored correctly in harness
+  - Use Hardhat Network for development (guaranteed snapshot support)
+
+**Issue 3: Tests Timeout**
+- **Symptom**: `Error: Timeout of 60000ms exceeded`
+- **Causes**: Operations too slow, network latency, contract execution gas limit
+- **Fix**:
+  - Increase timeout: `this.timeout(120000)` for complex workflows
+  - Use QUICK modes for external services (Arweave mock vs real upload)
+  - Optimize contract deployment (reduce constructor complexity)
+  - Check gas limits (ensure sufficient for operations)
+
+**Issue 4: Flaky E2E Tests**
+- **Symptom**: Tests intermittently fail (pass on retry)
+- **Causes**: Hard-coded timeouts, race conditions, network timing, state pollution
+- **Fix**:
+  - Replace hard-coded timeouts with event-based waiting (`tx.wait()`)
+  - Add retry patterns for network operations
+  - Ensure snapshot reset in `beforeEach`
+  - Use dynamic waiting (wait for specific state, not fixed time)
+
+**Issue 5: Execution Time > 1 Hour**
+- **Symptom**: E2E suite takes too long, blocks CI/CD
+- **Causes**: No snapshots used, too many E2E tests, not parallelized, slow external calls
+- **Fix**:
+  - **Implement snapshots** (40x speedup, most important)
+  - **Parallelize** where possible (`--parallel` flag)
+  - **Use QUICK modes** for external services
+  - **Defer to integration** (move low-value E2E tests)
+  - **Optimize setup** (create snapshot after expensive operations)
+
+---
+
+### **7.3 Definition of Done (E2E Tests)**
+
+```yaml
+production_ready_checklist:
+  infrastructure:
+    - [ ] tests/e2e/ directory created
+    - [ ] E2E harness implemented (E2EHarness.js or e2e_harness.py)
+    - [ ] Real node configured (Hardhat/Ganache/DevNet)
+    - [ ] Environment isolation (e2e.test.env file created)
+    - [ ] Snapshot management implemented (create, revert, restore)
+    - [ ] NPM scripts: test:e2e, test:e2e:workflows, test:e2e:parallel
+    - [ ] 3 infrastructure proof tests passing
+  
+  phases_complete:
+    - [ ] Phase 1: Infrastructure validated (harness + proof tests)
+    - [ ] Phase 2: Deploy actions tested E2E (Actions 0, 1, 2)
+    - [ ] Phase 3: Component actions tested E2E (Actions 555, 777)
+    - [ ] Phase 4: Catalog + pipeline tested E2E (Actions 41-43, 444, 888)
+  
+  quality_gates_passed:
+    - [ ] Gate 1: Infrastructure Validation (all checks pass)
+    - [ ] Gate 2: Workflow Passing (100% tests passing)
+    - [ ] Gate 3: Real E2E Validation (score > 8.5/10)
+    - [ ] Gate 4: ROI Analysis (ship decision at 8.5+/10)
+  
+  e2e_criteria:
+    - [ ] All tests use real infrastructure (node + contracts)
+    - [ ] Complete workflows tested (> 3 actions per workflow)
+    - [ ] Snapshot isolation working (beforeEach reset)
+    - [ ] Critical user journeys covered (> 70%)
+    - [ ] Execution time < 30 minutes (entire suite)
+    - [ ] Flakiness < 5% (stable infrastructure)
+  
+  documentation:
+    - [ ] E2E test patterns documented
+    - [ ] Harness usage clear
+    - [ ] Snapshot patterns explained
+    - [ ] Anti-flaky patterns enforced
+  
+  ci_cd_ready:
+    - [ ] Tests run in CI/CD pipeline
+    - [ ] Parallel execution possible (where applicable)
+    - [ ] Environment variables configured
+    - [ ] Failure notifications setup
+
+ship_criteria:
+  minimum: "Score > 8.5/10 AND all P0 criteria met"
+  recommended: "Score > 9.0/10 AND workflow coverage > 80%"
+  excellent: "Score > 9.5/10 AND execution time < 20 minutes"
+```
+
+---
+
+### **7.4 Integration with Other Rules**
+
+```yaml
+upstream_rules:
+  - "@unit-test-build.mdc": Unit tests (prerequisite, foundation)
+  - "@integration-test-build.mdc": Integration tests (prerequisite, module contracts)
+  - "@run-task.mdc": Orchestrates ItemY execution (optional)
+  - "@analysis.mdc": Can be used for E2E planning
+
+downstream_rules:
+  - "@test-qualification.mdc": Validates E2E test quality (Gate 3, adapted)
+  - "@test-to-success.mdc": Fixes failing E2E tests (auto-triggered)
+
+parallel_rules:
+  - "@meta.extract.mdc": Can extract E2E testing patterns
+  - "@meta.gap.mdc": Can identify gaps in E2E coverage
+
+rule_hierarchy:
+  foundation:
+    - "@unit-test-build.mdc": Base (single module, mocked)
+  
+  middle_layer:
+    - "@integration-test-build.mdc": Module interactions (real modules, minimal mocks)
+  
+  top_layer:
+    - "@e2e-test-build.mdc": Complete workflows (real infrastructure, minimal mocks)
+  
+  relationship: "E2E > Integration > Unit (scope and cost increase)"
+```
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025-10-16  
+**Status**: ✅ Production Ready  
+**Lines**: 3787 (comprehensive E2E testing methodology)
+
+**Compatibility**:
+- **Languages**: JavaScript (Node.js) + Python 3.8+
+- **Frameworks**: 
+  - Blockchain: Hardhat, Brownie/Ape, Ganache
+  - Web: Playwright (JS/Python), Cypress (JS)
+- **Infrastructure**: Hardhat Network, Standalone nodes, Cloud DevNets (Tenderly, Alchemy)
+
+**Related Rules**:
+- **@unit-test-build.mdc**: Unit tests (foundation, shares principles)
+- **@integration-test-build.mdc**: Integration tests (prerequisite, shares framework)
+- **@test-qualification.mdc**: Quality validation (auto-triggered at Gate 3, adapted for E2E)
+- **@test-to-success.mdc**: Systematic fixing of failing tests (auto-triggered at Gate 2)
+- **@run-task.mdc**: Optional orchestration for ItemY execution
+
+**Changelog**:
+
+**v1.0** (2025-10-16) — Production Release
+- ✅ **Foundation**: Quick Start (78 lines) + Core Principles (13 principles: 9 inherited + 4 E2E-specific)
+- ✅ **Infrastructure**: Complete E2EHarness implementation (JS ~200 lines, Python ~140 lines)
+- ✅ **Phases**: 4 specialized E2E phases (Infrastructure, Deploy, Component, Catalog/Pipeline)
+- ✅ **Harness Patterns**: 3 node strategies + 3 snapshot patterns + 4 validation helpers
+- ✅ **Quality Gates**: 4-gate framework adapted for E2E (Infrastructure, Workflow, Real E2E, ROI)
+- ✅ **Examples**: Proof tests (3), deployment workflows (3), full pipeline (Action 888)
+- ✅ **Web E2E Extension**: Playwright patterns for web applications
+- ✅ **Templates**: 3 copy-paste ready templates (Single Action, Sequential Workflow, Web App)
+- ✅ **Anti-Patterns**: 3 E2E-specific anti-patterns with BEFORE/AFTER examples
+- ✅ **Documentation**: Quick Reference table, Troubleshooting (5 issues), Definition of Done
+- ✅ **Language Support**: Full parity for JavaScript + Python (blockchain E2E)
+- ✅ **DRY Compliance**: Smart references to @unit-test-build and @integration-test-build (~20% size reduction)
+- ✅ **Production Ready**: Comprehensive, battle-tested methodology (proven in Amanita project)
+
+**Development Notes**:
+- Created from proven E2E patterns in Amanita scripts project
+- E2E focus: Complete workflows (3+ actions) + real infrastructure (not mocked)
+- Infrastructure emphasis: E2EHarness manages node lifecycle, snapshots, validation
+- Performance optimization: EVM snapshots provide 40x speedup (critical for E2E)
+- Selective coverage: ROI framework emphasizes E2E cost (10-30 critical workflows, not 200+)
+- Higher quality bar: 8.5/10 threshold (vs 8.0 integration) due to E2E cost/complexity
+
+**Metrics**:
+- Total sections: 7 (Quick Start → Reference)
+- Code examples: 20+ (E2EHarness, proof tests, workflows, Web E2E)
+- Patterns documented: 14 (phases, node strategies, snapshot patterns, validation helpers)
+- Quality gates: 4 (adapted for E2E, higher threshold)
+- Test templates: 3 (blockchain single/sequential, web app)
+- Anti-patterns: 3 (scope violation, hard-coded timeouts, no isolation)
+- Lines: 3787 (18% larger than integration-test-build, 65% larger than unit-test-build)
+
