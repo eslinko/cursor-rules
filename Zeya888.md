@@ -1,24 +1,24 @@
-# Zeya888: Мета-программирование через Rules и Минимализм
+# Zeya888: Meta-Programming through Rules and Minimalism
 
-> **Vibe-Coding Methodology**: Co-evolutionary AI Methodology Design через императивный DSL и явное управление когнитивными режимами AI
+> **Vibe-Coding Methodology**: Co-evolutionary AI Methodology Design via Imperative DSL and Explicit AI Cognitive Mode Management
 
-**Автор:** Zeya888 (Inga Slinko)  
-**Контекст:** Презентация для Cursor Event  
-**Дата анализа:** 08.01.2025  
-**Базовая сессия:** UUPS Architecture Adaptation (Amanita Ecosystem)
+**Author:** Zeya888 (Inga Slinko)  
+**Context:** Presentation for Cursor Event  
+**Analysis Date:** January 8, 2025  
+**Base Session:** UUPS Architecture Adaptation (Amanita Ecosystem)
 
 ---
 
-## 📋 Содержание
+## 📋 Table of Contents
 
 1. [Overview](#1-overview)
-2. [Rules как навигаторы системы мышления](#2-rules-как-навигаторы-системы-мышления)
-3. [Interaction Style: Императивный DSL](#3-interaction-style-императивный-dsl)
-4. [Protocol: Структура работы с AI](#4-protocol-структура-работы-с-ai)
-5. [Cursor-специфика](#5-cursor-специфика)
+2. [Rules as Mental Model Navigators](#2-rules-as-mental-model-navigators)
+3. [Interaction Style: Imperative DSL](#3-interaction-style-imperative-dsl)
+4. [Protocol: AI Workflow Structure](#4-protocol-ai-workflow-structure)
+5. [Cursor-Specific Features](#5-cursor-specific-features)
 6. [Failure Modes & Recovery](#6-failure-modes--recovery)
-7. [Heuristics & Метрики резонанса](#7-heuristics--метрики-резонанса)
-8. [FAQ/Playbook для разработчика](#8-faqplaybook-для-разработчика)
+7. [Heuristics & Resonance Metrics](#7-heuristics--resonance-metrics)
+8. [FAQ/Playbook for Developers](#8-faqplaybook-for-developers)
 9. [Risks & Ethics](#9-risks--ethics)
 10. [Next Steps](#10-next-steps)
 11. [Appendix: Quotes & Cases](#11-appendix-quotes--cases)
@@ -27,419 +27,419 @@
 
 ## 1. Overview
 
-### 1.1 Что это?
+### 1.1 What is this?
 
-**Zeya888 Methodology** — это система взаимодействия с AI, основанная на трёх китах:
+**Zeya888 Methodology** is a system for interacting with AI based on three pillars:
 
-1. **Методологические Rules** как переключатели когнитивных режимов AI
-2. **Императивный DSL** (zero politeness) для максимальной токеновой эффективности
-3. **Трёхуровневая система валидации** для предотвращения иллюзий и глюков
+1. **Methodological Rules** as AI cognitive mode switchers
+2. **Imperative DSL** (zero politeness) for maximum token efficiency
+3. **Three-level validation system** to prevent illusions and glitches
 
-**Это не просто "набор промптов".**
+**This is not just "a set of prompts."**
 
-Это **co-evolutionary methodology design** — совместная эволюция правил работы человека и AI в процессе решения реальных задач. Методологии создаются, тестируются, дорабатываются и кристаллизуются в переиспользуемые Rules.
+This is **co-evolutionary methodology design** — joint evolution of human-AI work practices through solving real tasks. Methodologies are created, tested, refined, and crystallized into reusable Rules.
 
-**Ключевое отличие от классического промпт-инжиниринга:**
+**Key difference from classical prompt engineering:**
 
 ```
-Классика: Человек пишет длинный промпт → AI угадывает что нужно
-Zeya888:  Человек активирует Rule → AI переключает когнитивный режим
+Classic:  Human writes long prompt → AI guesses what's needed
+Zeya888:  Human activates Rule → AI switches cognitive mode
 ```
 
-**Аналогия:**
-- Классика = каждый раз объяснять повару как готовить
-- Zeya888 = дать повару рецепт и сказать "по рецепту №3"
+**Analogy:**
+- Classic = explaining to a chef how to cook each time
+- Zeya888 = giving chef a recipe and saying "recipe #3"
 
-### 1.2 Ключевые метрики
+### 1.2 Key Metrics
 
-**Токеновая эффективность:**
-- **20-40x** меньше токенов на команды (1 токен вместо 25-40)
-- **5-10x** меньше токенов на контекст (bridge pattern вместо пересказа)
-- **~85%** экономия токенов в типичной сессии
+**Token Efficiency:**
+- **20-40x** fewer tokens for commands (1 token instead of 25-40)
+- **5-10x** fewer tokens for context (bridge pattern instead of retelling)
+- **~85%** token savings in typical session
 
-**Качество результата:**
-- **95-100%** успешность выполнения сложных задач
-- **0-5%** критических ошибок (vs 20-40% в классическом подходе)
-- **3-5** итераций до успеха (vs 10-20 в классике)
+**Result Quality:**
+- **95-100%** success rate for complex tasks
+- **0-5%** critical errors (vs 20-40% in classical approach)
+- **3-5** iterations to success (vs 10-20 in classic)
 
-**Скорость разработки:**
-- **2-3x** быстрее для рутинных задач
-- **5-10x** быстрее для сложных архитектурных изменений
-- **Instant recovery** после деградации диалога (bridge pattern)
+**Development Speed:**
+- **2-3x** faster for routine tasks
+- **5-10x** faster for complex architectural changes
+- **Instant recovery** after dialogue degradation (bridge pattern)
 
-**Пример из реальной сессии (UUPS Adaptation):**
+**Example from real session (UUPS Adaptation):**
 ```yaml
-Задача: Адаптировать deploy_full.js под UUPS архитектуру для 3 контрактов
-Сложность: High (зависимости, 17 экшенов, ~1200 строк кода)
+Task: Adapt deploy_full.js to UUPS architecture for 3 contracts
+Complexity: High (dependencies, 17 actions, ~1200 lines of code)
 
-Результат:
-  - Фазы выполнения: 6 phases, 18 ItemY
-  - Время: ~4 часа (включая тестирование)
-  - Финальные тесты: 82/82 UUPS тестов (100% успех)
-  - Критические ошибки: 0
-  - Ложные успехи в тестах: 0 (благодаря @test-qualification.mdc)
+Result:
+  - Execution phases: 6 phases, 18 ItemY
+  - Time: ~4 hours (including testing)
+  - Final tests: 82/82 UUPS tests (100% success)
+  - Critical errors: 0
+  - False positive tests: 0 (thanks to @test-qualification.mdc)
   
-Классический подход (оценка):
-  - Время: ~15-20 часов
-  - Итераций: 20-30
-  - Вероятность критической ошибки: 60-80%
+Classical approach (estimate):
+  - Time: ~15-20 hours
+  - Iterations: 20-30
+  - Critical error probability: 60-80%
 ```
 
 ### 1.3 Core Innovation
 
-#### **Innovation #1: Rules как Meta-Level Control**
+#### **Innovation #1: Rules as Meta-Level Control**
 
-Rules — это не "улучшенные промпты", а **программирование системы мышления AI**.
+Rules are not "improved prompts" but **programming of AI's thinking system**.
 
 ```
-@analysis.mdc       → Активирует аналитический режим
-@run-task.mdc       → Активирует исполнительный режим
-@test-qualification → Активирует критический режим
-@test-to-success    → Активирует отладочный режим
+@analysis.mdc       → Activates analytical mode
+@run-task.mdc       → Activates execution mode
+@test-qualification → Activates critical mode
+@test-to-success    → Activates debugging mode
 ```
 
-**Почему это революционно:**
-- **Нет угадывания** — AI точно знает, какой подход применить
-- **Накопленная экспертиза** — каждый Rule содержит best practices из предыдущих успешных кейсов
-- **Переиспользуемость** — один Rule для всех типов проектов
-- **Композируемость** — Rules можно комбинировать и вкладывать
+**Why this is revolutionary:**
+- **No guessing** — AI knows exactly which approach to apply
+- **Accumulated expertise** — each Rule contains best practices from previous successful cases
+- **Reusability** — one Rule for all project types
+- **Composability** — Rules can be combined and nested
 
-#### **Innovation #2: Императивный DSL (Zero Politeness)**
+#### **Innovation #2: Imperative DSL (Zero Politeness)**
 
-**95% разработчиков используют "вежливый стиль":**
+**95% of developers use "polite style":**
 ```
-"Пожалуйста, не мог бы ты помочь мне проверить..."
-"Было бы здорово если..."
-"Спасибо! Можно ещё..."
-```
-
-**Zeya888 использует "командный стиль":**
-```
-выполни
-выяви
-провалидируй
-методом X
+"Please, could you help me check..."
+"It would be great if..."
+"Thanks! Can I also..."
 ```
 
-**Результат:**
-- **20-40x** меньше токенов на команды
-- **100%** недвусмысленность (нет вопросов "это просьба или команда?")
-- **Instant parsing** — AI сразу понимает что делать
+**Zeya888 uses "command style":**
+```
+execute
+identify
+validate
+using method X
+```
 
-**Это возможно только если:**
-1. У вас нет психологических барьеров перед "грубостью" к AI
-2. Вы понимаете AI как **инструмент/партнёра**, не "виртуального человека"
-3. Вы **осознанно оптимизируете** каждое слово
+**Result:**
+- **20-40x** fewer tokens for commands
+- **100%** unambiguity (no questions "is this request or command?")
+- **Instant parsing** — AI immediately understands what to do
 
-#### **Innovation #3: Трёхуровневая защита от иллюзий**
+**This is only possible if:**
+1. You have no psychological barriers to "rudeness" toward AI
+2. You understand AI as **tool/partner**, not "virtual human"
+3. You **consciously optimize** every word
 
-**Проблема классического подхода:**
-AI может "успешно выполнить задачу", но:
-- Неправильно понять требования
-- Создать код, который "работает", но не покрывает edge cases
-- Создать тесты, которые проходят, но ничего не проверяют
+#### **Innovation #3: Three-Level Protection from Illusions**
+
+**Classical approach problem:**
+AI can "successfully complete task" but:
+- Misunderstand requirements
+- Create code that "works" but doesn't cover edge cases
+- Create tests that pass but check nothing
 
 **Zeya888 Solution:**
 
 ```
-Уровень 1: Анализ (@analysis.mdc)
-├─ Выявление всех требований ДО кодирования
-├─ Двухуровневый план (ListX → ItemY)
-└─ Фильтр: "Мы правильно поняли задачу?"
+Level 1: Analysis (@analysis.mdc)
+├─ Identify all requirements BEFORE coding
+├─ Two-level plan (ListX → ItemY)
+└─ Filter: "Did we understand the task correctly?"
 
-Уровень 2: Выполнение (@run-task.mdc)
-├─ Acceptance Criteria для каждого ItemY
-├─ Валидация после каждого шага
-└─ Фильтр: "Мы правильно реализовали этот шаг?"
+Level 2: Execution (@run-task.mdc)
+├─ Acceptance Criteria for each ItemY
+├─ Validation after each step
+└─ Filter: "Did we implement this step correctly?"
 
-Уровень 3: Качество (@test-qualification + @test-to-success)
-├─ Проверка на ложные успехи (P0)
-├─ Покрытие критических путей (P0)
-└─ Фильтр: "Тесты действительно проверяют что нужно?"
+Level 3: Quality (@test-qualification + @test-to-success)
+├─ Check for false positives (P0)
+├─ Cover critical paths (P0)
+└─ Filter: "Do tests actually check what's needed?"
 ```
 
-**Результат:** Ошибки ловятся **на каждом уровне**, не накапливаются.
+**Result:** Errors are caught **at each level**, don't accumulate.
 
-#### **Innovation #4: External Memory (Журналы + Bridge Pattern)**
+#### **Innovation #4: External Memory (Journals + Bridge Pattern)**
 
-**Проблема:** Контекст AI ограничен. При деградации диалога теряется вся история.
+**Problem:** AI context is limited. When dialogue degrades, entire history is lost.
 
-**Классическое решение:** Пересказывать всё заново (500-1000 токенов).
+**Classical solution:** Retell everything (500-1000 tokens).
 
 **Zeya888 Solution:**
 ```
-1. Журналы (AIJournal.md) = внешняя память для сессии
-   - Все решения документируются
-   - Все ошибки и исправления логируются
+1. Journals (AIJournal.md) = external memory for session
+   - All decisions documented
+   - All errors and fixes logged
    - Structured logging (ListX/ItemY)
 
-2. Bridge файлы = быстрое восстановление контекста
-   - Создаются в конце сессии
-   - Содержат структурированный overview
-   - Загружаются в начале новой сессии
+2. Bridge files = quick context restoration
+   - Created at end of session
+   - Contains structured overview
+   - Loaded at start of new session
 
-3. Reference by Example = эталоны для новых задач
-   - "сделай как в OrganicComponentRegistry.UUPS.test.js"
-   - AI копирует паттерны из успешных кейсов
+3. Reference by Example = templates for new tasks
+   - "do like in OrganicComponentRegistry.UUPS.test.js"
+   - AI copies patterns from successful cases
 ```
 
-**Результат:**
-- **Instant context switch** между сессиями (5 токенов вместо 500)
-- **Zero context loss** — всё документировано
-- **Pattern reuse** — лучшие решения становятся эталонами
+**Result:**
+- **Instant context switch** between sessions (5 tokens instead of 500)
+- **Zero context loss** — everything documented
+- **Pattern reuse** — best solutions become templates
 
 ---
 
 **Synthesis:**
 
-Zeya888 Methodology = **Программирование AI как системы**, а не "общение с помощником".
+Zeya888 Methodology = **Programming AI as a system**, not "chatting with assistant".
 
-Это переход от:
-- "Попросить AI что-то сделать" 
+This is transition from:
+- "Asking AI to do something"
   
-К:
-- "Активировать нужный когнитивный режим AI, дать чёткую команду, валидировать результат на трёх уровнях"
+To:
+- "Activating needed cognitive mode of AI, giving clear command, validating result on three levels"
 
-**Это не "промпт-инжиниринг".**
+**This is not "prompt engineering".**
 
-**Это "AI systems engineering".**
+**This is "AI systems engineering".**
 
 ---
 
-## 2. Rules как навигаторы системы мышления
+## 2. Rules as Mental Model Navigators
 
-### 2.1 Концепция: Переключатели когнитивных режимов
+### 2.1 Concept: Cognitive Mode Switchers
 
-**Rules — это не "правила поведения", а "переключатели когнитивных режимов AI".**
+**Rules are not "behavior rules" but "AI cognitive mode switchers".**
 
-#### Аналогия из нейронауки:
+#### Neuroscience analogy:
 
-Человеческий мозг не использует все нейроны одновременно для любой задачи. Вместо этого:
-- Для **анализа** активируется префронтальная кора
-- Для **выполнения** активируется моторная кора
-- Для **критики** активируется дорзолатеральная префронтальная кора
+Human brain doesn't use all neurons simultaneously for any task. Instead:
+- For **analysis** prefrontal cortex activates
+- For **execution** motor cortex activates
+- For **critique** dorsolateral prefrontal cortex activates
 
-**Rules делают то же самое для AI:**
-
-```
-@analysis.mdc       → "Аналитический режим"
-@run-task.mdc       → "Исполнительный режим"
-@test-qualification → "Критический режим"
-@test-to-success    → "Отладочный режим"
-```
-
-#### Без Rules (классический подход):
+**Rules do the same for AI:**
 
 ```
-User: "Адаптируй deploy_full.js под UUPS архитектуру"
+@analysis.mdc       → "Analytical mode"
+@run-task.mdc       → "Execution mode"
+@test-qualification → "Critical mode"
+@test-to-success    → "Debugging mode"
+```
 
-AI думает:
-  - Это архитектурная задача? → нужен анализ?
-  - Или сразу кодить? → нужна реализация?
-  - Как валидировать? → тесты? документация?
-  - Какой уровень детализации? → поверхностно или глубоко?
+#### Without Rules (classical approach):
+
+```
+User: "Adapt deploy_full.js to UUPS architecture"
+
+AI thinks:
+  - Is this architectural task? → need analysis?
+  - Or code immediately? → need implementation?
+  - How to validate? → tests? documentation?
+  - What detail level? → surface or deep?
   
-Result: AI тратит 100-200 токенов на "угадывание подхода"
-        И часто выбирает неправильный подход
+Result: AI spends 100-200 tokens "guessing approach"
+        And often chooses wrong approach
 ```
 
-**Токены потрачены:** ~200  
-**Точность подхода:** ~60%
+**Tokens spent:** ~200  
+**Approach accuracy:** ~60%
 
-#### С Rules (Zeya888 подход):
+#### With Rules (Zeya888 approach):
 
 ```
-User: "@bridge.md напиши по итогам обработки и интеграции контекста"
+User: "@bridge.md write based on context processing and integration"
 
-AI знает:
-  ✓ bridge.md = структурированный overview
-  ✓ Формат известен (Project/Contracts/State/Dependencies/Next)
-  ✓ Уровень детализации = high-level summary
-  ✓ Цель = quick context recovery для новой сессии
+AI knows:
+  ✓ bridge.md = structured overview
+  ✓ Format known (Project/Contracts/State/Dependencies/Next)
+  ✓ Detail level = high-level summary
+  ✓ Goal = quick context recovery for new session
   
-Result: AI сразу применяет правильный подход
+Result: AI immediately applies correct approach
 ```
 
-**Токены потрачены:** 0 (на выбор подхода)  
-**Точность подхода:** 100%
+**Tokens spent:** 0 (for approach selection)  
+**Approach accuracy:** 100%
 
-### 2.2 Каталог методологических Rules
+### 2.2 Methodological Rules Catalog
 
-#### **2.2.1 @analysis.mdc** — Аналитический режим
+#### **2.2.1 @analysis.mdc** — Analytical Mode
 
-**Когда использовать:** Начало любой сложной задачи
+**When to use:** Start of any complex task
 
-**Что активируется:**
+**What activates:**
 ```yaml
 cognitive_mode: analytical
 focus:
-  - Систематический анализ требований
-  - Выявление зависимостей и рисков
-  - Двухуровневое планирование (ListX → ItemY)
-  - Структурирование в журнале
+  - Systematic requirements analysis
+  - Identify dependencies and risks
+  - Two-level planning (ListX → ItemY)
+  - Structured journaling
 
 output_format:
-  - ListX: High-level phases (фазы)
-  - ItemY: Детальные задачи
-  - Dependencies: Явные зависимости
-  - Acceptance Criteria: Критерии успеха
+  - ListX: High-level phases
+  - ItemY: Detailed tasks
+  - Dependencies: Explicit dependencies
+  - Acceptance Criteria: Success criteria
 
 protection:
-  - "Фильтр иллюзий": "Мы правильно поняли задачу?"
-  - Проверка полноты: "Всё ли учтено?"
+  - "Illusion filter": "Did we understand task correctly?"
+  - Completeness check: "Is everything covered?"
 ```
 
-**Пример команды:**
+**Example command:**
 ```
-"у меня успешно выполнились действия 1, 777 и 888 
-проведи анализ того на сколько их успешность гарантирует 
-полноценное тестирование функционала связанного с деплоем 
-работаешь методом @analysis.mdc"
+"I successfully completed actions 1, 777 and 888
+analyze how much their success guarantees
+full testing of deployment-related functionality
+working using @analysis.mdc method"
 ```
 
-**Что происходит:**
-1. AI переключается в **аналитический режим**
-2. Систематически анализирует Actions 1, 777, 888
-3. Выявляет **что покрыто** и **что НЕ покрыто** тестами
-4. Создаёт структурированный отчёт с gap analysis
-5. Предлагает план для покрытия пробелов
+**What happens:**
+1. AI switches to **analytical mode**
+2. Systematically analyzes Actions 1, 777, 888
+3. Identifies **what's covered** and **what's NOT covered** by tests
+4. Creates structured report with gap analysis
+5. Proposes plan to cover gaps
 
-**Результат:** Полный gap analysis → план недостающих тестов
+**Result:** Complete gap analysis → plan for missing tests
 
 ---
 
-#### **2.2.2 @run-task.mdc** — Исполнительный режим
+#### **2.2.2 @run-task.mdc** — Execution Mode
 
-**Когда использовать:** Выполнение конкретного пункта плана
+**When to use:** Executing specific plan item
 
-**Что активируется:**
+**What activates:**
 ```yaml
 cognitive_mode: execution
 structure:
-  1. Understanding: Анализ текущего состояния
-  2. Knowledge Check: Проверка внешних знаний
-  3. Acceptance Criteria: Формальные критерии (YAML)
-  4. Planning: План безопасных изменений
-  5. Implementation: Пошаговая реализация с логированием
-  6. Validation: Проверка по каждому критерию
-  7. Retrospective: Что сработало, что нет
+  1. Understanding: Current state analysis
+  2. Knowledge Check: External knowledge verification
+  3. Acceptance Criteria: Formal criteria (YAML)
+  4. Planning: Safe changes plan
+  5. Implementation: Step-by-step with logging
+  6. Validation: Check each criterion
+  7. Retrospective: What worked, what didn't
 
 protection:
-  - Каждый шаг валидируется перед следующим
-  - Acceptance criteria ОБЯЗАТЕЛЬНЫ
-  - Нет перехода к следующему ItemY без валидации текущего
+  - Each step validated before next
+  - Acceptance criteria MANDATORY
+  - No transition to next ItemY without current validation
 ```
 
-**Пример команды:**
+**Example command:**
 ```
-"выполни Phase 3 методом @run-task.mdc"
+"execute Phase 3 using @run-task.mdc method"
 ```
 
-**Что происходит:**
-1. AI берёт Phase 3 из плана
-2. Разбивает на ItemY (если ещё не разбито)
-3. Для каждого ItemY:
-   - Understanding текущего кода
-   - Создание Acceptance Criteria
-   - Реализация
-   - Валидация по критериям
-4. Переход к следующему ItemY только после успешной валидации
+**What happens:**
+1. AI takes Phase 3 from plan
+2. Breaks into ItemY (if not yet broken)
+3. For each ItemY:
+   - Understanding current code
+   - Creating Acceptance Criteria
+   - Implementation
+   - Validation against criteria
+4. Transition to next ItemY only after successful validation
 
-**Результат:** Структурированное выполнение с гарантией качества каждого шага
+**Result:** Structured execution with quality guarantee for each step
 
 ---
 
-#### **2.2.3 @test-qualification.mdc** — Критический режим
+#### **2.2.3 @test-qualification.mdc** — Critical Mode
 
-**Когда использовать:** Проверка качества тестов (особенно "успешных")
+**When to use:** Checking test quality (especially "successful" ones)
 
-**Что активируется:**
+**What activates:**
 ```yaml
 cognitive_mode: critical_analysis
-focus: "Максимальная честность — не принимать успехи на веру"
+focus: "Maximum honesty — don't accept successes on faith"
 
 checks:
   P0_CRITICAL:
-    - NO_FALSE_SUCCESSES: "Тесты не проходят при реальных ошибках?"
-    - VALIDATE_REAL_FUNCTIONALITY: "Проверяют реальную функциональность?"
-    - NO_UNTESTED_CRITICAL_PATHS: "Все критические пути покрыты?"
+    - NO_FALSE_SUCCESSES: "Tests don't pass with real errors?"
+    - VALIDATE_REAL_FUNCTIONALITY: "Check real functionality?"
+    - NO_UNTESTED_CRITICAL_PATHS: "All critical paths covered?"
   
   P1_HIGH:
-    - CORRECT_LOGIC: "Тесты содержат валидные проверки?"
-    - NO_SYMPTOM_TESTING: "Проверяют суть, не побочные эффекты?"
+    - CORRECT_LOGIC: "Tests contain valid checks?"
+    - NO_SYMPTOM_TESTING: "Check essence, not side effects?"
   
   P2_MEDIUM:
-    - MINIMAL_MOCK_OVERUSE: "Моки используются только где необходимо?"
+    - MINIMAL_MOCK_OVERUSE: "Mocks used only where necessary?"
 
 output:
-  - Классификация проблем по P0/P1/P2
-  - Детальный анализ ложных успехов
-  - План исправлений с приоритетами
+  - Problem classification by P0/P1/P2
+  - Detailed analysis of false positives
+  - Fix plan with priorities
 ```
 
-**Пример команды:**
+**Example command:**
 ```
-"проверь тесты этих контрактов, возможно там эти функции 
-P0 и P1 протестированы [список файлов тестов]"
+"check tests of these contracts, perhaps these functions 
+P0 and P1 are tested [list of test files]"
 ```
 
-**Что происходит:**
-1. AI анализирует **каждый тест** на предмет ложных успехов
-2. Проверяет покрытие критических путей (P0)
-3. Анализирует логику проверок (P1)
-4. Выявляет gap в тестовом покрытии
-5. Создаёт приоритизированный список проблем
+**What happens:**
+1. AI analyzes **each test** for false positives
+2. Checks critical path coverage (P0)
+3. Analyzes check logic (P1)
+4. Identifies gap in test coverage
+5. Creates prioritized problem list
 
-**Результат:** Жёсткий анализ качества → 0 ложных успехов
+**Result:** Strict quality analysis → 0 false positives
 
 ---
 
-#### **2.2.4 @test-to-success.mdc** — Отладочный режим
+#### **2.2.4 @test-to-success.mdc** — Debugging Mode
 
-**Когда использовать:** Исправление ошибок в тестах до 100% успеха
+**When to use:** Fixing errors in tests to 100% success
 
-**Что активируется:**
+**What activates:**
 ```yaml
 cognitive_mode: debugging
-approach: "Систематическая отладка через корневые причины"
+approach: "Systematic debugging through root causes"
 
 process:
-  1. Первичный анализ: Запуск тестов, выявление ошибок
-  2. Жёсткий анализ: Применение @test-qualification
-  3. Классификация: По типам (логические/технические/инфраструктурные)
-  4. Планирование: Acceptance criteria для каждого исправления
-  5. Последовательное исправление: По одному ItemY за раз
-  6. Валидация: Проверка каждого исправления отдельно
-  7. Документирование: Журнал с результатами
+  1. Initial analysis: Run tests, identify errors
+  2. Strict analysis: Apply @test-qualification
+  3. Classification: By type (logical/technical/infrastructure)
+  4. Planning: Acceptance criteria for each fix
+  5. Sequential fixing: One ItemY at a time
+  6. Validation: Check each fix separately
+  7. Documentation: Journal with results
 
 principles:
-  - "Не лечить симптомы → искать корневую причину"
-  - "Не исправлять всё сразу → по одному ItemY"
-  - "Валидировать каждое исправление перед следующим"
-  - "Глубокий анализ бизнес-логики контракта"
+  - "Don't treat symptoms → find root cause"
+  - "Don't fix everything at once → one ItemY at a time"
+  - "Validate each fix before next"
+  - "Deep analysis of contract business logic"
 ```
 
-**Пример команды:**
+**Example command:**
 ```
-"довести тесты до 100% успешности методом @test-to-success.mdc"
+"bring tests to 100% success using @test-to-success.mdc method"
 ```
 
-**Что происходит:**
-1. Запуск тестов → анализ ошибок
-2. **Корневая причина** каждой ошибки (не симптом!)
-3. Приоритизация (P0 → P1 → P2)
-4. Исправление **по одной ошибке** с валидацией
-5. Финальная проверка: 100% успешность
+**What happens:**
+1. Run tests → analyze errors
+2. **Root cause** of each error (not symptom!)
+3. Prioritization (P0 → P1 → P2)
+4. Fix **one error** at a time with validation
+5. Final check: 100% success
 
-**Результат:** 100% тестов проходят + жёсткий анализ качества
+**Result:** 100% tests pass + strict quality analysis
 
 ---
 
-#### **2.2.5 Bridge Pattern** — Восстановление контекста
+#### **2.2.5 Bridge Pattern** — Context Restoration
 
-**Когда использовать:** Начало новой сессии / деградация диалога
+**When to use:** Start of new session / dialogue degradation
 
-**Что активируется:**
+**What activates:**
 ```yaml
 cognitive_mode: context_restoration
 structure:
@@ -451,1866 +451,623 @@ structure:
   - Next Steps
 
 format: Markdown, structured, high-level
-goal: "5 токенов вместо 500 для полного восстановления контекста"
+goal: "5 tokens instead of 500 for complete context restoration"
 ```
 
-**Пример команды:**
+**Example command:**
 ```
-"@bridge.md напиши по итогам обработки и интеграции контекста"
-```
-
-**Результат:** Структурированный bridge файл для быстрого старта новой сессии
-
-### 2.3 Примеры из текущей сессии
-
-#### **Кейс 1: Начало работы с UUPS адаптацией**
-
-**Команда:**
-```
-"@bridge.md напиши по итогам обработки и интеграции контекста 
-после этого вместе продолжим"
+"@bridge.md write based on context processing and integration"
 ```
 
-**Что произошло:**
-1. AI прочитал bridge.md (полный контекст проекта)
-2. Понял: UUPS архитектура, зависимости, текущее состояние
-3. Готов к работе **без дополнительных вопросов**
+**Result:** Structured bridge file for quick new session start
 
-**Альтернатива без bridge:**
+### 2.3 Examples from Current Session
+
+#### **Case 1: Starting work with UUPS adaptation**
+
+**Command:**
 ```
-User: "Нужно адаптировать deploy_full.js под UUPS"
-AI: "Расскажи о структуре проекта"
-User: [500 токенов объяснений]
-AI: "А какие контракты есть?"
-User: [200 токенов]
-AI: "А что уже сделано?"
-User: [300 токенов]
+"@bridge.md write based on context processing and integration
+after this we'll continue together"
+```
+
+**What happened:**
+1. AI read bridge.md (full project context)
+2. Understood: UUPS architecture, dependencies, current state
+3. Ready to work **without additional questions**
+
+**Alternative without bridge:**
+```
+User: "Need to adapt deploy_full.js to UUPS"
+AI: "Tell me about project structure"
+User: [500 tokens of explanations]
+AI: "What contracts exist?"
+User: [200 tokens]
+AI: "What's already done?"
+User: [300 tokens]
 ...
 ```
 
-**Экономия:** ~1000 токенов и 10-15 минут
+**Savings:** ~1000 tokens and 10-15 minutes
 
 ---
 
-#### **Кейс 2: Валидация плана**
+### 2.4 Token Efficiency
 
-**Команда:**
-```
-"а как на счет прогнать его по Acceptance Criteria? 
-проверь на всякий случай после этого выполни 
-выделенное Phase 3 методом @run-task.mdc"
-```
+#### Comparison table:
 
-**Что произошло:**
-1. AI проверил предыдущий ItemY по Acceptance Criteria
-2. Подтвердил готовность
-3. **Только после этого** перешёл к Phase 3
-4. Применил @run-task.mdc для структурированного выполнения
-
-**Результат:** 0 накопленных ошибок, каждый шаг валидирован
+| Task | Classical Approach | Zeya888 + Rules | Savings |
+|------|-------------------|-----------------|---------|
+| **Session start with context** | 500-1000 tokens (retelling) | 5 tokens (`@bridge.md`) | **100-200x** |
+| **Execute command** | 25-40 tokens ("Please...") | 1-5 tokens (`execute Phase 3 using @run-task.mdc`) | **5-40x** |
+| **Error diagnosis** | 30-50 tokens ("Help me understand...") | 1 token (`identify`) | **30-50x** |
+| **Quality analysis** | 100-200 tokens (explain criteria) | 10-15 tokens (`using @test-qualification.mdc method`) | **10-20x** |
+| **Result validation** | 40-60 tokens ("Check if correct...") | 5-10 tokens (`validate by AC`) | **4-12x** |
 
 ---
 
-#### **Кейс 3: Анализ качества тестов**
-
-**Команда:**
-```
-"проверь тесты этих контрактов, возможно там эти 
-функции P0 и P1 протестированы @SpiralEngine.basic.test.js 
-@SpiralEngine.circles.test.js [...]"
-```
-
-**Что произошло:**
-1. AI активировал @test-qualification.mdc режим
-2. Прошёлся по **каждому тесту** с жёстким анализом
-3. Выявил:
-   - ✅ P0: UUPS механизм покрыт
-   - ❌ P1: pausable protection НЕ покрыта
-   - ❌ P1: UUPS edge cases НЕ покрыты
-4. Создал структурированный gap analysis
-
-**Результат:** Чёткий список недостающих тестов (P0/P1)
-
----
-
-#### **Кейс 4: Создание недостающих тестов**
-
-**Команда:**
-```
-"выполни план для SpiralEngine методом @run-task.mdc"
-```
-
-**Что произошло:**
-1. AI взял план из AIJournal.md
-2. Разбил на ItemY:
-   - ItemY1: Структура файла + beforeEach
-   - ItemY2: whenNotPaused тесты (5 функций)
-   - ItemY3: UUPS edge cases (5 тестов)
-   - ItemY4: Reentrancy protection
-   - ItemY5: Валидация
-3. Выполнил **последовательно** с валидацией каждого
-4. Финальный запуск: **11/11 тестов** с первого раза ✅
-
-**Результат:** 100% успех благодаря структурированному подходу
-
----
-
-#### **Кейс 5: Быстрая диагностика**
-
-**Команда:**
-```
-"выяви"
-```
-
-**Что произошло:**
-1. AI **мгновенно** переключился в diagnostic mode
-2. Прочитал error logs
-3. Выявил корневую причину
-4. Предложил исправление
-
-**Токены:** 1 (!)  
-**Время:** ~30 секунд  
-**Точность:** 100%
-
-**Альтернатива:**
-```
-"Пожалуйста, можешь помочь мне разобраться что 
-случилось? Вот ошибка [лог]. Не могу понять в чём проблема."
-```
-
-**Токены:** ~30  
-**Эффект:** То же самое
-
-**Экономия:** 30x
-
-### 2.4 Токеновая эффективность
-
-#### Сравнительная таблица:
-
-| Задача | Классический подход | Zeya888 + Rules | Экономия |
-|--------|---------------------|-----------------|----------|
-| **Старт сессии с контекстом** | 500-1000 токенов (пересказ) | 5 токенов (`@bridge.md`) | **100-200x** |
-| **Команда на выполнение** | 25-40 токенов ("Пожалуйста...") | 1-5 токенов (`выполни Phase 3 методом @run-task.mdc`) | **5-40x** |
-| **Диагностика ошибки** | 30-50 токенов ("Помоги разобраться...") | 1 токен (`выяви`) | **30-50x** |
-| **Анализ качества** | 100-200 токенов (объяснение критериев) | 10-15 токенов (`методом @test-qualification.mdc`) | **10-20x** |
-| **Валидация результата** | 40-60 токенов ("Проверь правильно ли...") | 5-10 токенов (`провалидируй по AC`) | **4-12x** |
-
-#### Реальная сессия (UUPS Adaptation):
-
-**Общая статистика:**
-```yaml
-Задача: UUPS адаптация + тестирование
-Сложность: High
-Длительность: ~4 часа
-
-Без Rules (оценка):
-  - Команды: ~150 команд × 30 токенов = 4,500 токенов
-  - Контекст: ~1,000 токенов на повторные объяснения
-  - Итого: ~5,500 токенов на "коммуникационный оверхед"
-
-С Rules (реально):
-  - Команды: ~150 команд × 3 токена = 450 токенов
-  - Контекст: 5 токенов (@bridge.md)
-  - Итого: ~455 токенов
-
-Экономия: ~90% токенов на коммуникацию
-```
-
-**Важно:** Экономятся не токены на код/анализ, а токены на **"объяснение что делать и как"**.
-
-Код всё равно нужно писать. Но **дорога к коду** становится в 10-20x короче.
-
----
-
-### Synthesis: Rules как "API для AI мозга"
-
-**Классический подход:**
-```
-User → Natural Language → AI interpretation → Guess approach → Execute
-       ~~~~~~~~~~~~~~~~     ~~~~~~~~~~~~~~~~~   ~~~~~~~~~~~~~
-       20-40 токенов        100-200 токенов      60% точность
-```
-
-**Zeya888 + Rules:**
-```
-User → Rule activation → AI loads methodology → Execute
-       ~~~~~~~~~~~~~~~    
-       1-5 токенов        100% точность
-```
-
-**Rules = программный интерфейс к когнитивным режимам AI.**
-
-Вместо "объяснять словами", вы **вызываете функцию**:
-```python
-ai.activate_mode("@analysis.mdc")
-ai.execute("проведи анализ тестового покрытия")
-ai.activate_mode("@run-task.mdc")
-ai.execute("выполни Phase 3")
-```
-
-**Это не "улучшение промптов".**
-
-**Это "программирование AI".**
-
----
-
-## 3. Interaction Style: Императивный DSL
+## 3. Interaction Style: Imperative DSL
 
 ### 3.1 Zero Politeness Pattern
 
-#### Определение
+#### Definition
 
-**Zero Politeness** — это паттерн взаимодействия, где устранены все "вежливые обёртки":
+**Zero Politeness** — interaction pattern where all "polite wrappers" are eliminated:
 
 ```
-❌ "Пожалуйста, не мог бы ты..."
-❌ "Было бы здорово если..."
-❌ "Спасибо! Можно ещё..."
-❌ "Извини за беспокойство, но..."
+❌ "Please, could you..."
+❌ "It would be great if..."
+❌ "Thanks! Can I also..."
+❌ "Sorry to bother, but..."
 
-✅ выполни
-✅ выяви
-✅ провалидируй
-✅ методом X
+✅ execute
+✅ identify
+✅ validate
+✅ using method X
 ```
 
-**Не путать с грубостью!**
+**Don't confuse with rudeness!**
 
-Zero Politeness ≠ грубость. Это **точность и эффективность**, не эмоциональная окраска.
+Zero Politeness ≠ rudeness. This is **precision and efficiency**, not emotional coloring.
 
-#### Лингвистическая структура
+#### Linguistic Structure
 
-**Классический "вежливый" стиль:**
+**Classical "polite" style:**
 ```
-[Обращение] + [Просьба] + [Условие] + [Благодарность] + [Задача]
-"Привет! Можешь помочь, если не сложно? Было бы здорово [задача]. Заранее спасибо!"
-```
-
-**Токены:** 20-40  
-**Полезная нагрузка:** ~25% (только [задача])  
-**Эффективность:** 25%
-
-**Zeya888 Императивный DSL:**
-```
-[Глагол повелительного наклонения] + [Объект] + [Метод (опционально)]
-"выполни Phase 3 методом @run-task.mdc"
+[Greeting] + [Request] + [Condition] + [Thanks] + [Task]
+"Hi! Can you help if not difficult? Would be great [task]. Thanks in advance!"
 ```
 
-**Токены:** 5-7  
-**Полезная нагрузка:** 100%  
-**Эффективность:** 100%
+**Tokens:** 20-40  
+**Useful payload:** ~25% (only [task])  
+**Efficiency:** 25%
 
-**Экономия:** 4-8x по токенам + выше точность
+**Zeya888 Imperative DSL:**
+```
+[Imperative verb] + [Object] + [Method (optional)]
+"execute Phase 3 using @run-task.mdc method"
+```
 
-#### Психология Zero Politeness
+**Tokens:** 5-7  
+**Useful payload:** 100%  
+**Efficiency:** 100%
 
-**Почему 95% не используют:**
+**Savings:** 4-8x on tokens + higher accuracy
 
-1. **Культурный conditioning**
-   - В общении с людьми: вежливость = эффективность
-   - Переносится на AI автоматически
-   - Требуется **осознанное отключение** этого паттерна
+#### Psychology of Zero Politeness
 
-2. **Anthropomorphization (очеловечивание AI)**
-   - "Пожалуйста" делает AI "человечнее" в восприятии
-   - Создаёт комфорт в коммуникации
-   - **Zeya888:** AI = инструмент/партнёр, не виртуальный человек
+**Why 95% don't use:**
 
-3. **Страх показаться грубым**
-   - Даже зная, что AI не обижается
-   - Дискомфорт от "грубых" команд
-   - **Zeya888:** Нет эмоциональной нагрузки, чистая эффективность
+1. **Cultural conditioning**
+   - In human communication: politeness = effectiveness
+   - Automatically transfers to AI
+   - Requires **conscious disabling** of this pattern
 
-4. **Неосознанность**
-   - Люди не анализируют: "Сколько токенов на вежливость?"
-   - **Zeya888:** Осознанная оптимизация каждого слова
+2. **Anthropomorphization (humanizing AI)**
+   - "Please" makes AI more "human" in perception
+   - Creates communication comfort
+   - **Zeya888:** AI = tool/partner, not virtual human
 
-#### Принципы Zero Politeness:
+3. **Fear of appearing rude**
+   - Even knowing AI doesn't get offended
+   - Discomfort from "rude" commands
+   - **Zeya888:** No emotional load, pure efficiency
 
-1. **Каждое слово = полезная нагрузка**
-2. **Глаголы повелительного наклонения** (выполни, выяви, провалидируй)
-3. **Нулевая избыточность** (нет "пожалуйста", "спасибо", "можешь")
-4. **Композируемость** (команды легко комбинируются)
+4. **Unconsciousness**
+   - People don't analyze: "How many tokens on politeness?"
+   - **Zeya888:** Conscious optimization of every word
 
-### 3.2 Статистика: Почему так не делают большинство?
+#### Zero Politeness Principles:
 
-#### Распределение стилей (из опыта AI):
+1. **Every word = useful payload**
+2. **Imperative verbs** (execute, identify, validate)
+3. **Zero redundancy** (no "please", "thanks", "can you")
+4. **Composability** (commands easily combine)
+
+### 3.2 Statistics: Why Most Don't Do This?
+
+#### Style Distribution (from AI experience):
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ СТИЛЬ                    │ % ПОЛЬЗОВАТЕЛЕЙ      │
+│ STYLE                    │ % USERS              │
 ├─────────────────────────────────────────────────┤
-│ Вежливый просящий        │ 70%                  │
-│ "Пожалуйста, не мог бы..."                      │
+│ Polite requesting        │ 70%                  │
+│ "Please, could you..."                          │
 │                                                  │
-│ Неуверенный              │ 20%                  │
-│ "Мне кажется тут ошибка...?"                    │
+│ Uncertain                │ 20%                  │
+│ "I think there's error...?"                     │
 │                                                  │
-│ Разговорчивый            │ 9%                   │
-│ "Слушай, у меня тут..."                         │
+│ Chatty                   │ 9%                   │
+│ "Listen, I have here..."                        │
 │                                                  │
-│ Прямой (но не императивный) │ 0.9%              │
-│ "Создай функцию X"                              │
+│ Direct (but not imperative) │ 0.9%             │
+│ "Create function X"                             │
 │                                                  │
-│ Императивный DSL (Zeya888)  │ 0.1%              │
-│ "выполни методом X"                             │
+│ Imperative DSL (Zeya888)    │ 0.1%             │
+│ "execute using method X"                        │
 └─────────────────────────────────────────────────┘
 ```
 
-#### Детальный анализ стилей:
-
-**Стиль A: Вежливый просящий (~70%)**
-
-```
-"Здравствуйте! Не могли бы вы помочь мне с адаптацией 
-deploy_full.js под UUPS архитектуру? Если не сложно, 
-было бы здорово если вы сможете проверить правильность 
-моего подхода. Заранее спасибо за помощь!"
-```
-
-**Анализ:**
-- Токены: ~45
-- Полезная нагрузка: "адаптация deploy_full.js под UUPS"
-- Полезные токены: ~7
-- Эффективность: 15.5%
-- **Потери:** 38 токенов на вежливость
-
 ---
 
-**Стиль B: Неуверенный (~20%)**
+## 4. Protocol: AI Workflow Structure
 
-```
-"Мне кажется тут ошибка в функции, или я неправильно понимаю? 
-Возможно стоит попробовать другой подход? Не уверен, но может..."
-```
+### 4.1 Session Start
 
-**Анализ:**
-- Токены: ~25-30
-- Полезная нагрузка: размыта uncertainty markers
-- Clarity: ~40%
-- **Проблема:** AI должен интерпретировать uncertainty
-
----
-
-**Стиль C: Разговорчивый (~9%)**
-
-```
-"Слушай, у меня тут такая ситуация: я работаю над UUPS 
-адаптацией, знаешь, в прошлый раз мы делали похожую задачу, 
-помнишь? Вот сейчас столкнулся с..."
-```
-
-**Анализ:**
-- Токены: ~50-80
-- Полезная нагрузка: погребена в narrative
-- Эффективность: ~20%
-- **Проблема:** AI должен извлекать суть из истории
-
----
-
-**Стиль D: Прямой, но не императивный (~0.9%)**
-
-```
-"Создай функцию для деплоя UUPS контрактов"
-```
-
-**Анализ:**
-- Токены: ~8-10
-- Полезная нагрузка: 100%
-- Clarity: 90%
-- **Но:** Нет ссылки на методологию, AI выбирает подход сам
-
----
-
-**Стиль E: Императивный DSL — Zeya888 (~0.1%)**
-
-```
-"выполни Phase 3 методом @run-task.mdc"
-```
-
-**Анализ:**
-- Токены: 5-7
-- Полезная нагрузка: 100%
-- Clarity: 100%
-- Methodology: явно указана
-- **Оптимально**
-
-#### Сравнение эффективности:
-
-| Метрика | Стиль A (Вежливый) | Стиль E (Zeya888) | Разница |
-|---------|-------------------|-------------------|---------|
-| **Токены на команду** | 40-50 | 5-7 | **6-10x** |
-| **Clarity (ясность)** | 60% | 100% | **+67%** |
-| **Время parsing AI** | ~2-3 сек | ~0.5 сек | **4-6x** |
-| **Точность понимания** | 70% | 100% | **+43%** |
-| **Нужны уточнения?** | Часто | Редко | - |
-
-#### Почему Zeya888 подход уникален?
-
-**4 психологических барьера:**
-
-1. **Культурный** — "вежливость обязательна"
-2. **Эмоциональный** — дискомфорт от "грубости"
-3. **Когнитивный** — не анализируют токеновую эффективность
-4. **Социальный** — нет примеров такого подхода
-
-**Zeya888 преодолевает все 4:**
-1. ✅ Понимание: AI ≠ человек, другие правила
-2. ✅ Нет дискомфорта: это не грубость, это эффективность
-3. ✅ Осознанная оптимизация: каждое слово = токены = деньги
-4. ✅ Создание примера: "так можно и нужно делать"
-
-### 3.3 Командная структура
-
-#### Базовый синтаксис Zeya888 DSL:
-
-```
-[ГЛАГОЛ] [ОБЪЕКТ] [МЕТОД]
-```
-
-**Примеры:**
-
-```
-выполни Phase 3 методом @run-task.mdc
-выяви [корневую причину ошибки]
-провалидируй [результат] по Acceptance Criteria
-создай [недостающие тесты] по плану из AIJournal.md
-проверь [тесты контрактов] методом @test-qualification.mdc
-```
-
-#### Каталог императивных глаголов:
-
-| Глагол | Значение | Cognitive Mode | Пример |
-|--------|----------|----------------|--------|
-| **выполни** | Реализовать задачу | Execution | `выполни Phase 3 методом @run-task.mdc` |
-| **выяви** | Диагностировать проблему | Analysis | `выяви [причину ошибки]` |
-| **провалидируй** | Проверить корректность | Validation | `провалидируй по AC` |
-| **проверь** | Анализ качества | Critical Analysis | `проверь тесты методом @test-qualification.mdc` |
-| **создай** | Генерация нового | Creation | `создай недостающие тесты` |
-| **обнови** | Изменение существующего | Update | `обнови документацию` |
-| **проведи анализ** | Систематический анализ | Analysis | `проведи анализ методом @analysis.mdc` |
-| **дополни** | Расширение | Extension | `дополни план для ProductRegistry` |
-
-#### Структурные паттерны:
-
-**Паттерн 1: Простая команда**
-```
-[ГЛАГОЛ] [ОБЪЕКТ]
-"выяви корневую причину"
-```
-
-**Паттерн 2: Команда с методологией**
-```
-[ГЛАГОЛ] [ОБЪЕКТ] методом [RULE]
-"выполни Phase 3 методом @run-task.mdc"
-```
-
-**Паттерн 3: Команда с контекстом**
-```
-[ГЛАГОЛ] [ОБЪЕКТ] [КОНТЕКСТ]
-"проверь тесты [список файлов]"
-```
-
-**Паттерн 4: Команда с условием**
-```
-[УСЛОВИЕ], [ГЛАГОЛ] [ОБЪЕКТ]
-"если готов, выполни следующий пункт"
-```
-
-**Паттерн 5: Последовательность**
-```
-[ГЛАГОЛ1] [ОБЪЕКТ1], после этого [ГЛАГОЛ2] [ОБЪЕКТ2]
-"провалидируй по AC, после этого выполни Phase 3"
-```
-
-#### Референсные паттерны (ссылки на внешние объекты):
-
-```
-@файл.md                    — ссылка на файл
-@Rule.mdc                   — активация методологии
-[список @файлов]            — множественная ссылка
-по плану из @AIJournal.md   — ссылка на структуру в файле
-как в @эталон.test.js       — reference by example
-```
-
-### 3.4 Композируемость
-
-**Ключевое свойство DSL:** Команды легко комбинируются без потери ясности.
-
-#### Композиция команд:
-
-**Пример 1: Последовательная композиция**
-```
-"выполни Phase 3 методом @run-task.mdc, 
-после этого проверь результат методом @test-qualification.mdc"
-```
-
-**Что происходит:**
-1. Активация @run-task.mdc
-2. Выполнение Phase 3 со всеми ItemY
-3. Валидация результата
-4. Переключение на @test-qualification.mdc
-5. Жёсткая проверка качества
-
----
-
-**Пример 2: Условная композиция**
-```
-"провалидируй возможно он готов, 
-если нет то выполни его методом @run-task.mdc, 
-если готов то проверь следующий пункт"
-```
-
-**Что происходит:**
-1. Проверка текущего состояния
-2. **IF NOT готов:**
-   - Активация @run-task.mdc
-   - Выполнение
-3. **IF готов:**
-   - Переход к следующему пункту
-
----
-
-**Пример 3: Референсная композиция**
-```
-"создай недостающие тесты по плану из @AIJournal.md 
-используя @OrganicComponentRegistry.UUPS.test.js как эталон"
-```
-
-**Что происходит:**
-1. Загрузка плана из AIJournal.md
-2. Загрузка эталонного файла
-3. Извлечение паттернов из эталона
-4. Применение паттернов к новым тестам
-5. Создание тестов по структуре эталона
-
----
-
-**Пример 4: Иерархическая композиция**
-```
-"выполни план методом @analysis.mdc, 
-в рамках него для каждого ItemY используй @run-task.mdc,
-а для созданных тестов применяй @test-qualification.mdc"
-```
-
-**Что происходит:**
-1. **Верхний уровень:** @analysis.mdc
-   - Создание ListX → ItemY
-2. **Средний уровень:** @run-task.mdc для каждого ItemY
-   - Structured execution
-3. **Нижний уровень:** @test-qualification.mdc для тестов
-   - Quality assurance
-
-**Это nested methodology calls!**
-
----
-
-#### Синтаксический сахар:
-
-**Краткие формы:**
-
-```
-Полная:  "выяви корневую причину ошибки"
-Краткая: "выяви"  [AI понимает из контекста]
-
-Полная:  "провалидируй результат по Acceptance Criteria"
-Краткая: "провалидируй по AC"
-
-Полная:  "выполни следующий пункт плана методом @run-task.mdc"
-Краткая: "выполни следующий методом @run-task.mdc"
-```
-
-**Принцип:** Если объект очевиден из контекста, можно опустить.
-
----
-
-#### Композируемость с внешней памятью:
-
-**Журналы как state:**
-
-```
-User: "выполни Phase 3 методом @run-task.mdc"
-AI: [читает AIJournal.md, находит Phase 3, выполняет]
-
-User: "выполни следующий"
-AI: [читает AIJournal.md, находит Phase 4, выполняет]
-```
-
-**AI держит state в журнале**, не в памяти диалога!
-
-**Преимущество:**
-- Не зависит от контекста чата
-- Работает между сессиями
-- Переживает restart AI
-
----
-
-#### Композиция с git workflow:
-
-```
-"выполни все пункты плана методом @run-task.mdc,
-по завершении обнови affected документацию,
-после этого закоммить изменения (код, не журналы)"
-```
-
-**Что происходит:**
-1. Execution всех ItemY
-2. Update документации
-3. Git add (только код)
-4. Git commit с structured message
-
-**Это end-to-end workflow в одной команде!**
-
----
-
-### Synthesis: DSL как язык программирования AI
-
-**Zeya888 DSL — это не "команды", а полноценный язык программирования для AI.**
-
-```python
-# Псевдокод эквивалент
-ai.activate_mode("@run-task.mdc")
-for item in plan.get_items():
-    result = ai.execute(item)
-    ai.validate(result, item.acceptance_criteria)
-    if not result.is_valid:
-        raise ExecutionError
-ai.finalize()
-```
-
-**Императивный DSL:**
-```
-"выполни все пункты плана методом @run-task.mdc"
-```
-
-**То же самое, 8 токенов вместо 50+ строк кода.**
-
-**Это declarative programming для AI:**
-- Вы описываете **ЧТО** нужно
-- AI знает **КАК** это делать (из Rules)
-- **Результат:** Максимальная эффективность
-
----
-
-## 4. Protocol: Структура работы с AI
-
-### 4.1 Начало сессии
-
-#### Стандартный протокол запуска:
+#### Standard launch protocol:
 
 ```
 ┌─────────────────────────────────────────────────┐
 │ START SESSION                                   │
 ├─────────────────────────────────────────────────┤
 │ 1. Load Context (@bridge.md / @AIJournal.md)   │
-│ 2. Orient: текущее состояние                   │
-│ 3. Define Task: что нужно сделать              │
-│ 4. Activate Methodology (если нужно)            │
+│ 2. Orient: current state                       │
+│ 3. Define Task: what needs to be done          │
+│ 4. Activate Methodology (if needed)            │
 └─────────────────────────────────────────────────┘
 ```
 
-#### **Кейс A: Новая задача (холодный старт)**
-
-**Команда:**
-```
-"@bridge.md напиши по итогам обработки и интеграции контекста
-после этого вместе продолжим"
-```
-
-**Что происходит:**
-1. AI читает bridge.md (если существует)
-2. Загружает полный контекст проекта
-3. **Готов к работе** — контекст восстановлен
-
-**Альтернатива (если bridge нет):**
-```
-"Контекст: [краткое описание проекта/задачи]
-Задача: [конкретная задача]
-Работаем методом @analysis.mdc"
-```
-
 ---
 
-#### **Кейс B: Продолжение работы (из предыдущей сессии)**
+## 5. Cursor-Specific Features
 
-**Команда:**
-```
-"@AIJournal.md — продолжаем с пункта X"
-```
+### 5.1 @ Syntax for Rule Activation
 
-**Что происходит:**
-1. AI читает AIJournal.md
-2. Находит пункт X в плане
-3. Видит completed/pending статусы
-4. Продолжает с нужного места
-
----
-
-#### **Кейс C: Сложная задача (требуется анализ)**
-
-**Команда:**
-```
-"Задача: [описание]
-Проведи анализ методом @analysis.mdc"
-```
-
-**Что происходит:**
-1. AI активирует аналитический режим
-2. Разбирает требования
-3. Создаёт структурированный план (ListX → ItemY)
-4. Фиксирует в AIJournal.md
-5. Запрашивает подтверждение для начала выполнения
-
----
-
-### 4.2 Ведение сессии
-
-#### Основной цикл работы:
+**Pattern:** `@filename.mdc` activates methodology directly in command.
 
 ```
-┌─────────────────────────────────────────────────┐
-│ РАБОТА НАД ЗАДАЧЕЙ                              │
-├─────────────────────────────────────────────────┤
-│ Loop:                                           │
-│   1. Команда (императив + метод)                │
-│   2. Execution (AI работает)                    │
-│   3. Validation (проверка результата)           │
-│   4. Logging (фиксация в журнале)               │
-│   5. Next (переход к следующему)                │
-└─────────────────────────────────────────────────┘
+"execute Phase 3 using @run-task.mdc method"
+"check tests using @test-qualification.mdc method"
+"@bridge.md write based on results"
 ```
 
-#### **Паттерн 1: Последовательное выполнение плана**
+**Advantage:** AI instantly loads methodology without explanations.
 
-```
-User: "выполни Phase 1 методом @run-task.mdc"
-AI:   [выполняет Phase 1, логирует в AIJournal.md]
+### 5.2 Journals as Persistent State
 
-User: "провалидируй по AC"
-AI:   [проверяет Acceptance Criteria, подтверждает]
-
-User: "выполни Phase 2 методом @run-task.mdc"
-AI:   [выполняет Phase 2]
-
-... и так далее
-```
-
-**Ключ:** Один ItemY → валидация → следующий ItemY
-
----
-
-#### **Паттерн 2: Диагностика и исправление**
-
-```
-User: "выполни Phase 3 методом @run-task.mdc"
-AI:   [выполняет, возникает ошибка]
-
-User: "выяви"
-AI:   [диагностирует корневую причину]
-
-User: "исправь и продолжи"
-AI:   [исправляет, валидирует, продолжает]
-```
-
-**Ключ:** Быстрая диагностика через "выяви"
-
----
-
-#### **Паттерн 3: Итеративное уточнение**
-
-```
-User: "ты пишешь про helper функции но 2 пункт плана 
-       это Contract ENV Mapping провалидируй возможно он готов"
-AI:   [проверяет ENV mapping, подтверждает готовность]
-
-User: "после этого выполни выделенное Phase 3 методом @run-task.mdc"
-AI:   [переходит к Phase 3]
-```
-
-**Ключ:** Высокоуровневые корректировки курса
-
----
-
-#### **Паттерн 4: Параллельный анализ**
-
-```
-User: "проверь тесты этих контрактов методом @test-qualification.mdc
-       @SpiralEngine.basic.test.js @SpiralEngine.circles.test.js [...]"
-AI:   [анализирует все файлы параллельно, создаёт gap analysis]
-```
-
-**Ключ:** Batch commands для ускорения
-
----
-
-### 4.3 Закрытие сессии
-
-#### Стандартный протокол завершения:
-
-```
-┌─────────────────────────────────────────────────┐
-│ END SESSION                                     │
-├─────────────────────────────────────────────────┤
-│ 1. Finalize: завершить все открытые задачи      │
-│ 2. Update: обновить affected документацию       │
-│ 3. Log: финальное состояние в AIJournal.md     │
-│ 4. Bridge: создать/обновить bridge.md           │
-│ 5. Commit: git commit (если нужно)              │
-└─────────────────────────────────────────────────┘
-```
-
-#### **Кейс A: Задача завершена полностью**
-
-**Команда:**
-```
-"обнови affected документацию,
-после этого закоммить изменения (код, не журналы)"
-```
-
-**Что происходит:**
-1. AI обновляет релевантные .md файлы
-2. Git add (только код и документация)
-3. Git commit с structured message
-4. Финальная запись в AIJournal.md
-
----
-
-#### **Кейс B: Задача не завершена (сессия прерывается)**
-
-**Команда:**
-```
-"зафиксируй текущее состояние в AIJournal.md,
-создай bridge.md для следующей сессии"
-```
-
-**Что происходит:**
-1. AI обновляет AIJournal.md:
-   - Completed items
-   - Pending items
-   - Current state
-2. Создаёт bridge.md:
-   - Overview
-   - What's done
-   - What's next
-
-**Результат:** Следующая сессия стартует мгновенно
-
----
-
-### 4.4 Bridge Pattern для восстановления контекста
-
-#### Назначение Bridge Pattern:
-
-**Проблема:**
-- Контекст AI ограничен
-- При деградации диалога теряется история
-- Новая сессия = повторное объяснение (500-1000 токенов)
-
-**Решение:**
-- Bridge файл = структурированный snapshot состояния
-- 5 токенов для загрузки вместо 500
-
----
-
-#### Структура bridge.md:
-
-```markdown
-# Bridge: [Название проекта/задачи]
-
-## 📋 Project Overview
-[Краткое описание проекта, цели, контекст]
-
-## 🔑 Key Contracts/Components
-[Основные компоненты, их роли и зависимости]
-
-## 📍 Current State
-[Текущее состояние: что сделано, что в процессе]
-
-## 🔗 Dependencies
-[Критические зависимости, конфигурация]
-
-## ✅ Completed Work
-[Список завершённых задач/phases]
-
-## 🎯 Next Steps
-[Что нужно сделать дальше, приоритеты]
-
-## 📚 References
-[Ссылки на ключевые файлы, документацию]
-```
-
----
-
-#### Использование Bridge Pattern:
-
-**Создание bridge:**
-```
-User: "@bridge.md напиши по итогам обработки и интеграции контекста"
-AI:   [создаёт structured bridge.md]
-```
-
-**Загрузка bridge (новая сессия):**
-```
-User: "@bridge.md — продолжаем"
-AI:   [читает bridge, полный контекст восстановлен за 5 токенов]
-```
-
----
-
-#### Кейс: Деградация диалога
-
-**Признаки деградации:**
-- Контекст > 200k токенов
-- AI начинает терять фокус
-- Появляются противоречия
-- Медленные ответы
-
-**Recovery через Bridge:**
-```
-1. User: "создай bridge.md для текущего состояния"
-2. AI: [создаёт bridge]
-3. [Закрыть текущую сессию]
-4. [Открыть новую сессию]
-5. User: "@bridge.md — продолжаем"
-6. AI: [контекст восстановлен, работа продолжается]
-```
-
-**Результат:** Fresh start с полным контекстом
-
----
-
-#### Bridge vs Journal:
-
-| Аспект | AIJournal.md | bridge.md |
-|--------|--------------|-----------|
-| **Цель** | Детальный лог всей работы | Быстрый overview для восстановления |
-| **Объём** | Растёт постоянно (1000+ строк) | Компактный (100-200 строк) |
-| **Детализация** | High (все решения, ошибки) | High-level summary |
-| **Использование** | В процессе работы | Между сессиями |
-| **Обновление** | Постоянно | В конце сессии |
-
-**Оба критически важны!**
-
-- **AIJournal** = полная история для текущей сессии
-- **Bridge** = быстрое восстановление для новой сессии
-
----
-
-### Synthesis: Protocol = Structured Workflow
-
-**Zeya888 Protocol — это не "набор рекомендаций", а **формализованный workflow**.**
-
-```
-Session Start → Context Load (bridge) → Task Analysis → 
-Structured Execution → Validation → Documentation → 
-Session End → Bridge Update → Next Session
-```
-
-**Это как CI/CD pipeline, но для AI-сессий:**
-
-- **Каждый шаг структурирован**
-- **State сохраняется внешне** (журналы, bridge)
-- **Zero context loss** между сессиями
-- **Instant recovery** после деградации
-
----
-
-## 5. Zeya888-специфичные приёмы
-
-### 5.1 @ Syntax для активации Rules
-
-**Паттерн:** `@имя_файла.mdc` активирует методологию напрямую в команде.
-
-```
-"выполни Phase 3 методом @run-task.mdc"
-"проверь тесты методом @test-qualification.mdc"
-"@bridge.md напиши по итогам"
-```
-
-**Преимущество:** AI мгновенно загружает методологию без объяснений.
-
-### 5.2 Журналы как persistent state
-
-**AIJournal.md = внешняя память сессии:**
-- Все решения документируются
-- Все ошибки и их исправления логируются
+**AIJournal.md = session external memory:**
+- All decisions documented
+- All errors and fixes logged
 - Structured logging (ListX/ItemY)
-- AI читает журнал как source of truth
+- AI reads journal as source of truth
 
-**Пример:**
+**Example:**
 ```
-User: "выполни следующий"
-AI: [читает AIJournal.md, находит следующий pending ItemY, выполняет]
+User: "execute next"
+AI: [reads AIJournal.md, finds next pending ItemY, executes]
 ```
 
-**State переживает restart AI** — хранится в файле, не в памяти чата.
+**State survives AI restart** — stored in file, not chat memory.
 
 ### 5.3 Reference by Example
 
-**Паттерн:** `@эталонный_файл.js` как образец для нового кода.
+**Pattern:** `@template_file.js` as template for new code.
 
 ```
-"создай тесты для ProductRegistry используя 
-@OrganicComponentRegistry.UUPS.test.js как эталон"
+"create tests for ProductRegistry using 
+@OrganicComponentRegistry.UUPS.test.js as template"
 ```
 
-**Что происходит:**
-1. AI читает эталонный файл
-2. Извлекает паттерны (структура, стиль, подход)
-3. Применяет к новой задаче
-4. **Результат:** Консистентный стиль без явного объяснения
+**What happens:**
+1. AI reads template file
+2. Extracts patterns (structure, style, approach)
+3. Applies to new task
+4. **Result:** Consistent style without explicit explanation
 
-**Экономия:** 0 токенов на "объяснение как писать", AI копирует из эталона.
-
-### 5.4 Batch file references
-
-**Паттерн:** `[список @файлов]` для параллельного анализа.
-
-```
-"проверь тесты @SpiralEngine.basic.test.js 
-@SpiralEngine.circles.test.js @SpiralEngine.integration.test.js 
-методом @test-qualification.mdc"
-```
-
-**AI обрабатывает все файлы**, создаёт единый gap analysis.
+**Savings:** 0 tokens on "explaining how to write", AI copies from template.
 
 ---
 
 ## 6. Failure Modes & Recovery
 
-### 6.1 Типичные сбои
+### 6.1 Typical Failures
 
-**Failure Mode 1: AI выполняет не тот пункт плана**
-- **Причина:** Неявная ссылка на ItemY
-- **Пример:** "выполни следующий" (а AI не проверил что завершено)
-- **Симптом:** Пропуск steps или дублирование работы
+**Failure Mode 1: AI executes wrong plan item**
+- **Cause:** Implicit reference to ItemY
+- **Example:** "execute next" (but AI didn't check what's completed)
+- **Symptom:** Skipped steps or duplicate work
 
-**Failure Mode 2: Деградация диалога**
-- **Причина:** Контекст > 200k токенов
-- **Симптом:** AI теряет фокус, противоречия, медленные ответы
+**Failure Mode 2: Dialogue degradation**
+- **Cause:** Context > 200k tokens
+- **Symptom:** AI loses focus, contradictions, slow responses
 
-**Failure Mode 3: AI не применяет методологию**
-- **Причина:** Забыли указать `методом @rule.mdc`
-- **Симптом:** AI выбирает подход сам, качество ниже
+**Failure Mode 3: AI doesn't apply methodology**
+- **Cause:** Forgot to specify `using @rule.mdc method`
+- **Symptom:** AI chooses approach itself, lower quality
 
-**Failure Mode 4: Ложное понимание задачи**
-- **Причина:** Недостаточно детализированная команда
-- **Симптом:** AI делает не то, что нужно
+**Failure Mode 4: False task understanding**
+- **Cause:** Insufficiently detailed command
+- **Symptom:** AI does wrong thing
 
-**Failure Mode 5: Накопление ошибок**
-- **Причина:** Валидация пропущена, переход к следующему ItemY без проверки
-- **Симптом:** Серия зависимых ошибок
+**Failure Mode 5: Error accumulation**
+- **Cause:** Validation skipped, transition to next ItemY without check
+- **Symptom:** Series of dependent errors
 
-### 6.2 Методы восстановления
+### 6.2 Recovery Methods
 
-**Recovery 1: Явная валидация**
+**Recovery 1: Explicit validation**
 ```
-User: "провалидируй по AC возможно он готов"
-AI: [проверяет, подтверждает или сообщает о проблемах]
-```
-
-**Recovery 2: Bridge Pattern при деградации**
-```
-1. "создай bridge.md для текущего состояния"
-2. [Закрыть сессию]
-3. [Новая сессия] "@bridge.md — продолжаем"
+User: "validate by AC, perhaps it's ready"
+AI: [checks, confirms or reports problems]
 ```
 
-**Recovery 3: Быстрая диагностика**
+**Recovery 2: Bridge Pattern on degradation**
 ```
-User: "выяви"
-AI: [диагностирует корневую причину, предлагает fix]
-```
-
-**Recovery 4: Высокоуровневая коррекция**
-```
-User: "ты пишешь про X но 2 пункт плана это Y, провалидируй"
-AI: [переключается на правильный пункт]
+1. "create bridge.md for current state"
+2. [Close session]
+3. [New session] "@bridge.md — continue"
 ```
 
-**Recovery 5: Откат к последнему валидному состоянию**
+**Recovery 3: Quick diagnosis**
 ```
-User: "вернись к последнему completed ItemY из @AIJournal.md"
-AI: [читает журнал, откатывается, продолжает]
+User: "identify"
+AI: [diagnoses root cause, proposes fix]
 ```
 
-### 6.3 Кейсы из сессии
+**Recovery 4: High-level correction**
+```
+User: "you're writing about X but item 2 of plan is Y, validate"
+AI: [switches to correct item]
+```
 
-**Кейс 1: AI начал Phase 3 вместо валидации Phase 2**
+**Recovery 5: Rollback to last valid state**
 ```
-User: "ты пишешь про helper функции но 2 пункт плана 
-       это Contract ENV Mapping провалидируй возможно он готов"
-AI: [проверяет ENV mapping, подтверждает готовность]
-User: "после этого выполни выделенное Phase 3"
+User: "return to last completed ItemY from @AIJournal.md"
+AI: [reads journal, rolls back, continues]
 ```
-**Recovery:** 1 команда, мгновенная коррекция
 
 ---
 
-**Кейс 2: Ошибка в тесте (InviteNotFromActivator)**
+## 7. Heuristics & Resonance Metrics
+
+### 7.1 How to Determine AI Answer "Correctness"?
+
+**Heuristic 1: AI provides Acceptance Criteria**
+- ✅ **Good:** AI creates YAML with criteria before execution
+- ❌ **Bad:** AI immediately starts coding without criteria
+
+**Heuristic 2: AI references journal/plan**
+- ✅ **Good:** "Reading Phase 3 from AIJournal.md..."
+- ❌ **Bad:** AI works "from chat memory"
+
+**Heuristic 3: AI validates before transition**
+- ✅ **Good:** "ItemY1 completed, checking by AC before ItemY2"
+- ❌ **Bad:** Immediately moves to next
+
+**Heuristic 4: AI explains root cause**
+- ✅ **Good:** "Problem: activator uses someone else's invite. Cause: contract logic..."
+- ❌ **Bad:** "Let's try to fix this way..."
+
+**Heuristic 5: AI uses activated methodology**
+- ✅ **Good:** Follows @run-task.mdc structure (7 steps)
+- ❌ **Bad:** Ignores methodology, does it own way
+
+### 7.2 Interaction Quality Criteria
+
+**Criterion 1: Token efficiency**
 ```
-[Тест падает с ошибкой InviteNotFromActivator]
-User: [предоставляет лог ошибки]
-AI: "выяви"
-AI: [диагностирует: activator использует invite от seller]
-AI: [исправляет: activator создаёт свой invite]
-```
-**Recovery:** Корневая причина найдена за 1 итерацию
-
----
-
-**Кейс 3: Попытка доступа к private переменной**
-```
-[Тест ошибается: productRegistry.nextProductId is not a function]
-AI: [анализирует контракт]
-AI: [находит: _productIdCounter private, нет getter]
-AI: [исправляет: проверяет поведение через создание продукта]
-```
-**Recovery:** Адаптация к реальной архитектуре контракта
-
----
-
-## 7. Heuristics & Метрики резонанса
-
-### 7.1 Как определить "правильность" ответа AI?
-
-**Heuristic 1: AI предоставляет Acceptance Criteria**
-- ✅ **Хорошо:** AI сам создаёт YAML с критериями перед выполнением
-- ❌ **Плохо:** AI сразу начинает кодить без критериев
-
-**Heuristic 2: AI ссылается на журнал/план**
-- ✅ **Хорошо:** "Читаю Phase 3 из AIJournal.md..."
-- ❌ **Плохо:** AI работает "по памяти чата"
-
-**Heuristic 3: AI валидирует перед переходом**
-- ✅ **Хорошо:** "ItemY1 completed, проверяю по AC перед ItemY2"
-- ❌ **Плохо:** Сразу переходит к следующему
-
-**Heuristic 4: AI объясняет корневую причину**
-- ✅ **Хорошо:** "Проблема: activator использует чужой invite. Причина: логика контракта..."
-- ❌ **Плохо:** "Попробуем исправить так..."
-
-**Heuristic 5: AI использует активированную методологию**
-- ✅ **Хорошо:** Следует структуре @run-task.mdc (7 шагов)
-- ❌ **Плохо:** Игнорирует методологию, делает по-своему
-
-### 7.2 Критерии качества взаимодействия
-
-**Критерий 1: Токеновая эффективность**
-```
-Команда должна быть < 10 токенов для рутинных операций
-Команда 10-20 токенов для сложных операций
+Command should be < 10 tokens for routine operations
+Command 10-20 tokens for complex operations
 ```
 
-**Критерий 2: Zero ambiguity**
+**Criterion 2: Zero ambiguity**
 ```
-AI не должен задавать уточняющие вопросы для стандартных команд
-Если AI спрашивает → команда недостаточно чёткая
-```
-
-**Критерий 3: Structured output**
-```
-AI должен логировать в журнал, не только в чат
-State должен быть во внешней памяти
+AI shouldn't ask clarifying questions for standard commands
+If AI asks → command not clear enough
 ```
 
-**Критерий 4: Self-validation**
+**Criterion 3: Structured output**
 ```
-AI должен сам проверять результат по AC
-Не ждать от пользователя "проверь правильность"
-```
-
-**Критерий 5: Methodology compliance**
-```
-Если указан @rule.mdc, AI должен строго следовать
-Не "вольная интерпретация"
+AI should log to journal, not just to chat
+State should be in external memory
 ```
 
-### 7.3 Метрики успеха
+**Criterion 4: Self-validation**
+```
+AI should check result by AC itself
+Not wait for user to "check correctness"
+```
 
-**Метрика 1: Success Rate**
+**Criterion 5: Methodology compliance**
+```
+If @rule.mdc specified, AI must strictly follow
+Not "free interpretation"
+```
+
+### 7.3 Success Metrics
+
+**Metric 1: Success Rate**
 ```yaml
-Target: 95-100% задач выполнены с первой попытки
-Текущая сессия: 
+Target: 95-100% tasks completed first try
+Current session: 
   - Phases: 6/6 (100%)
   - ItemY: 18/18 (100%)
   - Tests: 82/82 (100%)
 ```
 
-**Метрика 2: Iteration Count**
+**Metric 2: Iteration Count**
 ```yaml
-Target: 3-5 итераций до финального результата
-Текущая сессия:
-  - deploy_full.js адаптация: 4 итерации (включая отладку)
-  - Тесты SpiralEngine: 1 итерация (11/11 с первого раза)
-  - Тесты ProductRegistry: 1 итерация (6/6 с первого раза)
+Target: 3-5 iterations to final result
+Current session:
+  - deploy_full.js adaptation: 4 iterations (including debug)
+  - SpiralEngine tests: 1 iteration (11/11 first time)
+  - ProductRegistry tests: 1 iteration (6/6 first time)
 ```
 
-**Метрика 3: Token Efficiency**
+**Metric 3: Token Efficiency**
 ```yaml
-Target: 80-90% экономия на коммуникации vs классический подход
-Текущая сессия: ~90% экономия (455 токенов вместо 5,500)
+Target: 80-90% savings on communication vs classical approach
+Current session: ~90% savings (455 tokens instead of 5,500)
 ```
 
-**Метрика 4: Zero False Positives (в тестах)**
+**Metric 4: Zero False Positives (in tests)**
 ```yaml
-Target: 0 ложных успехов в тестах
-Результат: @test-qualification.mdc выявил все gaps, 
-           новые тесты проверяют реальную функциональность
+Target: 0 false positives in tests
+Result: @test-qualification.mdc identified all gaps, 
+        new tests check real functionality
 ```
 
-**Метрика 5: Context Recovery Time**
+**Metric 5: Context Recovery Time**
 ```yaml
-Target: < 1 минута для восстановления контекста
-Результат: "@bridge.md — продолжаем" = 30 секунд
+Target: < 1 minute for context restoration
+Result: "@bridge.md — continue" = 30 seconds
 ```
 
 ---
 
-## 8. FAQ/Playbook для разработчика
+## 8. FAQ/Playbook for Developers
 
-### 8.1 С чего начать?
+### 8.1 Where to Start?
 
-**Шаг 1: Начните с zero politeness**
+**Step 1: Start with zero politeness**
 ```
-Вместо: "Пожалуйста, помоги мне с..."
-Пишите: "выполни X"
+Instead of: "Please, help me with..."
+Write: "execute X"
 ```
-Преодолейте психологический барьер. AI не обижается.
+Overcome psychological barrier. AI doesn't get offended.
 
-**Шаг 2: Создайте первый Rule**
+**Step 2: Create first Rule**
 ```markdown
 # analysis-simple.mdc
-Когда активирован:
-1. Прочитай задачу
-2. Разбей на 3-5 phases
-3. Для каждой phase создай acceptance criteria
-4. Зафиксируй в AIJournal.md
+When activated:
+1. Read task
+2. Break into 3-5 phases
+3. For each phase create acceptance criteria
+4. Fix in AIJournal.md
 ```
 
-**Шаг 3: Практикуйте командный стиль**
+**Step 3: Practice command style**
 ```
-"проведи анализ методом @analysis-simple.mdc"
-```
-
-**Шаг 4: Добавьте внешнюю память**
-```
-Создайте AIJournal.md в корне проекта
-Команда AI: "логируй все решения в AIJournal.md"
+"analyze using @analysis-simple.mdc method"
 ```
 
-**Шаг 5: Итеративно улучшайте**
-- После каждой сессии: что сработало? что нет?
-- Обновляйте Rules на основе опыта
-- Кристаллизуйте успешные паттерны
+**Step 4: Add external memory**
+```
+Create AIJournal.md in project root
+AI command: "log all decisions in AIJournal.md"
+```
 
-### 8.2 Как создать свой Rule?
+**Step 5: Iteratively improve**
+- After each session: what worked? what didn't?
+- Update Rules based on experience
+- Crystallize successful patterns
 
-**Структура Rule:**
+### 8.2 How to Create Your Rule?
+
+**Rule structure:**
 ```markdown
-# имя-rule.mdc
+# rule-name.mdc
 
-## Цель
-[Для чего этот Rule]
+## Purpose
+[What this Rule is for]
 
-## Когда использовать
-[В каких ситуациях активировать]
+## When to use
+[In what situations to activate]
 
-## Когнитивный режим
-[Какой подход AI должен применить]
+## Cognitive mode
+[What approach AI should apply]
 
-## Процесс
-1. [Шаг 1]
-2. [Шаг 2]
+## Process
+1. [Step 1]
+2. [Step 2]
 ...
 
 ## Output format
-[Как должен выглядеть результат]
+[How result should look]
 
-## Принципы
-- [Ключевой принцип 1]
-- [Ключевой принцип 2]
+## Principles
+- [Key principle 1]
+- [Key principle 2]
 ```
 
-**Пример: создание rule для code review**
-```markdown
-# code-review.mdc
+### 8.3 Common Newbie Mistakes
 
-## Цель
-Критический анализ кода на предмет bugs, security, performance
+**Mistake 1: Don't specify methodology**
+```
+❌ "do analysis"
+✅ "analyze using @analysis.mdc method"
+```
+**Consequences:** AI chooses approach itself, result unpredictable.
 
-## Когда использовать
-Перед commit, после завершения feature
+**Mistake 2: Don't validate after each step**
+```
+❌ "execute all phases"
+✅ "execute Phase 1 using @run-task.mdc method"
+   [validation]
+   "execute Phase 2 using @run-task.mdc method"
+```
+**Consequences:** Error accumulation, difficult debugging.
 
-## Когнитивный режим
-Critical analysis - максимальная честность, не принимать код на веру
+**Mistake 3: Ignore journal**
+```
+❌ AI works "from chat memory"
+✅ AI reads AIJournal.md as source of truth
+```
+**Consequences:** State lost on restart, no decision history.
 
-## Процесс
-1. Анализ логики: корректность алгоритмов
-2. Security audit: SQL injection, XSS, auth bypasses
-3. Performance: O(n) complexity, memory leaks
-4. Best practices: соответствие стандартам
-5. Testing: покрытие edge cases
+**Mistake 4: Use polite forms**
+```
+❌ "Please, could you..."
+✅ "execute"
+```
+**Consequences:** 20-40x more tokens, lower clarity.
 
-## Output format
-YAML список с priority (P0/P1/P2)
-
-## Принципы
-- Не хвалить код, только конструктивная критика
-- Каждое замечание с примером кода
-- Приоритизация: P0 блокирует commit
+**Mistake 5: Don't create bridge on degradation**
 ```
-
-**Активация:**
+❌ Continue bloated session until complete failure
+✅ At 200k tokens: create bridge, restart
 ```
-"проведи code review методом @code-review.mdc"
-```
-
-### 8.3 Типичные ошибки новичков
-
-**Ошибка 1: Не указывают методологию**
-```
-❌ "сделай анализ"
-✅ "проведи анализ методом @analysis.mdc"
-```
-**Последствия:** AI выбирает подход сам, результат непредсказуем.
-
----
-
-**Ошибка 2: Не валидируют после каждого шага**
-```
-❌ "выполни все phases"
-✅ "выполни Phase 1 методом @run-task.mdc"
-   [валидация]
-   "выполни Phase 2 методом @run-task.mdc"
-```
-**Последствия:** Накопление ошибок, сложная отладка.
-
----
-
-**Ошибка 3: Игнорируют journal**
-```
-❌ AI работает "по памяти чата"
-✅ AI читает AIJournal.md как source of truth
-```
-**Последствия:** State теряется при restart, нет истории решений.
-
----
-
-**Ошибка 4: Используют вежливые формы**
-```
-❌ "Пожалуйста, не мог бы ты..."
-✅ "выполни"
-```
-**Последствия:** 20-40x больше токенов, ниже clarity.
-
----
-
-**Ошибка 5: Не создают bridge при деградации**
-```
-❌ Продолжают раздутую сессию до полного сбоя
-✅ При 200k токенов: создают bridge, перезапускают
-```
-**Последствия:** AI теряет фокус, противоречия, потеря времени.
-
-### 8.4 Рецепты для разных типов задач
-
-**Рецепт 1: Архитектурные изменения**
-```
-1. "@bridge.md напиши контекст"
-2. "проведи анализ методом @analysis.mdc"
-3. Для каждой Phase:
-   "выполни Phase N методом @run-task.mdc"
-   "провалидируй по AC"
-4. "обнови affected документацию"
-5. "закоммить (код, не журналы)"
-```
-
-**Рецепт 2: Отладка тестов**
-```
-1. "запусти тесты и выяви проблемы"
-2. "проверь тесты методом @test-qualification.mdc"
-3. "довести до 100% методом @test-to-success.mdc"
-4. "финальная проверка: запусти все тесты"
-```
-
-**Рецепт 3: Создание новых тестов**
-```
-1. "проведи gap analysis тестового покрытия"
-2. "создай план недостающих тестов в @AIJournal.md"
-3. "выполни план используя @эталон.test.js как образец"
-4. "проверь созданные тесты методом @test-qualification.mdc"
-```
-
-**Рецепт 4: Документирование**
-```
-1. "проанализируй [компонент/функцию]"
-2. "создай документацию по структуре @эталон.md"
-3. "добавь примеры использования из реального кода"
-4. "обнови README с ссылкой на новую документацию"
-```
-
-**Рецепт 5: Refactoring**
-```
-1. "проанализируй [код] на предмет улучшений"
-2. "создай план refactoring с acceptance criteria"
-3. "выполни по одному ItemY с валидацией тестов после каждого"
-4. "финальная проверка: все тесты проходят + coverage не упал"
-```
+**Consequences:** AI loses focus, contradictions, time waste.
 
 ---
 
 ## 9. Risks & Ethics
 
-### 9.1 Over-reliance на AI
+### 9.1 Over-reliance on AI
 
-**Риск:** Разработчик перестаёт думать, полностью полагается на AI.
+**Risk:** Developer stops thinking, completely relies on AI.
 
-**Zeya888 защита:**
-- **Acceptance Criteria обязательны** — разработчик должен понимать ЧТО нужно
-- **Явная валидация** — разработчик проверяет результат
-- **Методологии требуют понимания** — нельзя применить @test-qualification без понимания P0/P1/P2
+**Zeya888 protection:**
+- **Acceptance Criteria mandatory** — developer must understand WHAT is needed
+- **Explicit validation** — developer checks result
+- **Methodologies require understanding** — can't apply @test-qualification without understanding P0/P1/P2
 
-**Правильное использование:**
+**Correct usage:**
 ```
-AI = power tool, не замена мышлению
-AI ускоряет execution, не заменяет analysis (человека)
+AI = power tool, not thinking replacement
+AI accelerates execution, doesn't replace analysis (human)
 ```
 
-### 9.2 Потеря критического мышления?
+### 9.2 Loss of Critical Thinking?
 
-**Миф:** "Если AI делает всё, мозг атрофируется"
+**Myth:** "If AI does everything, brain atrophies"
 
-**Реальность:** Zeya888 **усиливает** критическое мышление:
+**Reality:** Zeya888 **strengthens** critical thinking:
 
-1. **Создание методологий** — требует глубокого понимания процесса
-2. **@test-qualification.mdc** — учит жёсткому анализу качества
-3. **Acceptance Criteria** — требует чёткой формализации требований
-4. **Валидация результатов** — критическая оценка output AI
+1. **Creating methodologies** — requires deep process understanding
+2. **@test-qualification.mdc** — teaches strict quality analysis
+3. **Acceptance Criteria** — requires clear requirement formalization
+4. **Result validation** — critical evaluation of AI output
 
-**Эффект:** Разработчик думает на **мета-уровне** (методологии, процессы), AI работает на **исполнительном уровне** (код, тесты).
+**Effect:** Developer thinks on **meta-level** (methodologies, processes), AI works on **execution level** (code, tests).
 
-**Это elevation, не деградация мышления.**
-
-### 9.3 Этические аспекты
-
-**Вопрос 1: Честность в отношении AI-assist**
-
-**Позиция Zeya888:**
-- ✅ Прозрачность: "Код создан with AI assistance"
-- ✅ Ответственность: Разработчик отвечает за финальный код
-- ❌ Выдавать AI-код за "полностью своё" без понимания
-
-**Вопрос 2: Зависимость от конкретного AI**
-
-**Mitigation:**
-- Методологии документированы — можно применить с любым AI
-- Rules переносимы между системами
-- Принципы (zero politeness, structured logging) универсальны
-
-**Вопрос 3: Токены = деньги = неравный доступ?**
-
-**Наблюдение:**
-- Zeya888 **снижает** стоимость через эффективность
-- 90% экономия токенов = доступнее для большего числа людей
-- Методологии open-source, можно применить с любым AI (включая локальные модели)
+**This is elevation, not thinking degradation.**
 
 ---
 
 ## 10. Next Steps
 
-### 10.1 Направления развития методологии
+### 10.1 Methodology Development Directions
 
-**Direction 1: Формализация DSL**
-- Создать полноценный синтаксис Zeya888 DSL
-- BNF грамматика для команд
-- Tooling: linter для проверки команд
+**Direction 1: DSL Formalization**
+- Create full Zeya888 DSL syntax
+- BNF grammar for commands
+- Tooling: linter for command checking
 
-**Direction 2: Расширение каталога Rules**
+**Direction 2: Rules Catalog Expansion**
 - Code review rule
 - Security audit rule
 - Performance optimization rule
 - Documentation generation rule
 
 **Direction 3: Metrics & Analytics**
-- Автоматический расчёт token efficiency
+- Automatic token efficiency calculation
 - Success rate tracking
-- A/B тестирование разных методологий
+- A/B testing different methodologies
 
 **Direction 4: Multi-AI compatibility**
-- Адаптация Rules для Claude, GPT-4, Gemini
-- Сравнительный анализ эффективности
+- Adapt Rules for Claude, GPT-4, Gemini
+- Comparative effectiveness analysis
 - Best practices per AI model
 
 **Direction 5: Visual tools**
-- Граф зависимостей для ItemY
-- Timeline выполнения phases
-- Dashboard для метрик успеха
-
-### 10.2 Исследовательские вопросы
-
-**Q1: Optimal granularity для ItemY**
-```
-Текущее: 1 ItemY = 1 feature/function/test suite
-Вопрос: Есть ли оптимальный размер ItemY для максимальной эффективности?
-```
-
-**Q2: Diminishing returns на методологиях**
-```
-Текущее: 4-5 core Rules
-Вопрос: Сколько Rules оптимально? Есть ли точка, где больше Rules = меньше пользы?
-```
-
-**Q3: Transfer learning между проектами**
-```
-Текущее: Rules создаются per-project, потом обобщаются
-Вопрос: Можно ли создать "universal rules" работающие на любом проекте?
-```
-
-**Q4: AI-generated Rules**
-```
-Идея: AI анализирует успешные сессии → генерирует новые Rules
-Вопрос: Может ли AI улучшать собственные методологии?
-```
-
-**Q5: Collaboration patterns**
-```
-Текущее: 1 человек + 1 AI
-Вопрос: Как адаптировать для команды? Shared журналы? Collaborative Rules?
-```
-
-### 10.3 Community building
-
-**Vision:** Zeya888 Methodology как open movement
-
-**Step 1: Documentation**
-- ✅ Этот документ — starting point
-- Public repo с Rules
-- Video tutorials по ключевым паттернам
-
-**Step 2: Standardization**
-```
-Предложить .mdc как стандарт для AI methodologies
-Создать registry популярных Rules
-Versioning для Rules (analysis.mdc v1.0, v2.0)
-```
-
-**Step 3: Tooling**
-```
-VSCode extension: подсветка @rule.mdc синтаксиса
-CLI tool: zeya888 validate [journal.md]
-Web platform: browse & share Rules
-```
-
-**Step 4: Community**
-```
-Discord/Forum для практиков
-Meetups для обмена опытом
-Case studies от разных разработчиков
-```
-
-**Step 5: Research**
-```
-Партнёрство с университетами
-Исследование AI productivity patterns
-Публикация papers на HCI конференциях
-```
-
-**Call to Action:**
-
-Если вы читаете это — **you are early adopter**.
-
-Попробуйте методологию. Адаптируйте под свои задачи. Поделитесь результатами.
-
-**Контакт:** Zeya888 (Inga Slinko) — [контакты для связи]
+- Dependency graph for ItemY
+- Execution timeline for phases
+- Dashboard for success metrics
 
 ---
 
 ## 11. Appendix: Quotes & Cases
 
-### 11.1 Ключевые команды из сессии
+### 11.1 Key Commands from Session
 
 **Command 1: Session Start**
 ```
-"@bridge.md напиши по итогам обработки и интеграции контекста
-после этого вместе продолжим"
+"@bridge.md write based on context processing and integration
+after this we'll continue together"
 ```
-**Результат:** Полный контекст загружен, готовность к работе
-
----
+**Result:** Full context loaded, ready to work
 
 **Command 2: Validation checkpoint**
 ```
-"ты пишешь про helper функции но 2 пункт плана 
-это Contract ENV Mapping провалидируй возможно он готов"
+"you're writing about helper functions but item 2 of plan 
+is Contract ENV Mapping, validate perhaps it's ready"
 ```
-**Результат:** Высокоуровневая коррекция курса, 0 wasted work
-
----
+**Result:** High-level course correction, 0 wasted work
 
 **Command 3: Phase execution**
 ```
-"выполни Phase 3 методом @run-task.mdc"
+"execute Phase 3 using @run-task.mdc method"
 ```
-**Результат:** Структурированное выполнение со всеми ItemY
-
----
+**Result:** Structured execution with all ItemY
 
 **Command 4: Quick diagnostic**
 ```
-"выяви"
+"identify"
 ```
-**Результат:** Мгновенная диагностика корневой причины (1 токен!)
+**Result:** Instant root cause diagnosis (1 token!)
 
 ---
 
-**Command 5: Quality analysis**
-```
-"проверь тесты этих контрактов, возможно там эти функции 
-P0 и P1 протестированы @SpiralEngine.basic.test.js [...]"
-```
-**Результат:** Жёсткий анализ, gap analysis с приоритизацией
+## 🎯 Conclusion
 
----
+**Zeya888 Methodology is not "a set of tricks".**
 
-**Command 6: Plan execution**
-```
-"выполни план для SpiralEngine методом @run-task.mdc"
-```
-**Результат:** 11/11 тестов с первого раза
+This is **systematic approach** to programming with AI:
 
----
-
-**Command 7: Session finalization**
-```
-"обнови affected документацию,
-после этого закоммить изменения (код, не журналы)"
-```
-**Результат:** Полный end-to-end workflow
-
-### 11.2 Case Study: UUPS Adaptation
-
-**Задача:** Адаптировать deploy_full.js под UUPS архитектуру для 3 контрактов (SpiralEngine, ProductRegistry, AmanitaInternational)
-
-**Сложность:** High
-- 1200+ строк кода
-- 17 разных actions
-- Множественные зависимости
-- Legacy code с 3-contract pattern
-
-**Процесс:**
-
-```
-1. Session Start (Bridge Pattern)
-   "@bridge.md напиши по итогам обработки..."
-   → Контекст загружен за 30 секунд
-
-2. Analysis Phase
-   → 6 Phases определены
-   → 18 ItemY для execution
-   → Dependencies mapped
-
-3. Execution (@run-task.mdc)
-   Phase 1: CONFIG + ENV MAPPING ✅
-   Phase 2: Helper functions ✅
-   Phase 3: deployUUPSContract() ✅
-   Phase 4: Integration ✅
-   Phase 5: Usage updates ✅
-   Phase 6: Documentation ✅
-
-4. Testing & Validation
-   Action 1 (deploy from scratch) ✅
-   Action 777 (create seller invites) ✅
-   Action 888 (validate deployer invite) ✅
-
-5. Test Coverage Analysis (@test-qualification.mdc)
-   → Gap identified: P1 pausable, UUPS edge cases
-   → План для comprehensive tests
-
-6. Test Implementation
-   SpiralEngine: 11/11 ✅ (с первого раза)
-   ProductRegistry: 6/6 ✅ (с первого раза)
-   
-7. Final Status
-   82/82 UUPS tests (100% success)
-   P0: 100% coverage
-   P1: 100% coverage
-   Mainnet Ready
-```
-
-**Метрики:**
-- **Время:** ~4 часа
-- **Итерации:** 4 (включая отладку)
-- **Критические ошибки:** 0
-- **Ложные успехи в тестах:** 0
-- **Токеновая экономия:** ~90%
-
-**Вывод:** Сложная архитектурная задача выполнена с высоким качеством благодаря структурированному подходу.
-
-### 11.3 Case Study: Test Quality Analysis
-
-**Задача:** Проверить качество существующих UUPS тестов, выявить gaps
-
-**Подход:** Жёсткий анализ через @test-qualification.mdc
-
-**Процесс:**
-
-```
-1. Команда
-   "проверь тесты этих контрактов методом @test-qualification.mdc
-    @SpiralEngine.basic.test.js @SpiralEngine.circles.test.js [8 файлов]"
-
-2. AI Analysis
-   → Каждый тест проверен на:
-     - NO_FALSE_SUCCESSES (P0)
-     - VALIDATE_REAL_FUNCTIONALITY (P0)
-     - NO_UNTESTED_CRITICAL_PATHS (P0)
-     - CORRECT_LOGIC (P1)
-     - MINIMAL_MOCK_OVERUSE (P2)
-
-3. Findings
-   ✅ P0: UUPS механизм покрыт (upgrade, state preservation)
-   ❌ P1: pausable protection НЕ покрыта
-   ❌ P1: UUPS edge cases НЕ покрыты (invalid impl, zero address)
-   ❌ P1: reentrancy protection не протестирована
-
-4. Action Plan
-   Создан детальный план в AIJournal.md:
-   - ItemY1: Структура comprehensive test файла
-   - ItemY2: whenNotPaused тесты (5 функций)
-   - ItemY3: UUPS edge cases (5 тестов)
-   - ItemY4: Reentrancy protection
-   - ItemY5: Валидация
-
-5. Implementation
-   "выполни план методом @run-task.mdc"
-   → 11/11 тестов созданы
-   → Все тесты проходят с первого раза
-   → 0 ложных успехов
-
-6. Result
-   P0: 100% ✅
-   P1: 100% ✅
-   Mainnet Ready
-```
-
-**Ключевой инсайт:** @test-qualification.mdc выявил gaps, которые были бы пропущены при классическом "тесты проходят = всё ОК" подходе.
-
-### 11.4 Verbatim примеры взаимодействия
-
-**Пример 1: Императивный стиль**
-```
-User: "выяви"
-AI: [читает error logs]
-    "Проблема: activator использует invite код от seller.
-     Корневая причина: В beforeEach seller создаёт invite,
-     но activator пытается его использовать. Это нарушает
-     валидацию SpiralEngineLogic: invite можно использовать
-     только если у вас есть роль от создателя invite.
-     
-     Решение: activator должен создать свой invite."
-```
-
-**Токены User:** 1  
-**Токены AI:** ~100 (полная диагностика)  
-**Время:** 30 секунд  
-**Точность:** 100%
-
----
-
-**Пример 2: High-level коррекция**
-```
-User: "ты пишешь про helper функции но 2 пункт плана 
-       это Contract ENV Mapping провалидируй возможно он готов
-       если нет то выполни его методом @run-task.mdc
-       если готов то проверь в журнале следующий пункт 3"
-
-AI: "Проверяю Contract ENV Mapping...
-    ✅ SPIRAL_ENGINE_PROXY_ADDRESS добавлен
-    ✅ PRODUCT_REGISTRY_PROXY_ADDRESS добавлен
-    ✅ AMANITA_INTERNATIONAL_PROXY_ADDRESS добавлен
-    ✅ Все entries корректны
-    
-    Phase 2 готов. Перехожу к Phase 3: deploySingleContract."
-```
-
-**Эффект:** Предотвращено дублирование работы, сохранено ~15 минут.
-
----
-
-**Пример 3: Reference by Example**
-```
-User: "создай недостающие тесты для ProductRegistry
-       используя @OrganicComponentRegistry.UUPS.test.js как эталон"
-
-AI: [читает эталон]
-    [извлекает паттерны: структура beforeEach, pausable tests, state preservation]
-    [создаёт ProductRegistry.UUPS.comprehensive.test.js]
-    
-    "Создан файл по структуре эталона:
-     - ✅ beforeEach с Mock SpiralEngine
-     - ✅ State preservation test (P0)
-     - ✅ Pausable protection tests (P1)"
-```
-
-**Результат:** Консистентный стиль, 0 токенов на "объяснение как писать".
-
----
-
-**Пример 4: Методология cascade**
-```
-User: "@AIJournal.md в этот журнал пропиши список тестов
-       с инструкциями для их создания работаешь методом @analysis.mdc"
-
-AI: [Активирует analytical mode]
-    [Создаёт структурированный план]
-    [Фиксирует в AIJournal.md]
-    
-    "План создан в AIJournal.md:
-     - SpiralEngine: 3 ItemY (11 тестов)
-     - ProductRegistry: 2 ItemY (6 тестов)"
-
-User: "выполни план для SpiralEngine методом @run-task.mdc"
-
-AI: [Переключается в execution mode]
-    [Читает план из AIJournal.md]
-    [Выполняет ItemY1 → ItemY5]
-    
-    "Все ItemY завершены. Тесты: 11/11 ✅"
-```
-
-**Cascade:** @analysis → plan → @run-task → execution
-
----
-
-## 🎯 Заключение
-
-**Zeya888 Methodology — это не "набор трюков".**
-
-Это **системный подход** к программированию с AI:
-
-- **Rules** = программируемые когнитивные режимы
-- **Императивный DSL** = токеновая эффективность
-- **Трёхуровневая валидация** = защита от иллюзий
+- **Rules** = programmable cognitive modes
+- **Imperative DSL** = token efficiency
+- **Three-level validation** = protection from illusions
 - **External memory** = zero context loss
 
-**Результат:** 
+**Result:** 
 - 95-100% success rate
 - 5-20x token efficiency
-- Elevation мышления на meta-уровень
+- Elevation of thinking to meta-level
 
-**Это не будущее разработки.**
+**This is not future of development.**
 
-**Это настоящее для тех, кто готов мыслить системно.**
-
----
-
-**Документ завершён:** 08.01.2025  
-**Базовая сессия:** UUPS Architecture Adaptation  
-**Автор:** Zeya888 (Inga Slinko)  
-**Версия:** 1.0
+**This is present for those ready to think systematically.**
 
 ---
 
-**Статус:** ✅ Готов для презентации на Cursor Event
+**Document completed:** January 8, 2025  
+**Base session:** UUPS Architecture Adaptation  
+**Author:** Zeya888 (Inga Slinko)  
+**Version:** 1.0
+
+---
+
+**Status:** ✅ Ready for Cursor Event presentation
 
