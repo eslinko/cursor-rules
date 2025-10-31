@@ -1,10 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Structured analysis of current ItemY state
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 

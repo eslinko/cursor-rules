@@ -1,10 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Controlled execution of ItemY with logging and criteria tracking
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 

@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description: Top-level driver for processing a goal-level task
+globs: ["**/tasks/*.md", "**/*.plan.md", "**/*.md"]
 alwaysApply: false
 ---
 ---

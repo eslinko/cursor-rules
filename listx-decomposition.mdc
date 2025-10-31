@@ -1,11 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Structured task decomposition using ListX and ItemY processing
-globs: ["plans/**/*.md", "**/roadmaps/**", "**/*.task.md"]
+globs: ["plans/**/*.md", "**/roadmaps/**", "**/*.task.md", "**/*.md"]
 alwaysApply: false
 ---
 

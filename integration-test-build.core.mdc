@@ -1,0 +1,53 @@
+---
+description: "Systematic methodology for building production-ready integration tests (core)"
+globs: ["tests/integration/**", "docker-compose*.yml", "testcontainers.*", "package.json"]
+alwaysApply: false
+---
+
+# @integration-test-build.core — Core
+
+> Lightweight, auto-applied core using thresholds from `@quality-gates#integration`. Full examples & templates: `@integration-test-build.appendix.mdc`.
+
+## TL;DR
+- Goal: production-ready integration tests for module boundaries and flows
+- Phases: Infra → Contract Validation → Flow Testing
+- Gates: Existence → Passing → Validation → Strategic
+- Done when: see `@quality-gates#integration`
+
+## Quick Start
+1. "Execute Phase 1 using @integration-test-build.core.mdc"
+2. Setup multi-module harness + test DB
+3. Validate contracts (module boundaries, API, DB schema)
+4. Run multi-step workflows + flow coverage
+
+## Core Principles
+- Progressive Complexity, Quality Gates, Test Level Appropriateness, ROI-Driven
+- Integration: test module handshakes, not internals; use real modules, DB; mock only real external APIs
+- See extended patterns: `@integration-test-build.appendix.mdc#patterns`
+
+## Context Detection & Scenarios
+- Detects NEW, EXTEND, or CONTRACT_VALIDATION via infra, test coverage, and score
+- See scenario logic: `@integration-test-build.appendix.mdc#scenarios`
+
+## Phases
+- Phase 1: Infrastructure (multi-module harness, test DB, minimal mocks)  
+  See: `@integration-test-build.appendix.mdc#phases` for harness setup, framework config, proof tests
+- Phase 2: Contract Validation (module boundaries, API, DB, error contracts)  
+  See: `@integration-test-build.appendix.mdc#contracts` for all contract validation patterns
+- Phase 3: Flow Testing (multi-step scenarios, state consistency)  
+  See: `@integration-test-build.appendix.mdc#flows` for happy path, error handling, atomicity, state consistency
+
+## Quality Gates
+- Reference: `@quality-gates#integration` and `@test-qualification.mdc`
+- Gates 1–4: contract compatibility, flow passing, real integration, ROI analysis  
+  See: `@integration-test-build.appendix.mdc#quality-gates` for detailed gate checks, scoring formulas, pass criteria
+
+## CI/Policies (concise)
+- Minimal mocks (external only), per-test DB isolation, coverage reporting, artifacts
+- See troubleshooting & advanced setup: `@integration-test-build.appendix.mdc#troubleshooting`
+
+## Reference Mapping
+- Only the content above is in scope for core activation in Cursor, full details/examples/templates/DoD in appendix.
+- Appendix sections: `#scenarios`, `#patterns` (4.1-4.3), `#contracts`, `#flows`, `#phases`, `#quality-gates`, `#examples`, `#troubleshooting`, `#DoD`
+- See: `@integration-test-build.appendix.mdc` for all extended content
+

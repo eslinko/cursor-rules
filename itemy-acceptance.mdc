@@ -1,10 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Define detailed, typed acceptance criteria for ItemY with validation logic
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 

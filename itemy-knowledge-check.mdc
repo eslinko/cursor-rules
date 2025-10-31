@@ -1,10 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Perform external knowledge validation for ItemY
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 
@@ -84,6 +80,7 @@ This file will:
 - Maintain knowledge integration standards
 ---
 description: Perform external knowledge validation for ItemY
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 

@@ -1,11 +1,25 @@
 ---
 alwaysApply: false
 description: "Universal methodology for building production-ready unit test suites with progressive quality gates"
+globs: ["tests/unit/**", "vitest.config.*", "jest.config.*", "package.json"]
 ---
 
 # @unit-test-build: Progressive Unit Test Development
 
 > **Purpose**: Guide AI through systematic unit test development with built-in quality gates and cognitive mode switching to prevent false successes and perfectionism
+
+---
+
+## TL;DR (≤20 lines)
+- Goal: production-ready unit tests that validate real functionality.
+- Thresholds & metrics: `@quality-gates#unit` (SSOT).
+- Phases: Infrastructure → Smoke → Real → Strategic.
+- Gates: Existence → Passing → Validation → Strategic.
+- Criteria: NO_FALSE_SUCCESSES, VALIDATE_REAL_FUNCTIONALITY, NO_UNTESTED_CRITICAL_PATHS.
+- Mocking policy: external systems only.
+- Done when: score ≥ 8.5, critical coverage ≥ 85%, runtime < 60s.
+- Start: "Execute Phase 1 using @unit-test-build.mdc".
+- If Gate 3 fails: transform smoke → real tests with P0 priority.
 
 ---
 
@@ -62,6 +76,7 @@ AI will automatically:
 ```
 
 ### Success Threshold
+Reference: see `@quality-gates#unit` for authoritative thresholds.
 ```yaml
 production_ready:
   score: "> 8.5/10 (@test-qualification)"

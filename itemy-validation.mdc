@@ -1,10 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Final validation of ItemY implementation against acceptance criteria
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 

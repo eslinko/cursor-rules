@@ -1,11 +1,22 @@
----
 alwaysApply: false
-description: "Systematic methodology for building production-ready E2E test suites with real infrastructure and workflow validation"
+description: "Systematic methodology for building production-ready E2E test suites with real infrastructure and workflow validation (deprecated container)"
 ---
 
 # @e2e-test-build: End-to-End Test Development
 
 > **Purpose**: Guide AI through systematic E2E test development focusing on complete workflows, real infrastructure, and critical user journeys
+
+---
+
+## TL;DR (≤20 lines)
+- Goal: production-ready E2E coverage of critical user journeys.
+- Thresholds & metrics: `@quality-gates#e2e` (SSOT).
+- Phases: Infrastructure → Deploy Workflows → Component Workflows → Catalog/Pipeline.
+- Gates: Existence → Passing → Real E2E Validation → Strategic.
+- Infrastructure: real node + aggressive snapshot isolation.
+- Done when: score ≥ 8.5, workflow coverage ≥ 70%, flakiness < 5%, runtime < 30m.
+- Start: "Execute Phase 1 using @e2e-test-build.mdc".
+- Selectivity policy: high-ROI workflows only; defer others to integration/unit.
 
 ---
 
@@ -68,6 +79,7 @@ AI will automatically:
 ```
 
 ### Success Threshold
+Reference: see `@quality-gates#e2e` for authoritative thresholds.
 ```yaml
 production_ready:
   score: "> 8.5/10 (@test-qualification adapted for E2E, higher than integration 8.0)"

@@ -1,3 +1,9 @@
+---
+description: "Analysis driver for code/documentation planning with verified-state methodology"
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
+alwaysApply: false
+---
+
 # Hard Analysis Rules for Code Study, Documentation, and Roadmap Planning
 
 ## Core Principles
@@ -272,7 +278,3 @@ grep_search query="validate|check|verify" include_pattern="**/*"  # Find validat
 ```
 
 These universal patterns ensure robust system analysis that prevents architectural inconsistencies, integration failures, and development inefficiencies across any type of software project.
-description:
-globs:
-alwaysApply: false
----

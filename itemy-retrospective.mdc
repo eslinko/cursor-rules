@@ -1,10 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
-description: Structured change planning for ItemY
+description: Retrospective and lessons learned logging for ItemY
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md"]
 alwaysApply: false
 ---
 # 📘 Step: Retrospective Summary for ItemY

@@ -1,0 +1,34 @@
+---
+description: "Appendix for E2E test build — extended examples and templates (all full code, harness, flows, troubleshooting, reference)."
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @e2e-test-build.appendix — Appendix
+
+> Comprehensive examples, templates, patterns, web/EVM troubleshooting, all long code and checklists. All anchor names as in original.
+
+## #scenarios
+((PASTE "### **Detection Logic**" and "### **Scenarios**" with all scenario YAML))
+
+## #harness
+((PASTE Section 3: E2E Harness Pattern, node/snapshot helpers, harness full code (JS, Python)))
+
+## #patterns
+((PASTE E2E-specific principles about infra, snapshot, completeness, ROI and web patterns, any extended YAML, formulas))
+
+## #phases
+((PASTE full text/examples from each phase: Deploy, Component, Catalog, Pipeline. Include code for proof tests, contracts, component upload, full pipeline))
+
+## #web-e2e
+((PASTE all web automation patterns, browser/Playwright sections, web E2E templates))
+
+## #templates
+((PASTE all copy-paste test, harness, CI templates for E2E (JS/Python)))
+
+## #troubleshooting
+((All text from troubleshooting/anti-flaky/code/retry, event/deps/infra patterns))
+
+## #DoD
+((Definition of Done checklists, reference matrices, quick-ref DoD for all critical paths, infra, coverage, flakiness, plus YAML checklists from Section 7.2 and more))
+

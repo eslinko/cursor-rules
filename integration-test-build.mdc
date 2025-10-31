@@ -1,11 +1,22 @@
----
 alwaysApply: false
-description: "Systematic methodology for building production-ready integration test suites with contract validation and flow testing"
+description: "Systematic methodology for building production-ready integration test suites with contract validation and flow testing (deprecated container)"
 ---
 
 # @integration-test-build: Integration Test Development
 
 > **Purpose**: Guide AI through systematic integration test development focusing on module interactions, contract validation, and multi-step workflow testing
+
+---
+
+## TL;DR (≤20 lines)
+- Goal: production-ready integration tests for module boundaries and flows.
+- Thresholds & metrics: `@quality-gates#integration` (SSOT).
+- Phases: Infrastructure → Contract Validation → Flow Testing.
+- Gates: Existence → Passing → Validation → Strategic.
+- Principles: real modules, mock external systems only.
+- Done when: score ≥ 8.5, contract ≥ 80%, flow ≥ 70%, runtime < 5m.
+- Start: "Execute Phase 1 using @integration-test-build.mdc".
+- Escalate to E2E only for truly critical workflows.
 
 ---
 
@@ -61,6 +72,7 @@ AI will automatically:
 ```
 
 ### Success Threshold
+Reference: see `@quality-gates#integration` for authoritative thresholds.
 ```yaml
 production_ready:
   score: "> 8.5/10 (@test-qualification adapted)"
