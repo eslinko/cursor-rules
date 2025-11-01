@@ -1,0 +1,170 @@
+---
+description: "Appendix for E2E test build — Web App E2E Pattern (Playwright patterns for web applications)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @e2e-test-build.appendix.examples.web — Web E2E Pattern
+
+> E2E testing patterns beyond blockchain — web applications with Playwright.
+
+## #examples
+
+### **6.2 Web App E2E Pattern (Universal)**
+
+> **Extension**: E2E testing beyond blockchain — web applications with Playwright
+
+**Infrastructure: Browser Automation**
+
+**Tools**: Playwright (JS/Python), Cypress (JS), Selenium (legacy)  
+**Harness**: WebE2EHarness (manages browser, server, database)  
+**Pattern**: Launch app → Navigate → Interact → Assert → Cleanup
+
+**Comparison: Blockchain vs Web E2E**
+
+| Aspect | Blockchain E2E | Web E2E |
+|--------|----------------|---------|
+| **Infrastructure** | Hardhat node + contracts | Browser + web server + DB |
+| **State Management** | EVM snapshots | DB transactions + browser storage clear |
+| **Validation** | On-chain contract calls | DOM assertions + API responses |
+| **Isolation** | Snapshot revert (~1s) | DB rollback + clear cookies (~2s) |
+| **Execution Speed** | 10-60s per test | 5-30s per test |
+| **Flakiness Risk** | 5-10% (node stability) | 10-20% (browser timing, network) |
+
+**Web E2E Example (Playwright, JavaScript):**
+
+```javascript
+// tests/e2e/web/login-checkout.e2e.test.js
+const { test, expect } = require('@playwright/test');
+
+test.describe('E2E: User Journey - Login → Product → Checkout', () => {
+  let page;
+  
+  test.beforeAll(async ({ browser }) => {
+    // Setup: Launch app (backend + frontend)
+    page = await browser.newPage();
+    
+    // Navigate to app
+    await page.goto('http://localhost:3000');
+  });
+  
+  test.afterAll(async () => {
+    await page.close();
+  });
+  
+  test.beforeEach(async ({ context }) => {
+    // Clear state between tests
+    await context.clearCookies();
+    await page.evaluate(() => localStorage.clear());
+  });
+  
+  test('should complete purchase workflow E2E', async () => {
+    // STEP 1: Login
+    await page.fill('input[name="email"]', 'test@example.com');
+    await page.fill('input[name="password"]', 'test123');
+    await page.click('button[type="submit"]');
+    
+    // Validate: Login successful
+    await expect(page.locator('.user-profile')).toBeVisible();
+    
+    // STEP 2: Browse products
+    await page.click('a[href="/products"]');
+    await page.waitForSelector('.product-card');
+    
+    // STEP 3: Add to cart
+    await page.click('.product-card:first-child .add-to-cart');
+    
+    // Validate: Cart updated
+    const cartCount = await page.locator('.cart-count').textContent();
+    expect(cartCount).toBe('1');
+    
+    // STEP 4: Checkout
+    await page.click('.cart-icon');
+    await page.click('button:has-text("Checkout")');
+    
+    // STEP 5: Payment
+    await page.fill('input[name="cardNumber"]', '4242424242424242');
+    await page.fill('input[name="expiry"]', '12/25');
+    await page.fill('input[name="cvc"]', '123');
+    await page.click('button:has-text("Pay Now")');
+    
+    // Validate: Order complete
+    await expect(page.locator('.order-success')).toBeVisible();
+    const orderNumber = await page.locator('.order-number').textContent();
+    expect(orderNumber).toMatch(/^ORD-\d+$/);
+  });
+});
+```
+
+**Web E2E Example (Playwright, Python):**
+
+```python
+# tests/e2e/web/test_login_checkout.py
+import pytest
+from playwright.async_api import async_playwright
+
+@pytest.fixture(scope='module')
+async def browser():
+    """Launch browser for E2E tests"""
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        yield browser
+        await browser.close()
+
+@pytest.fixture
+async def page(browser):
+    """Create page with clean state"""
+    page = await browser.new_page()
+    await page.goto('http://localhost:3000')
+    
+    yield page
+    
+    # Cleanup
+    await page.context.clear_cookies()
+    await page.evaluate('localStorage.clear()')
+    await page.close()
+
+@pytest.mark.e2e
+async def test_complete_purchase_workflow(page):
+    """E2E: Login → Product → Checkout"""
+    
+    # STEP 1: Login
+    await page.fill('input[name="email"]', 'test@example.com')
+    await page.fill('input[name="password"]', 'test123')
+    await page.click('button[type="submit"]')
+    
+    # Validate: Login successful
+    await page.wait_for_selector('.user-profile')
+    
+    # STEP 2: Browse products
+    await page.click('a[href="/products"]')
+    await page.wait_for_selector('.product-card')
+    
+    # STEP 3: Add to cart
+    await page.click('.product-card:first-child .add-to-cart')
+    
+    # Validate: Cart updated
+    cart_count = await page.locator('.cart-count').text_content()
+    assert cart_count == '1'
+    
+    # STEP 4: Checkout
+    await page.click('.cart-icon')
+    await page.click('button:has-text("Checkout")')
+    
+    # STEP 5: Payment
+    await page.fill('input[name="cardNumber"]', '4242424242424242')
+    await page.fill('input[name="expiry"]', '12/25')
+    await page.fill('input[name="cvc"]', '123')
+    await page.click('button:has-text("Pay Now")')
+    
+    # Validate: Order complete
+    await page.wait_for_selector('.order-success')
+    order_number = await page.locator('.order-number').text_content()
+    assert order_number.startswith('ORD-')
+```
+
+---
+
+**References:**
+- Core rule: `@e2e-test-build.core.mdc#examples`
+- Original content: `.cursor/rules/e2e-test-build.mdc` (lines 2766-2920)

@@ -1,0 +1,39 @@
+---
+description: "Appendix for E2E test build — Example Library (quick references to code examples)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @e2e-test-build.appendix.examples.library — Example Library
+
+> Quick reference to E2E code examples and implementation patterns from Phase sections.
+
+## #examples
+
+### **6.1 Example Library (References)**
+
+> **Quick Reference**: Most E2E examples are embedded in Section 4 (Phases). This section provides references + Web E2E pattern + copy-paste ready templates.
+
+**Infrastructure & Proof Tests** (See Section 4, Phase 1):
+- **E2EHarness Implementation**: Lines 550-888 (JS ~200 lines, Python ~140 lines)
+- **Framework Setup**: Lines 890-929 (package.json, pytest.ini)
+- **Proof Tests**: Lines 933-1076 (3 infrastructure validation tests, both languages)
+
+**Deployment Workflows** (See Section 4, Phase 2):
+- **Single Action E2E**: Lines 1108-1177 (Action 0: Deploy Registry)
+- **Sequential Actions E2E**: Lines 1179-1237 (Actions 0 → 1 → 2)
+- **Error Scenarios**: Lines 1491-1512 (Error handling at each phase)
+
+**Component Workflows** (See Section 4, Phase 3):
+- **Component Upload E2E**: Lines 1274-1342 (CSV → Arweave → Contract)
+- **Multi-Step Workflow**: Complete example with snapshot management
+
+**Full Pipeline** (See Section 4, Phase 4):
+- **Action 888 E2E**: Lines 1385-1514 (Complete deployment pipeline, 10+ actions)
+- **Holistic Validation**: 5-point state validation across entire system
+
+---
+
+**References:**
+- Core rule: `@e2e-test-build.core.mdc#examples`
+- Original content: `.cursor/rules/e2e-test-build.mdc` (lines 2744-2765)

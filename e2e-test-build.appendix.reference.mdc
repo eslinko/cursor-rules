@@ -1,0 +1,177 @@
+---
+description: "Appendix for E2E test build — Reference (quick reference tables, troubleshooting, DoD, integration with other rules)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @e2e-test-build.appendix.reference — Reference
+
+> Quick reference tables, troubleshooting, Definition of Done, and integration with other rules for E2E tests.
+
+## #reference
+
+### **7.1 Quick Reference: Unit vs Integration vs E2E**
+
+| Aspect | Unit Tests | Integration Tests | E2E Tests |
+|--------|------------|-------------------|-----------|
+| **Scope** | Single module | 2-4 modules | Entire system (full workflows) |
+| **Dependencies** | Mocked (heavy) | Real modules + mocked external | Real everything + minimal external mocks |
+| **Infrastructure** | None (mocked) | Test DB (in-memory/Docker) | Real node + contracts + DB |
+| **State Management** | No state | DB transactions | EVM snapshots (blockchain) / DB + cookies (web) |
+| **Speed** | ⚡⚡⚡ Very fast (< 1s) | ⚡⚡ Fast (1-10s) | ⚡ Slow (10-60s per test) |
+| **Isolation** | ✅ Perfect | ✅ High (test DB) | ✅ High (snapshots/reset) |
+| **Focus** | Method behavior | Module contracts | Complete user journeys |
+| **Execution** | Every commit | Every PR | Nightly/pre-deploy |
+| **Cost** | Minimal | Medium | High (infrastructure, time, maintenance) |
+| **Flakiness** | ~1% | ~5% | ~5-10% (infrastructure complexity) |
+| **Rule** | @unit-test-build.mdc | @integration-test-build.mdc | @e2e-test-build.mdc |
+
+---
+
+### **7.2 Troubleshooting (E2E-Specific Issues)**
+
+## #troubleshooting
+
+**Issue 1: Node Won't Start**
+- **Symptom**: `Error: Cannot connect to network` or timeout during node startup
+- **Causes**: Port conflict (8545 already in use), Hardhat config errors, missing dependencies
+- **Fix**:
+  ```bash
+  # Check port usage
+  lsof -i :8545  # Kill process if found
+  
+  # Verify Hardhat config
+  npx hardhat node --network hardhat  # Test standalone
+  
+  # Check dependencies
+  npm list hardhat @nomicfoundation/hardhat-ethers
+  ```
+
+**Issue 2: Snapshots Not Working**
+- **Symptom**: `Error: Snapshot not found` or state not reverting
+- **Causes**: Provider doesn't support snapshots, snapshot ID invalid, using wrong network
+- **Fix**:
+  - Verify network supports snapshots (Hardhat ✅, some RPCs ❌)
+  - Check snapshot ID stored correctly in harness
+  - Use Hardhat Network for development (guaranteed snapshot support)
+
+**Issue 3: Tests Timeout**
+- **Symptom**: `Error: Timeout of 60000ms exceeded`
+- **Causes**: Operations too slow, network latency, contract execution gas limit
+- **Fix**:
+  - Increase timeout: `this.timeout(120000)` for complex workflows
+  - Use QUICK modes for external services (Arweave mock vs real upload)
+  - Optimize contract deployment (reduce constructor complexity)
+  - Check gas limits (ensure sufficient for operations)
+
+**Issue 4: Flaky E2E Tests**
+- **Symptom**: Tests intermittently fail (pass on retry)
+- **Causes**: Hard-coded timeouts, race conditions, network timing, state pollution
+- **Fix**:
+  - Replace hard-coded timeouts with event-based waiting (`tx.wait()`)
+  - Add retry patterns for network operations
+  - Ensure snapshot reset in `beforeEach`
+  - Use dynamic waiting (wait for specific state, not fixed time)
+
+**Issue 5: Execution Time > 1 Hour**
+- **Symptom**: E2E suite takes too long, blocks CI/CD
+- **Causes**: No snapshots used, too many E2E tests, not parallelized, slow external calls
+- **Fix**:
+  - **Implement snapshots** (40x speedup, most important)
+  - **Parallelize** where possible (`--parallel` flag)
+  - **Use QUICK modes** for external services
+  - **Defer to integration** (move low-value E2E tests)
+  - **Optimize setup** (create snapshot after expensive operations)
+
+---
+
+### **7.3 Definition of Done (E2E Tests)**
+
+## #DoD
+
+```yaml
+production_ready_checklist:
+  infrastructure:
+    - [ ] tests/e2e/ directory created
+    - [ ] E2E harness implemented (E2EHarness.js or e2e_harness.py)
+    - [ ] Real node configured (Hardhat/Ganache/DevNet)
+    - [ ] Environment isolation (e2e.test.env file created)
+    - [ ] Snapshot management implemented (create, revert, restore)
+    - [ ] NPM scripts: test:e2e, test:e2e:workflows, test:e2e:parallel
+    - [ ] 3 infrastructure proof tests passing
+  
+  phases_complete:
+    - [ ] Phase 1: Infrastructure validated (harness + proof tests)
+    - [ ] Phase 2: Deploy actions tested E2E (Actions 0, 1, 2)
+    - [ ] Phase 3: Component actions tested E2E (Actions 555, 777)
+    - [ ] Phase 4: Catalog + pipeline tested E2E (Actions 41-43, 444, 888)
+  
+  quality_gates_passed:
+    - [ ] Gate 1: Infrastructure Validation (all checks pass)
+    - [ ] Gate 2: Workflow Passing (100% tests passing)
+    - [ ] Gate 3: Real E2E Validation (score > 8.5/10)
+    - [ ] Gate 4: ROI Analysis (ship decision at 8.5+/10)
+  
+  e2e_criteria:
+    - [ ] All tests use real infrastructure (node + contracts)
+    - [ ] Complete workflows tested (> 3 actions per workflow)
+    - [ ] Snapshot isolation working (beforeEach reset)
+    - [ ] Critical user journeys covered (> 70%)
+    - [ ] Execution time < 30 minutes (entire suite)
+    - [ ] Flakiness < 5% (stable infrastructure)
+  
+  documentation:
+    - [ ] E2E test patterns documented
+    - [ ] Harness usage clear
+    - [ ] Snapshot patterns explained
+    - [ ] Anti-flaky patterns enforced
+  
+  ci_cd_ready:
+    - [ ] Tests run in CI/CD pipeline
+    - [ ] Parallel execution possible (where applicable)
+    - [ ] Environment variables configured
+    - [ ] Failure notifications setup
+
+ship_criteria:
+  minimum: "Score > 8.5/10 AND all P0 criteria met"
+  recommended: "Score > 9.0/10 AND workflow coverage > 80%"
+  excellent: "Score > 9.5/10 AND execution time < 20 minutes"
+```
+
+---
+
+### **7.4 Integration with Other Rules**
+
+```yaml
+upstream_rules:
+  - "@unit-test-build.mdc": Unit tests (prerequisite, foundation)
+  - "@integration-test-build.mdc": Integration tests (prerequisite, module contracts)
+  - "@run-task.mdc": Orchestrates ItemY execution (optional)
+  - "@analysis.mdc": Can be used for E2E planning
+
+downstream_rules:
+  - "@test-qualification.mdc": Validates E2E test quality (Gate 3, adapted)
+  - "@test-to-success.mdc": Fixes failing E2E tests (auto-triggered)
+
+parallel_rules:
+  - "@meta.extract.mdc": Can extract E2E testing patterns
+  - "@meta.gap.mdc": Can identify gaps in E2E coverage
+
+rule_hierarchy:
+  foundation:
+    - "@unit-test-build.mdc": Base (single module, mocked)
+  
+  middle_layer:
+    - "@integration-test-build.mdc": Module interactions (real modules, minimal mocks)
+  
+  top_layer:
+    - "@e2e-test-build.mdc": Complete workflows (real infrastructure, minimal mocks)
+  
+  relationship: "E2E > Integration > Unit (scope and cost increase)"
+```
+
+---
+
+**References:**
+- Core rule: `@e2e-test-build.core.mdc#reference`
+- Original content: `.cursor/rules/e2e-test-build.mdc` (lines 3587-3799)

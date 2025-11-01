@@ -1,0 +1,334 @@
+---
+description: "Appendix for E2E test build — E2E-Specific Anti-Patterns (common mistakes and how to avoid them)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @e2e-test-build.appendix.examples.anti-patterns — Anti-Patterns
+
+> E2E-specific anti-patterns and how to avoid them.
+
+## #examples
+
+### **6.4 E2E-Specific Anti-Patterns**
+
+> **Critical**: These anti-patterns are unique to E2E testing. Different from unit/integration anti-patterns.
+
+---
+
+**Anti-Pattern 1: Integration Tests at E2E Level (Scope Violation)**
+
+**Symptom**: Testing module contracts or simple flows at E2E level (wastes expensive infrastructure)  
+**Detection**: Workflow < 3 actions, only module interaction tested, no complete user journey
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ This is INTEGRATION test, not E2E (wastes E2E infrastructure)
+describe('E2E: ContractManager → ArweaveManager', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode(); // Expensive infrastructure for simple test!
+  });
+  
+  it('should validate data contract', async () => {
+    // Only 2 modules, testing contract compatibility
+    const deployment = await contractManager.deploy('Test');
+    const cid = await arweaveManager.upload(deployment);
+    
+    expect(deployment.proxy).to.equal(cid.metadata.address);
+    // This is integration test — defer to @integration-test-build!
+  });
+});
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ INTEGRATION test (moved to tests/integration/)
+describe('Integration: ContractManager → ArweaveManager', () => {
+  let contractManager, arweaveManager, testDB;
+  
+  beforeEach(async () => {
+    // Use simple test infrastructure (no blockchain node)
+    testDB = new sqlite3.Database(':memory:');
+    contractManager = new ContractManager(testDB);
+    arweaveManager = new ArweaveManager();
+  });
+  
+  it('should validate data contract', async () => {
+    // Test module interaction (cheaper, faster)
+    const deployment = await contractManager.deploy('Test');
+    const cid = await arweaveManager.upload(deployment);
+    
+    expect(deployment.proxy).to.equal(cid.metadata.address);
+    // Run with @integration-test-build (10s vs 60s E2E overhead)
+  });
+});
+
+// ✅ E2E test (complete workflow, 5+ actions)
+describe('E2E: Full Deployment Pipeline', () => {
+  let harness;
+  
+  before(async () => {
+    harness = new E2EHarness();
+    await harness.startNode(); // Justified — complete workflow needs real node
+  });
+  
+  it('should execute complete deployment E2E', async () => {
+    // Complete workflow (10+ actions)
+    await deployRegistry();        // Action 0
+    await deployAllContracts();    // Action 1
+    await initializeSystem();      // Action 2
+    await activateSellers();       // User workflow
+    await uploadComponents();      // Action 555
+    await uploadCatalog();         // Actions 41-43
+    
+    // This justifies E2E infrastructure (complete system validation)
+  });
+});
+```
+
+**Fix**: Move module contract tests to `tests/integration/`, keep only complete workflows (3+ actions) in `tests/e2e/`
+
+---
+
+**Anti-Pattern 2: Hard-Coded Timeouts (Flaky Tests)**
+
+**Symptom**: Tests fail randomly with "timeout exceeded" errors  
+**Detection**: Hard-coded `timeout(5000)`, tests pass sometimes, fail others
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ Hard-coded timeout → flaky tests
+describe('E2E: Deploy Workflow', () => {
+  it('should deploy contracts', async () => {
+    const result = await deployAllContracts();
+    
+    // ❌ Hard-coded wait (brittle)
+    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5s
+    
+    // Check deployment (might not be ready yet → flaky!)
+    const deployed = await harness.validateDeployment(result.proxy);
+    expect(deployed).to.be.true;
+  });
+});
+```
+
+**Python:**
+```python
+# ❌ Hard-coded sleep → flaky tests
+async def test_deploy_workflow(harness):
+    result = await deploy_all_contracts()
+    
+    # ❌ Hard-coded sleep
+    await asyncio.sleep(5)  # Wait 5s (might not be enough!)
+    
+    # Check deployment (flaky if takes > 5s)
+    deployed = await harness.validate_deployment(result['proxy'])
+    assert deployed is True
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ Event-based waiting (reliable)
+describe('E2E: Deploy Workflow', () => {
+  it('should deploy contracts', async () => {
+    const result = await deployAllContracts();
+    
+    // ✅ Wait for transaction confirmation (event-based)
+    const tx = result.transaction;
+    await tx.wait(); // Waits for actual confirmation
+    
+    // ✅ Retry pattern for validation (robust)
+    let deployed = false;
+    for (let i = 0; i < 10; i++) {
+      try {
+        await harness.validateDeployment(result.proxy);
+        deployed = true;
+        break;
+      } catch {
+        await new Promise(r => setTimeout(r, 1000)); // Retry after 1s
+      }
+    }
+    
+    expect(deployed).to.be.true;
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ Event-based waiting with retry (reliable)
+async def test_deploy_workflow(harness):
+    result = await deploy_all_contracts()
+    
+    # ✅ Wait for transaction confirmation
+    await result['transaction'].wait()
+    
+    # ✅ Retry pattern (robust)
+    deployed = False
+    for _ in range(10):
+        try:
+            await harness.validate_deployment(result['proxy'])
+            deployed = True
+            break
+        except:
+            await asyncio.sleep(1)  # Retry after 1s
+    
+    assert deployed is True
+```
+
+**Fix**: Use event-based waiting (transaction confirmations) + retry patterns instead of hard-coded timeouts
+
+---
+
+**Anti-Pattern 3: No State Isolation (Test Pollution)**
+
+**Symptom**: Tests pass individually, fail when run together; execution order matters  
+**Detection**: Different results when running `--grep "Test A"` vs full suite
+
+**❌ BEFORE (Wrong):**
+
+**JavaScript:**
+```javascript
+// ❌ No snapshot reset → tests pollute each other
+describe('E2E: Component Upload', () => {
+  let harness, deployedContracts;
+  
+  before(async function() {
+    this.timeout(120000);
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    
+    // Deploy contracts (expensive)
+    deployedContracts = await deployAllContracts();
+    
+    // ❌ NO SNAPSHOT CREATED!
+  });
+  
+  // ❌ NO beforeEach reset!
+  
+  it('Test 1: Upload component A', async () => {
+    await uploadComponent('A', deployedContracts);
+    // State: Component A uploaded
+  });
+  
+  it('Test 2: Upload component B', async () => {
+    await uploadComponent('B', deployedContracts);
+    // State: Components A + B uploaded (from Test 1!)
+    // ❌ Test 2 depends on Test 1 state (pollution)
+  });
+  
+  it('Test 3: Expect 1 component', async () => {
+    const count = await getComponentCount(deployedContracts);
+    expect(count).to.equal(1); // ❌ FAILS! Count is 2 (A + B from previous tests)
+  });
+});
+```
+
+**✅ AFTER (Correct):**
+
+**JavaScript:**
+```javascript
+// ✅ Snapshot isolation → tests independent
+describe('E2E: Component Upload', () => {
+  let harness, deployedContracts;
+  
+  before(async function() {
+    this.timeout(120000);
+    
+    harness = new E2EHarness();
+    await harness.startNode();
+    
+    // Deploy contracts (expensive, once)
+    deployedContracts = await deployAllContracts();
+    
+    // ✅ CREATE SNAPSHOT (save clean state)
+    await harness.createInitialSnapshot();
+  });
+  
+  beforeEach(async () => {
+    // ✅ RESET TO SNAPSHOT (each test starts clean)
+    await harness.resetNetwork();
+  });
+  
+  it('Test 1: Upload component A', async () => {
+    await uploadComponent('A', deployedContracts);
+    // State: Component A uploaded (reverted after test)
+  });
+  
+  it('Test 2: Upload component B', async () => {
+    // Starts from clean snapshot (A not uploaded)
+    await uploadComponent('B', deployedContracts);
+    // State: Only component B uploaded ✅
+  });
+  
+  it('Test 3: Expect 0 components', async () => {
+    // Starts from clean snapshot (no uploads)
+    const count = await getComponentCount(deployedContracts);
+    expect(count).to.equal(0); // ✅ PASSES! Clean state
+  });
+});
+```
+
+**Python:**
+```python
+# ✅ Fixture with snapshot reset (tests independent)
+@pytest.fixture(scope='module')
+async def harness_with_contracts():
+    """Setup with snapshot"""
+    h = E2EHarness()
+    await h.start_node()
+    
+    # Expensive setup (once)
+    contracts = await deploy_all_contracts()
+    
+    # ✅ CREATE SNAPSHOT
+    await h.create_initial_snapshot()
+    
+    yield h, contracts
+    await h.stop_node()
+
+@pytest.fixture
+async def clean_state(harness_with_contracts):
+    """Reset before each test"""
+    h, contracts = harness_with_contracts
+    
+    # ✅ RESET TO SNAPSHOT
+    await h.reset_network()
+    
+    yield h, contracts
+
+async def test_upload_component_a(clean_state):
+    h, contracts = clean_state
+    await upload_component('A', contracts)
+    # Reverted after test
+
+async def test_upload_component_b(clean_state):
+    h, contracts = clean_state
+    # Starts clean (A not uploaded)
+    await upload_component('B', contracts)
+
+async def test_expect_zero_components(clean_state):
+    h, contracts = clean_state
+    count = await get_component_count(contracts)
+    assert count == 0  # ✅ Clean state
+```
+
+**Fix**: Always use `beforeEach` with `resetNetwork()` for E2E test isolation
+
+---
+
+**References:**
+- Core rule: `@e2e-test-build.core.mdc#examples`
+- Original content: `.cursor/rules/e2e-test-build.mdc` (lines 3268-3586)

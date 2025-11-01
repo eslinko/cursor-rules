@@ -6,7 +6,7 @@ alwaysApply: false
 
 # @e2e-test-build.core — Core
 
-> Lightweight, auto-applied core referencing thresholds from `@quality-gates#e2e`. Extended examples/patterns: `@e2e-test-build.appendix.mdc`.
+> Lightweight, auto-applied core referencing thresholds from `@quality-gates#e2e`. Extended examples/patterns: see appendix modules below.
 
 ## TL;DR
 - Goal: production-ready E2E of critical journeys
@@ -21,18 +21,19 @@ alwaysApply: false
 
 ## Core Principles
 - Progressive Complexity; Quality Gates; End-to-end completeness; ROI-driven selectivity; Infrastructure-first
-- Extended patterns: see `@e2e-test-build.appendix.mdc#patterns`, `#web-e2e`
+- Extended patterns: see `@e2e-test-build.appendix.harness.mdc#harness`, `@e2e-test-build.appendix.examples.web.mdc#examples`
+- E2E-Specific Principles (10-13): Infrastructure First, Workflow Completeness, Selective Coverage, Snapshot-Driven Isolation - see `@e2e-test-build.appendix.mdc#patterns`
 
 ## Context Detection & Scenarios
 - Automatic scenario selection (NEW, EXTEND, FIX, VALIDATE) based on project/test coverage/score
-- Detailed YAML and steps: see `@e2e-test-build.appendix.mdc#scenarios`
+- Detailed YAML and steps: see `@e2e-test-build.appendix.scenarios.mdc#scenarios`
 
 ## Phases
 - Infra/harness: node, snapshots, proof tests
 - Deploy: contract registration, dependency flow
 - Component: multi-step management/activate/invite flows
 - Catalog/Pipeline: full system orchestration, end-to-end
-- All detailed harness and full patterns in appendix: `#harness`, `#patterns`
+- All detailed harness and full patterns in appendix: `@e2e-test-build.appendix.harness.mdc#harness`, `@e2e-test-build.appendix.examples.templates.mdc#examples`
 
 ## Quality Gates
 - Reference: `@quality-gates#e2e`
@@ -40,7 +41,7 @@ alwaysApply: false
 
 ## CI/Policies (concise)
 - Shard, retriable; artifacts; smart fallback to standalone node if instability
-- Full advanced policies, troubleshooting: see `#troubleshooting`
+- Full advanced policies, troubleshooting: see `@e2e-test-build.appendix.reference.mdc#troubleshooting`
 
 ## Reference Mapping
 - Only above is rule-activation logic for Cursor; all full code/examples/templates/DoD in appendix.
