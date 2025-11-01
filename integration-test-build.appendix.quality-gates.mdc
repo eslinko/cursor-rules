@@ -1,0 +1,429 @@
+---
+description: "Appendix for Integration test build — Quality Gates (Gate 1-4: contract compatibility, flow passing, real integration validation, ROI analysis)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @integration-test-build.appendix.quality-gates — Quality Gates
+
+> Quality gates framework for integration tests: contract compatibility, flow passing, real integration validation, and ROI analysis.
+
+## #quality-gates
+
+> **Framework**: Uses same 4-gate progressive validation as @unit-test-build.mdc, adapted for integration testing context.  
+> **Reference**: See @unit-test-build.mdc Section 4 for detailed gate architecture and philosophy.
+
+**Integration-Specific Adaptations:**
+
+---
+
+### **Gate 1: Contract Compatibility Check** 🔴 CRITICAL
+
+**Auto-Trigger**: After Phase 2 (Contract Validation Tests complete)  
+**Question**: "Do module contracts align at all boundaries?"  
+**Method**: Automated contract validation
+
+```yaml
+gate_1_checks:
+  module_to_module_contracts:
+    question: "Does Module A output match Module B input format?"
+    validation:
+      - Check: Data structure compatibility (fields, types)
+      - Check: Required fields present
+      - Check: Optional fields handled
+      - Example: ContractManager.deploy() → ArweaveManager.uploadMetadata()
+    
+    threshold: "All critical module boundaries validated (> 80% coverage)"
+  
+  api_contracts:
+    question: "Are API request/response formats consistent?"
+    validation:
+      - Check: POST /deploy response → GET /deploy/:id accepts same ID format
+      - Check: Status codes consistent (201 for create, 200 for read)
+      - Check: Error responses follow same format
+    
+    threshold: "All API contracts validated"
+  
+  data_contracts:
+    question: "Are database schemas compatible across modules?"
+    validation:
+      - Check: Module A writes → Module B reads (same table, same columns)
+      - Check: Foreign keys valid
+      - Check: Column types match expectations
+      - Example: deployments table accessed by ContractManager + ArweaveManager
+    
+    threshold: "All shared data contracts validated"
+  
+  error_contracts:
+    question: "Do errors propagate correctly between modules?"
+    validation:
+      - Check: Module B error → Module A catches and handles
+      - Check: Error types preserved (ValidationError, NotFoundError)
+      - Check: Stack traces available for debugging
+    
+    threshold: "Error propagation tested for all critical paths"
+
+pass_criteria:
+  - [ ] All critical contracts validated (> 80% of module boundaries)
+  - [ ] Zero contract violations found in tests
+  - [ ] API contracts consistent across endpoints
+  - [ ] Database schema compatibility confirmed
+  - [ ] Error propagation works correctly
+
+next_steps:
+  if_pass: "✅ Continue to Gate 2 (Flow Passing)"
+  if_fail: "❌ Fix contract mismatches before proceeding"
+```
+
+**Contract Validation Script (Auto-run):**
+```javascript
+// Auto-triggered after Phase 2
+function validateContracts(testResults) {
+  const contractTests = testResults.filter(t => t.suite.includes('Contract:'));
+  const passing = contractTests.filter(t => t.status === 'passed').length;
+  const total = contractTests.length;
+  const coverage = (passing / total) * 100;
+  
+  console.log(`Contract Coverage: ${coverage.toFixed(1)}% (${passing}/${total})`);
+  
+  if (coverage < 80) {
+    throw new Error(`Gate 1 FAILED: Contract coverage ${coverage}% < 80% threshold`);
+  }
+  
+  return { passed: true, coverage, message: '✅ Gate 1 PASSED: Contracts validated' };
+}
+```
+
+---
+
+### **Gate 2: Flow Passing Check**
+
+**Auto-Trigger**: After Gate 1 passes  
+**Question**: "Do all multi-step workflows execute successfully?"  
+**Method**: Integration test execution results
+
+```yaml
+gate_2_checks:
+  all_tests_passing:
+    question: "Are all integration tests passing?"
+    threshold: "100% passing (zero failures)"
+    rationale: "Integration tests validate critical workflows — no failures allowed"
+  
+  workflows_complete:
+    question: "Do workflows complete end-to-end?"
+    validation:
+      - Check: Deploy → Upload → Validate (3 modules) completes
+      - Check: User → Seller → Product (3 modules) completes
+      - Check: No timeouts or hanging operations
+    
+    threshold: "All critical workflows complete within timeout (< 5 minutes)"
+  
+  no_multi_module_errors:
+    question: "Are there errors in multi-module operations?"
+    validation:
+      - Check: No module communication errors
+      - Check: No state inconsistencies between modules
+      - Check: No database conflicts
+    
+    threshold: "Zero multi-module errors"
+
+pass_criteria:
+  - [ ] 100% integration tests passing
+  - [ ] All workflows complete end-to-end
+  - [ ] Execution time < 5 minutes (acceptable for integration)
+  - [ ] Zero module communication errors
+
+next_steps:
+  if_pass: "✅ Continue to Gate 3 (Quality Analysis)"
+  if_fail: "❌ Apply @test-to-success.mdc to fix failing tests"
+```
+
+---
+
+### **Gate 3: Real Integration Validation** 🔴 CRITICAL
+
+**Auto-Trigger**: After Gate 2 passes  
+**Method**: @test-qualification.mdc (adapted for integration level)  
+**Question**: "Are tests validating REAL integration (not disguised unit tests)?"
+
+**Integration-Specific Quality Criteria:**
+
+**P0 - Critical (Must Pass):**
+
+**1. NO_UNIT_TESTS_AT_INTEGRATION_LEVEL**
+```yaml
+anti_pattern: "Testing isolated methods at integration level"
+detection:
+  - Single module loaded in test
+  - No module communication tested
+  - Testing internal logic (not boundaries)
+
+correct_pattern: "Test module handshakes, defer isolated logic to unit tests"
+validation:
+  - [ ] Each test loads 2+ modules
+  - [ ] Tests validate module interactions
+  - [ ] Tests focus on boundaries, not internals
+
+example_violation:
+  # ❌ WRONG: This is a unit test, not integration
+  it('should validate invite code format', async () => {
+    const valid = contractManager._validateInviteCode('ABC123');
+    expect(valid).to.be.true;
+  });
+
+example_correct:
+  # ✅ RIGHT: Tests integration between modules
+  it('should activate user with valid invite (2 modules)', async () => {
+    // InviteModule + UserModule working together
+    const invite = await inviteModule.create('ABC123');
+    const user = await userModule.activateWithInvite('ABC123');
+    expect(user.activated).to.be.true;
+  });
+```
+
+**2. VALIDATE_REAL_INTEGRATION**
+```yaml
+anti_pattern: "Mocking your own modules (defeats integration purpose)"
+detection:
+  - ContractManager mocked (your module!)
+  - ArweaveManager stubbed (your module!)
+  - Only external API called
+
+correct_pattern: "Use REAL modules, mock only external systems"
+validation:
+  - [ ] All your modules loaded as real instances
+  - [ ] Only external APIs mocked (< 3 external mocks per test)
+  - [ ] Real database used (in-memory or Docker)
+
+example_violation:
+  # ❌ WRONG: Mocking your own modules
+  const mockContract = sinon.stub(ContractManager.prototype, 'deploy')
+    .resolves({ proxy: '0xFake' });
+  const mockArweave = sinon.stub(ArweaveManager.prototype, 'upload')
+    .resolves('fake-cid');
+  // Not integration — modules never interact!
+
+example_correct:
+  # ✅ RIGHT: Real modules, minimal external mocks
+  const mockArweaveAPI = sinon.stub(ArweaveClient.prototype, 'post')
+    .resolves({ id: 'tx-123' }); // Mock external API only
+  
+  // Use REAL modules
+  const contractManager = new ContractManager(testDB);
+  const arweaveManager = new ArweaveManager();
+```
+
+**3. NO_OVER_MOCKING**
+```yaml
+anti_pattern: "Mocking > 3 external systems (probably e2e test, not integration)"
+detection:
+  - Mocking: Arweave + Web3 + IPFS + Email + Database + ...
+  - Test becomes complex mock orchestration
+  - Hard to understand what's being tested
+
+correct_pattern: "Mock ≤ 3 external systems, use real for the rest"
+validation:
+  - [ ] External mocks count ≤ 3 per test
+  - [ ] If > 3 mocks → consider e2e test instead
+  - [ ] Mocks are simple (return value, not complex behavior)
+
+rule_of_thumb: |
+  Integration tests: Mock external systems (≤ 3)
+  E2E tests: Mock nothing OR use testnet/staging environment
+```
+
+**4. CORRECT_FLOW_LOGIC**
+```yaml
+anti_pattern: "Artificial workflows that don't happen in production"
+detection:
+  - Test sequence doesn't match user flow
+  - Testing edge cases that unit tests should cover
+  - Flow is too simple (single operation)
+
+correct_pattern: "Realistic workflows that mirror production"
+validation:
+  - [ ] Workflow matches production user flow
+  - [ ] Multi-step scenarios (2-4 modules)
+  - [ ] State consistency validated across workflow
+
+example_violation:
+  # ❌ WRONG: Not realistic workflow
+  it('should test random method combination', async () => {
+    await moduleA.methodX();
+    await moduleB.methodY();
+    await moduleA.methodZ();
+    // This sequence never happens in production
+  });
+
+example_correct:
+  # ✅ RIGHT: Realistic production workflow
+  it('should complete user onboarding flow', async () => {
+    // 1. User activates (UserModule)
+    const user = await userModule.activate(invite);
+    
+    // 2. Seller role granted (RoleModule)
+    await roleModule.grantSeller(user.id);
+    
+    // 3. First product created (ProductModule)
+    const product = await productModule.create(user.id, data);
+    
+    // This is the actual production onboarding flow
+  });
+```
+
+**Scoring Formula (Integration-Specific):**
+```javascript
+function calculateIntegrationQualityScore(tests) {
+  let score = 10.0;
+  
+  // P0 violations (critical)
+  const unitTestsAtIntegrationLevel = countIsolatedTests(tests);
+  score -= unitTestsAtIntegrationLevel * 2.0; // -2 per violation
+  
+  const mockedOwnModules = countMockedOwnModules(tests);
+  score -= mockedOwnModules * 1.5; // -1.5 per mocked module
+  
+  const overMockedTests = countOverMocked(tests); // > 3 external mocks
+  score -= overMockedTests * 1.0; // -1 per over-mocked test
+  
+  const unrealisticFlows = countUnrealisticFlows(tests);
+  score -= unrealisticFlows * 1.0; // -1 per unrealistic flow
+  
+  return Math.max(0, score);
+}
+```
+
+**Pass Criteria:**
+```yaml
+integration_quality_threshold: "> 8.0/10"
+
+scoring:
+  9.0_to_10.0: "Excellent — production-ready integration tests"
+  8.0_to_8.9: "Good — minor improvements possible"
+  7.0_to_7.9: "Acceptable — fix P0 issues before shipping"
+  below_7.0: "Poor — significant refactoring needed"
+```
+
+**Next Steps:**
+```yaml
+if_score_above_8:
+  action: "✅ Continue to Gate 4 (ROI Analysis)"
+  message: "Integration tests validated for production"
+
+if_score_7_to_8:
+  action: "⚠️ Fix P0 issues, then revalidate"
+  method: "@test-to-success.mdc for systematic fixes"
+
+if_score_below_7:
+  action: "❌ Major refactoring required"
+  recommendations:
+    - "Review minimal mocking strategy (Section 4.1)"
+    - "Ensure real modules loaded, not mocked"
+    - "Validate workflows are production-realistic"
+```
+
+---
+
+### **Gate 4: ROI Analysis (Integration-Specific)**
+
+**Auto-Trigger**: After Gate 3 passes (score > 8/10)  
+**Question**: "Should we add more integration tests OR defer to e2e?"  
+**Method**: ROI framework from @unit-test-build.mdc (adapted)
+
+```yaml
+roi_framework_reference:
+  source: "@unit-test-build.mdc Section 4.4"
+  adaptation: "Integration tests focus on module contracts + flows, NOT full e2e"
+
+integration_specific_decisions:
+  high_roi_additions:
+    - Additional contract validation tests (< 80% coverage)
+    - Critical workflow variants (error scenarios)
+    - Database integration edge cases
+    
+    action: "Add these tests (high value, low cost)"
+  
+  low_roi_additions:
+    - Full e2e user journeys with UI
+    - Performance/load testing
+    - External system integration (real APIs)
+    
+    action: "Defer to @e2e-test-build.mdc OR specialized tools"
+  
+  defer_to_e2e:
+    criteria:
+      - Test requires full UI interaction
+      - Test requires real external services (not mocked)
+      - Test covers entire system (frontend + backend + database + external)
+    
+    rationale: "E2E tests are slower, more brittle — use sparingly for critical paths"
+
+ship_decision:
+  threshold: "Score > 8.5/10 AND all critical contracts validated"
+  
+  if_met:
+    action: "✅ SHIP INTEGRATION TESTS"
+    message: "Production-ready integration test suite"
+  
+  if_not_met:
+    options:
+      - "Add high-ROI tests (if score 8.0-8.5)"
+      - "Fix quality issues (if score < 8.0)"
+      - "Defer complex scenarios to @e2e-test-build.mdc"
+```
+
+**ROI Decision Tree (Integration Tests):**
+```yaml
+proposed_test: "New integration test idea"
+
+question_1: "Does this test module interactions (2+ modules)?"
+  if_no: "❌ Defer to @unit-test-build.mdc (unit test)"
+  if_yes: "→ Continue to question 2"
+
+question_2: "Does this test require real external services (not mocked)?"
+  if_yes: "❌ Defer to @e2e-test-build.mdc OR run on testnet"
+  if_no: "→ Continue to question 3"
+
+question_3: "Does this test cover critical workflow?"
+  if_yes: "✅ HIGH ROI — Add this test"
+  if_no: "→ Continue to question 4"
+
+question_4: "Does this test add unique contract validation?"
+  if_yes: "✅ MEDIUM ROI — Consider adding"
+  if_no: "❌ LOW ROI — Skip or defer"
+```
+
+---
+
+**Quality Gates Summary:**
+
+```yaml
+gate_flow:
+  Gate_1_Contract_Compatibility:
+    trigger: "After Phase 2 (Contract Validation)"
+    threshold: "> 80% contract coverage"
+    next: "Gate 2 OR fix contracts"
+  
+  Gate_2_Flow_Passing:
+    trigger: "After Gate 1 passes"
+    threshold: "100% tests passing"
+    next: "Gate 3 OR @test-to-success"
+  
+  Gate_3_Real_Integration_Validation:
+    trigger: "After Gate 2 passes"
+    method: "@test-qualification.mdc (adapted)"
+    threshold: "Score > 8.0/10"
+    next: "Gate 4 OR refactor"
+  
+  Gate_4_ROI_Analysis:
+    trigger: "After Gate 3 passes"
+    decision: "Ship at 8.5+ OR add high-ROI tests"
+    defer: "E2E tests to @e2e-test-build.mdc"
+
+production_ready_criteria:
+  - [ ] All 4 gates passed
+  - [ ] Score > 8.5/10
+  - [ ] Contract coverage > 80%
+  - [ ] All critical workflows tested
+  - [ ] Minimal mocking validated (< 3 external mocks/test)
+```

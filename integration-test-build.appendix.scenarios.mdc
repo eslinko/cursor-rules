@@ -1,0 +1,127 @@
+---
+description: "Appendix for Integration test build — Context Detection & Scenarios (detection logic, scenarios, self-orchestration framework)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @integration-test-build.appendix.scenarios — Scenarios
+
+> Context detection, scenario selection, and self-orchestration framework for integration test development.
+
+## #scenarios
+
+> **Self-Orchestrating**: Rule automatically detects context and selects appropriate execution path
+
+### **Detection Logic**
+
+```yaml
+step_1_check_infrastructure:
+  question: "Does tests/integration/ directory exist with test runner configured?"
+  if_no: → SCENARIO: NEW_INTEGRATION (Full cycle)
+  if_yes: → Continue to step 2
+
+step_2_check_existing_tests:
+  question: "Do integration tests exist for affected modules?"
+  if_no: → SCENARIO: NEW_INTEGRATION (Create integration tests)
+  if_yes: → Continue to step 3
+
+step_3_check_quality:
+  question: "What is integration test quality score?"
+  method: "@test-qualification.mdc (adapted for integration level)"
+  if_score_below_8: → SCENARIO: CONTRACT_VALIDATION (focus on contracts)
+  if_score_above_8: → SCENARIO: EXTEND (add for new modules)
+```
+
+### **Scenarios**
+
+**Scenario A: NEW_INTEGRATION** — No integration tests exist → Full cycle (Phases 1, 2, 3)  
+**Duration**: 10-14 hours | **Output**: Production-ready integration test suite from scratch
+
+**Scenario B: EXTEND** — Tests exist (score > 8) → Add tests for new module interactions  
+**Duration**: 3-5 hours | **Output**: Extended coverage for new modules, contracts validated
+
+**Scenario C: CONTRACT_VALIDATION** — Tests exist (score < 8) → Focus on contract validation  
+**Duration**: 4-6 hours | **Output**: All contracts validated, score > 8/10
+
+---
+
+## 🎯 SELF-ORCHESTRATION FRAMEWORK
+
+> **Built-in orchestration**: No need for separate @run-task.mdc or @analysis.mdc
+
+### **How It Works**
+
+```yaml
+single_rule_execution:
+  input: "@integration-test-build.mdc + task description"
+  
+  automatic_steps:
+    1. Context Detection → Determine scenario (NEW/EXTEND/CONTRACT_VALIDATION)
+    2. ItemY Generation → Create phase-specific tasks
+    3. Progressive Execution → Phase 1 → Phase 2 → Phase 3 → Done
+    4. Quality Gates → Auto-trigger @test-qualification (adapted)
+    5. ROI Analysis → Defer e2e flows to @e2e-test-build
+    6. Anti-pattern Detection → Continuous monitoring
+  
+  output: "Production-ready integration tests without additional orchestration"
+```
+
+### **ItemY Structure (Per Phase)**
+
+Each Phase = ListX with ItemY tasks following @run-task pattern:
+
+```yaml
+ItemY_Template:
+  understanding:
+    sub_rule: "@itemy-understanding.mdc (optional)"
+    actions:
+      - Analyze current state (which modules need integration testing)
+      - Identify module boundaries and contracts
+      - Check existing integration patterns
+  
+  knowledge_check:
+    sub_rule: "@itemy-knowledge-check.mdc (optional)"
+    actions:
+      - Review integration testing best practices
+      - Check contract testing patterns
+      - Identify critical module interactions
+  
+  acceptance_criteria:
+    sub_rule: "@itemy-acceptance.mdc (optional)"
+    actions:
+      - [ ] Specific, measurable criteria per phase
+      - [ ] Contract validation thresholds
+      - [ ] Flow coverage targets
+  
+  planning:
+    sub_rule: "@itemy-planning.mdc (optional)"
+    actions:
+      - Break down into concrete steps
+      - Identify module dependencies
+      - Plan test DB strategy
+  
+  implementation:
+    sub_rule: "@itemy-execution.mdc (optional)"
+    actions:
+      - Execute step-by-step
+      - Load multiple modules together
+      - Use minimal mocking
+  
+  validation:
+    sub_rule: "@itemy-validation.mdc (optional)"
+    actions:
+      - Run integration tests
+      - Check contract compatibility
+      - Validate flow completion
+  
+  retrospective:
+    sub_rule: "@itemy-retrospective.mdc (optional)"
+    actions:
+      - Document integration learnings
+      - Identify contract issues
+      - Note flow testing insights
+
+execution_note: |
+  AI can execute each step using embedded logic OR delegate to @itemy-*.mdc sub-rules.
+  Recommendation: Use sub-rules for complex contract validation (Phase 2).
+```

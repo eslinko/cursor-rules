@@ -23,31 +23,31 @@ alwaysApply: false
 ## Core Principles
 - Progressive Complexity, Quality Gates, Test Level Appropriateness, ROI-Driven
 - Integration: test module handshakes, not internals; use real modules, DB; mock only real external APIs
-- See extended patterns: `@integration-test-build.appendix.mdc#patterns`
+- See extended patterns: `@integration-test-build.appendix.patterns.mdc#patterns`
 
 ## Context Detection & Scenarios
 - Detects NEW, EXTEND, or CONTRACT_VALIDATION via infra, test coverage, and score
-- See scenario logic: `@integration-test-build.appendix.mdc#scenarios`
+- See scenario logic: `@integration-test-build.appendix.scenarios.mdc#scenarios`
 
 ## Phases
 - Phase 1: Infrastructure (multi-module harness, test DB, minimal mocks)  
-  See: `@integration-test-build.appendix.mdc#phases` for harness setup, framework config, proof tests
+  See: `@integration-test-build.appendix.phases.mdc#phases` for harness setup, framework config, proof tests
 - Phase 2: Contract Validation (module boundaries, API, DB, error contracts)  
-  See: `@integration-test-build.appendix.mdc#contracts` for all contract validation patterns
+  See: `@integration-test-build.appendix.contracts.mdc#contracts` for all contract validation patterns
 - Phase 3: Flow Testing (multi-step scenarios, state consistency)  
-  See: `@integration-test-build.appendix.mdc#flows` for happy path, error handling, atomicity, state consistency
+  See: `@integration-test-build.appendix.flows.mdc#flows` for happy path, error handling, atomicity, state consistency
 
 ## Quality Gates
 - Reference: `@quality-gates#integration` and `@test-qualification.mdc`
 - Gates 1–4: contract compatibility, flow passing, real integration, ROI analysis  
-  See: `@integration-test-build.appendix.mdc#quality-gates` for detailed gate checks, scoring formulas, pass criteria
+  See: `@integration-test-build.appendix.quality-gates.mdc#quality-gates` for detailed gate checks, scoring formulas, pass criteria
 
 ## CI/Policies (concise)
 - Minimal mocks (external only), per-test DB isolation, coverage reporting, artifacts
-- See troubleshooting & advanced setup: `@integration-test-build.appendix.mdc#troubleshooting`
+- See troubleshooting & advanced setup: `@integration-test-build.appendix.troubleshooting.mdc#troubleshooting`
 
 ## Reference Mapping
 - Only the content above is in scope for core activation in Cursor, full details/examples/templates/DoD in appendix.
-- Appendix sections: `#scenarios`, `#patterns` (4.1-4.3), `#contracts`, `#flows`, `#phases`, `#quality-gates`, `#examples`, `#troubleshooting`, `#DoD`
-- See: `@integration-test-build.appendix.mdc` for all extended content
+- Appendix sections: `#scenarios` (scenarios.mdc), `#patterns` (patterns.mdc), `#contracts` (contracts.mdc), `#flows` (flows.mdc), `#phases` (phases.mdc), `#quality-gates` (quality-gates.mdc), `#examples` (examples.mdc), `#troubleshooting` (troubleshooting.mdc), `#DoD` (troubleshooting.mdc)
+- See: `@integration-test-build.appendix.*.mdc` for all extended content
 

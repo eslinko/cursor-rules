@@ -1,0 +1,230 @@
+---
+description: "Appendix for Integration test build — Phase 1 Infrastructure (multi-module harness, test DB setup, framework configuration)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @integration-test-build.appendix.phases — Phase 1 Infrastructure
+
+> Phase 1: Integration infrastructure setup including multi-module harness, test database configuration, and framework setup examples.
+
+## #phases
+
+### **Phase 1: Integration Infrastructure**
+**Goal**: Enable integration testing (multiple modules working together)  
+**Duration**: 2-3 hours  
+**Cognitive Mode**: EXECUTION
+
+```yaml
+deliverables:
+  - tests/integration/ directory structure
+  - Multi-module test harness (loads modules together, not isolated)
+  - Test database setup (choose strategy: in-memory, Docker, or dedicated)
+  - Minimal mock infrastructure (external APIs only, not your modules)
+  - Integration test runner configuration
+  - Scripts: test:integration, test:integration:parallel, test:integration:coverage
+
+validation:
+  - [ ] Multiple modules load together successfully
+  - [ ] Test database works (can read/write)
+  - [ ] External APIs mocked (Arweave, Web3 RPC)
+  - [ ] 2-3 proof integration tests pass (Module A → Module B interaction)
+  - [ ] Execution time < 10 seconds for proof tests
+```
+
+**Framework Setup Examples:**
+
+**JavaScript (Mocha + Supertest + Testcontainers):**
+```json
+// package.json scripts
+{
+  "test:integration": "mocha 'tests/integration/**/*.test.js' --timeout 30000",
+  "test:integration:parallel": "mocha --parallel 'tests/integration/**/*.test.js' --timeout 30000",
+  "test:integration:coverage": "nyc mocha 'tests/integration/**/*.test.js'"
+}
+
+// Dependencies
+"devDependencies": {
+  "mocha": "^10.0.0",
+  "chai": "^4.3.0",
+  "supertest": "^6.3.0",     // For API testing
+  "testcontainers": "^10.0.0", // For Docker DB (optional)
+  "nyc": "^15.1.0"
+}
+```
+
+**Python (pytest + httpx + pytest-docker):**
+```ini
+# pytest.ini
+[pytest]
+testpaths = tests/integration
+timeout = 30
+addopts = -v --tb=short --strict-markers
+
+# With parallel
+addopts = -v --tb=short -n auto
+
+# With coverage
+addopts = -v --cov=src --cov-report=html --cov-fail-under=70
+
+# With Docker DB (optional)
+markers =
+    integration: Integration tests requiring database
+    docker: Tests requiring Docker containers
+```
+
+```bash
+# requirements-test.txt
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+pytest-xdist>=3.0.0          # Parallel execution
+pytest-docker>=2.0.0          # Docker containers (optional)
+httpx>=0.24.0                 # Async HTTP client for API tests
+```
+
+**Multi-Module Test Harness:**
+
+**JavaScript:**
+```javascript
+// tests/integration/helpers/IntegrationHarness.js
+class IntegrationHarness {
+  constructor() {
+    this.modules = {};
+    this.testDB = null;
+    this.externalMocks = {};
+  }
+  
+  async setupIntegrationEnvironment() {
+    // 1. Setup test database (in-memory for speed)
+    const sqlite3 = require('sqlite3');
+    this.testDB = new sqlite3.Database(':memory:');
+    await this.testDB.exec(testSchema);
+    
+    // 2. Mock external APIs (minimal)
+    this.externalMocks.arweave = sinon.stub(ArweaveClient.prototype, 'upload')
+      .resolves('fake-cid-123');
+    this.externalMocks.web3 = sinon.stub(Web3Provider.prototype, 'sendTransaction')
+      .resolves({ hash: '0xfake' });
+    
+    // 3. Load REAL modules (not mocked!)
+    this.modules.contractManager = new ContractManager(this.testDB);
+    this.modules.arweaveManager = new ArweaveManager();
+    this.modules.coreLogic = new CoreLogic(this.testDB);
+    
+    return this.modules;
+  }
+  
+  async teardownIntegrationEnvironment() {
+    // Cleanup external mocks
+    sinon.restore();
+    
+    // Close DB connection
+    if (this.testDB) {
+      await this.testDB.close();
+    }
+  }
+}
+
+module.exports = { IntegrationHarness };
+```
+
+**Python:**
+```python
+# tests/integration/helpers/integration_harness.py
+import sqlite3
+from unittest.mock import Mock, patch
+import pytest
+
+class IntegrationHarness:
+    def __init__(self):
+        self.modules = {}
+        self.test_db = None
+        self.external_mocks = {}
+    
+    async def setup_integration_environment(self):
+        # 1. Setup test database (in-memory for speed)
+        self.test_db = sqlite3.connect(':memory:')
+        self.test_db.executescript(test_schema)
+        
+        # 2. Mock external APIs (minimal)
+        self.external_mocks['arweave'] = Mock()
+        self.external_mocks['arweave'].upload.return_value = 'fake-cid-123'
+        
+        # 3. Load REAL modules (not mocked!)
+        self.modules['contract_manager'] = ContractManager(self.test_db)
+        self.modules['arweave_manager'] = ArweaveManager()
+        self.modules['core_logic'] = CoreLogic(self.test_db)
+        
+        return self.modules
+    
+    async def teardown_integration_environment(self):
+        # Close DB connection
+        if self.test_db:
+            self.test_db.close()
+
+# Pytest fixture for auto-setup/teardown
+@pytest.fixture
+async def integration_env():
+    harness = IntegrationHarness()
+    modules = await harness.setup_integration_environment()
+    yield modules
+    await harness.teardown_integration_environment()
+```
+
+**Proof Integration Test Example:**
+
+**JavaScript:**
+```javascript
+// tests/integration/proof.test.js
+const { expect } = require('chai');
+const { IntegrationHarness } = require('./helpers/IntegrationHarness');
+
+describe('Integration Proof Tests', () => {
+  let harness, modules;
+  
+  before(async () => {
+    harness = new IntegrationHarness();
+    modules = await harness.setupIntegrationEnvironment();
+  });
+  
+  after(async () => {
+    await harness.teardownIntegrationEnvironment();
+  });
+  
+  it('should integrate ContractManager → ArweaveManager', async () => {
+    // Module A: Deploy contract
+    const deployment = await modules.contractManager.deploy('Test');
+    
+    // Module B: Upload metadata (using Module A output)
+    const metadata = { address: deployment.proxy };
+    const cid = await modules.arweaveManager.uploadMetadata(metadata);
+    
+    // Integration validated: data flowed from A to B
+    expect(cid).to.exist;
+    expect(deployment.proxy).to.equal(metadata.address);
+  });
+});
+```
+
+**Python:**
+```python
+# tests/integration/test_proof.py
+import pytest
+
+@pytest.mark.asyncio
+async def test_contract_manager_to_arweave_integration(integration_env):
+    """Integration: ContractManager → ArweaveManager"""
+    modules = integration_env
+    
+    # Module A: Deploy contract
+    deployment = await modules['contract_manager'].deploy('Test')
+    
+    # Module B: Upload metadata (using Module A output)
+    metadata = {'address': deployment['proxy']}
+    cid = await modules['arweave_manager'].upload_metadata(metadata)
+    
+    # Integration validated: data flowed from A to B
+    assert cid is not None
+    assert deployment['proxy'] == metadata['address']
+```

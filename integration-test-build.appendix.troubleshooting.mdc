@@ -1,0 +1,154 @@
+---
+description: "Appendix for Integration test build — Reference & Troubleshooting (quick reference table, DoD, integration with other rules, troubleshooting)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @integration-test-build.appendix.troubleshooting — Reference & Troubleshooting
+
+> Quick reference tables, Definition of Done, integration with other rules, and troubleshooting common issues for integration tests.
+
+## #troubleshooting
+
+### **7.1 Quick Reference: Integration vs Unit vs E2E**
+
+| Aspect | Unit Tests | Integration Tests | E2E Tests |
+|--------|------------|-------------------|-----------|
+| **Scope** | Single module | 2-4 modules | Entire system |
+| **Dependencies** | Mocked (heavy) | Real modules + mocked external | Real everything |
+| **Database** | Mocked or none | Test DB (in-memory/Docker) | Test/staging DB |
+| **Speed** | ⚡⚡⚡ Very fast (< 1s) | ⚡⚡ Fast (1-10s) | ⚡ Slow (10s-minutes) |
+| **Isolation** | ✅ Perfect | ✅ High (test DB) | ⚠️ Shared state risks |
+| **Focus** | Method behavior | Module contracts | User journeys |
+| **Execution** | Every commit | Every PR | Nightly/deploy |
+| **Rule** | @unit-test-build.mdc | @integration-test-build.mdc | @e2e-test-build.mdc (future) |
+
+---
+
+### **7.2 Definition of Done (Integration Tests)**
+
+## #DoD
+
+```yaml
+production_ready_checklist:
+  infrastructure:
+    - [ ] tests/integration/ directory created
+    - [ ] Test runner configured (Mocha/pytest)
+    - [ ] Test DB strategy selected (in-memory/Docker)
+    - [ ] NPM scripts: test:integration, test:integration:parallel, test:integration:coverage
+  
+  phases_complete:
+    - [ ] Phase 1: Infrastructure setup (multi-module harness)
+    - [ ] Phase 2: Contract validation (> 80% coverage)
+    - [ ] Phase 3: Flow testing (> 70% critical workflows)
+  
+  quality_gates_passed:
+    - [ ] Gate 1: Contract Compatibility (> 80% contract coverage)
+    - [ ] Gate 2: Flow Passing (100% tests passing)
+    - [ ] Gate 3: Real Integration Validation (score > 8.0/10)
+    - [ ] Gate 4: ROI Analysis (ship at 8.5+/10)
+  
+  integration_criteria:
+    - [ ] All tests load 2+ real modules (not mocked)
+    - [ ] External mocks ≤ 3 per test
+    - [ ] Real database used (in-memory or Docker)
+    - [ ] Workflows are production-realistic
+    - [ ] Execution time < 5 minutes
+  
+  documentation:
+    - [ ] Integration test patterns documented
+    - [ ] Setup/teardown patterns clear
+    - [ ] Contract validation examples provided
+  
+  ci_cd_ready:
+    - [ ] Tests run in CI/CD pipeline
+    - [ ] Parallel execution configured
+    - [ ] Coverage reporting enabled
+    - [ ] Failure notifications configured
+
+ship_criteria:
+  minimum: "Score > 8.0/10 AND all P0 criteria met"
+  recommended: "Score > 8.5/10 AND contract coverage > 80%"
+  excellent: "Score > 9.0/10 AND flow coverage > 80%"
+```
+
+---
+
+### **7.3 Integration with Other Rules**
+
+```yaml
+upstream_rules:
+  - "@run-task.mdc": Orchestrates ItemY execution within phases
+  - "@analysis.mdc": Can be used for complex integration planning
+  - "@unit-test-build.mdc": Unit tests should pass before integration
+
+downstream_rules:
+  - "@test-qualification.mdc": Validates integration test quality (Gate 3)
+  - "@test-to-success.mdc": Fixes failing integration tests
+  - "@e2e-test-build.mdc": E2E tests validate full user journeys (deferred from Gate 4)
+
+parallel_rules:
+  - "@meta.extract.mdc": Can extract integration testing patterns
+  - "@meta.gap.mdc": Can identify gaps in integration coverage
+```
+
+---
+
+### **7.4 Troubleshooting (Common Issues)**
+
+**Issue 1: Tests Pass Locally, Fail in CI**
+- **Symptom**: Integration tests work on dev machine, fail in CI/CD
+- **Cause**: Environment differences (DB, external services)
+- **Fix**: Use Docker containers (Testcontainers) for consistent environment
+
+**Issue 2: Flaky Integration Tests**
+- **Symptom**: Tests intermittently fail
+- **Cause**: Race conditions, shared state, timing issues
+- **Fix**: 
+  - Ensure test isolation (independent tests)
+  - Use transaction rollback for DB cleanup
+  - Add explicit waits for async operations
+
+**Issue 3: Slow Integration Tests**
+- **Symptom**: Tests take > 5 minutes
+- **Cause**: Too many modules, slow DB, not parallelized
+- **Fix**:
+  - Run tests in parallel (`--parallel` flag)
+  - Use in-memory DB for speed
+  - Defer slow workflows to E2E tests
+
+**Issue 4: Contract Mismatches**
+- **Symptom**: Module A output doesn't match Module B input
+- **Cause**: API changes, schema drift
+- **Fix**:
+  - Add contract validation tests (Phase 2)
+  - Use TypeScript interfaces for contracts
+  - Document contract expectations
+
+**Issue 5: Over-Mocking (Disguised Unit Tests)**
+- **Symptom**: Gate 3 score < 8.0 due to mocking violations
+- **Cause**: Mocking your own modules instead of external systems
+- **Fix**:
+  - Review minimal mocking strategy (Section 4.1)
+  - Load real module instances
+  - Mock only external APIs (< 3 per test)
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025-10-15  
+**Status**: ✅ Production Ready
+
+**Compatibility**:
+- **Languages**: JavaScript (Node.js) + Python 3.8+
+- **Frameworks**: 
+  - JavaScript: Mocha, Jest, Supertest, Testcontainers
+  - Python: pytest, httpx, pytest-docker, pytest-asyncio
+- **Databases**: SQLite (in-memory), PostgreSQL (Docker), MySQL (Docker)
+
+**Related Rules**:
+- **@unit-test-build.mdc**: Unit tests (prerequisite, shares framework)
+- **@test-qualification.mdc**: Quality validation (auto-triggered at Gate 3, adapted for integration)
+- **@test-to-success.mdc**: Systematic fixing of failing tests (auto-triggered at Gate 2 if needed)
+- **@run-task.mdc**: Optional orchestration for ItemY execution
+- **@e2e-test-build.mdc**: E2E tests (future, for scenarios deferred from Gate 4)

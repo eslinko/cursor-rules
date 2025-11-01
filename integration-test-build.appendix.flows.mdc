@@ -1,0 +1,296 @@
+---
+description: "Appendix for Integration test build — Flow Testing (Phase 3: multi-step scenarios, happy paths, error handling, atomicity)"
+globs: [".cursor/docs/**"]
+alwaysApply: false
+---
+
+# @integration-test-build.appendix.flows — Flow Testing
+
+> Phase 3: Multi-step workflow testing patterns including happy paths, error handling flows, transaction atomicity, and state consistency.
+
+## #flows
+
+### **Phase 3: Flow Testing (Multi-Step Scenarios)** 🔴 CRITICAL
+**Goal**: Validate complete workflows through multiple modules  
+**Duration**: 4-6 hours  
+**Cognitive Mode**: STRATEGIC  
+**Expected Output**: 10-20 flow tests
+
+```yaml
+trigger: After Phase 2 (contracts validated)
+
+strategic_focus:
+  question: "Do multi-module workflows complete successfully?"
+  method: "Test realistic scenarios across 2+ modules"
+
+flow_types:
+  1. Happy Path: Complete workflow succeeds (all modules cooperate)
+  2. Error Scenarios: Failure at each step with proper handling
+  3. Transaction Flows: Multi-step atomic operations (all or nothing)
+  4. State Consistency: Modules maintain synchronized state
+
+characteristics:
+  test_scope: "Multi-step workflows, not single operations"
+  modules_involved: "2-4 modules per flow"
+  realistic_scenarios: "Based on production use cases"
+
+acceptance_criteria:
+  - [ ] Critical workflows tested (> 70% of production flows)
+  - [ ] Multi-module interactions validated
+  - [ ] Error handling across flow works (cleanup, rollback)
+  - [ ] State consistency guaranteed across modules
+  - [ ] Rollback/cleanup mechanisms tested
+```
+
+**Flow Testing Patterns:**
+
+**Pattern 1: Happy Path Flows**
+
+Complete workflow succeeds with all modules cooperating.
+
+**JavaScript Example:**
+```javascript
+describe('Flow: Deploy → Upload → Validate (Happy Path)', () => {
+  it('should complete full deployment workflow', async () => {
+    // STEP 1: Deploy contract (ContractManager)
+    const deployment = await contractManager.deployUUPS('TestContract', [], []);
+    expect(deployment.proxy).to.exist;
+    expect(deployment.logic).to.exist;
+    
+    // STEP 2: Upload metadata to Arweave (ArweaveManager)
+    const metadata = {
+      contractAddress: deployment.proxy,
+      implementationAddress: deployment.logic,
+      timestamp: Date.now()
+    };
+    const cid = await arweaveManager.uploadContractMetadata(metadata);
+    expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/);
+    
+    // STEP 3: Validate on-chain (Web3Utils)
+    const onChainCode = await web3Utils.getCode(deployment.proxy);
+    expect(onChainCode).to.not.equal('0x'); // Contract deployed
+    
+    // FLOW VALIDATED: 3 modules worked together successfully
+    expect(deployment.arweaveCID).to.equal(cid); // State consistent
+  });
+});
+```
+
+**Python Example:**
+```python
+@pytest.mark.asyncio
+async def test_happy_path_deploy_upload_validate_flow(integration_env):
+    """Flow: Deploy → Upload → Validate (3 modules)"""
+    contract_mgr = integration_env['contract_manager']
+    arweave_mgr = integration_env['arweave_manager']
+    web3_utils = integration_env['web3_utils']
+    
+    # STEP 1: Deploy contract
+    deployment = await contract_mgr.deploy_uups('TestContract', [], [])
+    assert deployment['proxy'] is not None
+    assert deployment['logic'] is not None
+    
+    # STEP 2: Upload metadata to Arweave
+    metadata = {
+        'contract_address': deployment['proxy'],
+        'implementation_address': deployment['logic'],
+        'timestamp': time.time()
+    }
+    cid = await arweave_mgr.upload_contract_metadata(metadata)
+    assert re.match(r'^[A-Za-z0-9_-]{43}$', cid)
+    
+    # STEP 3: Validate on-chain
+    on_chain_code = await web3_utils.get_code(deployment['proxy'])
+    assert on_chain_code != '0x'  # Contract deployed
+    
+    # FLOW VALIDATED: 3 modules worked together
+    assert deployment['arweave_cid'] == cid  # State consistent
+```
+
+---
+
+**Pattern 2: Error Handling Flows**
+
+Workflow fails at specific step, validates proper cleanup and error handling.
+
+**JavaScript Example:**
+```javascript
+describe('Flow: Error Handling (Deploy OK → Upload FAILS)', () => {
+  it('should handle mid-flow failure with cleanup', async () => {
+    // STEP 1: Deploy succeeds
+    const deployment = await contractManager.deployUUPS('Test', [], []);
+    expect(deployment.proxy).to.exist;
+    
+    // STEP 2: Upload FAILS (simulate Arweave service down)
+    const arweaveStub = sinon.stub(ArweaveClient.prototype, 'upload')
+      .rejects(new Error('Arweave service down'));
+    
+    // WHEN: Try to complete flow
+    try {
+      await contractManager.deployAndUploadWithRetry('Test');
+      expect.fail('Should have thrown error');
+    } catch (error) {
+      // THEN: Error handled, cleanup triggered
+      expect(error.message).to.include('Arweave service down');
+      
+      // Validate cleanup: Deployment marked as "metadata_upload_failed"
+      const deploymentStatus = await contractManager.getDeploymentStatus(deployment.id);
+      expect(deploymentStatus).to.equal('metadata_upload_failed');
+    }
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_error_flow_deploy_ok_upload_fails(integration_env, mocker):
+    """Flow: Deploy succeeds → Upload fails → Cleanup triggered"""
+    contract_mgr = integration_env['contract_manager']
+    
+    # STEP 1: Deploy succeeds
+    deployment = await contract_mgr.deploy_uups('Test', [], [])
+    assert deployment['proxy'] is not None
+    
+    # STEP 2: Upload FAILS (simulate Arweave down)
+    mock_upload = mocker.patch('arweave.client.upload')
+    mock_upload.side_effect = Exception('Arweave service down')
+    
+    # WHEN: Try to complete flow
+    with pytest.raises(Exception) as exc_info:
+        await contract_mgr.deploy_and_upload_with_retry('Test')
+    
+    # THEN: Error handled, cleanup triggered
+    assert 'Arweave service down' in str(exc_info.value)
+    
+    # Validate cleanup: Deployment marked as failed
+    status = await contract_mgr.get_deployment_status(deployment['id'])
+    assert status == 'metadata_upload_failed'
+```
+
+---
+
+**Pattern 3: Transaction Atomicity Flows**
+
+Multi-step operation that must be atomic (all succeed or all fail).
+
+**JavaScript Example:**
+```javascript
+describe('Flow: Batch Upload (Transaction Atomicity)', () => {
+  it('should ensure all-or-nothing for batch operations', async () => {
+    const contracts = ['Contract1', 'Contract2', 'Contract3'];
+    
+    // WHEN: Batch deploy + upload (atomic operation)
+    const results = await contractManager.deployBatchAndUpload(contracts);
+    
+    // THEN: All succeeded OR all failed (no partial state)
+    const allSucceeded = results.every(r => r.status === 'success');
+    const allFailed = results.every(r => r.status === 'failed');
+    
+    expect(allSucceeded || allFailed).to.be.true;
+    expect(results).to.have.length(3);
+    
+    // Validate state consistency in DB
+    if (allSucceeded) {
+      const dbCount = await db.query('SELECT COUNT(*) FROM deployments');
+      expect(dbCount.rows[0].count).to.equal(3);
+    } else {
+      const dbCount = await db.query('SELECT COUNT(*) FROM deployments');
+      expect(dbCount.rows[0].count).to.equal(0); // Rolled back
+    }
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_transaction_atomicity_batch_upload(integration_env, test_db):
+    """Flow: Batch upload must be atomic (all or nothing)"""
+    contract_mgr = integration_env['contract_manager']
+    contracts = ['Contract1', 'Contract2', 'Contract3']
+    
+    # WHEN: Batch deploy + upload (atomic operation)
+    results = await contract_mgr.deploy_batch_and_upload(contracts)
+    
+    # THEN: All succeeded OR all failed (no partial state)
+    all_succeeded = all(r['status'] == 'success' for r in results)
+    all_failed = all(r['status'] == 'failed' for r in results)
+    
+    assert all_succeeded or all_failed
+    assert len(results) == 3
+    
+    # Validate state consistency in DB
+    cursor = test_db.execute('SELECT COUNT(*) FROM deployments')
+    count = cursor.fetchone()[0]
+    
+    if all_succeeded:
+        assert count == 3  # All persisted
+    else:
+        assert count == 0  # All rolled back
+```
+
+---
+
+**Pattern 4: State Consistency Flows**
+
+Modules maintain synchronized state across multi-step operations.
+
+**JavaScript Example:**
+```javascript
+describe('Flow: State Consistency (User Activation → Seller → Product)', () => {
+  it('should maintain state consistency across 3 modules', async () => {
+    // STEP 1: Activate user (UserModule)
+    const user = await userModule.activateUser('0xUser', 'invite-code');
+    expect(user.activated).to.be.true;
+    
+    // STEP 2: Grant seller role (RoleModule)
+    await roleModule.grantSellerRole('0xUser');
+    const role = await roleModule.getUserRole('0xUser');
+    expect(role).to.equal('seller');
+    
+    // STEP 3: Create product (ProductModule)
+    const product = await productModule.createProduct('0xUser', { name: 'Test' });
+    expect(product.seller).to.equal('0xUser');
+    
+    // STATE CONSISTENCY VALIDATED:
+    // All modules have consistent view of user
+    const userState = await userModule.getUser('0xUser');
+    const roleState = await roleModule.getUserRole('0xUser');
+    const productState = await productModule.getProductsBySeller('0xUser');
+    
+    expect(userState.activated).to.be.true;
+    expect(roleState).to.equal('seller');
+    expect(productState).to.have.length(1);
+  });
+});
+```
+
+**Python Example:**
+```python
+async def test_state_consistency_user_seller_product_flow(integration_env):
+    """Flow: State consistency across User → Role → Product modules"""
+    user_module = integration_env['user_module']
+    role_module = integration_env['role_module']
+    product_module = integration_env['product_module']
+    
+    # STEP 1: Activate user
+    user = await user_module.activate_user('0xUser', 'invite-code')
+    assert user['activated'] is True
+    
+    # STEP 2: Grant seller role
+    await role_module.grant_seller_role('0xUser')
+    role = await role_module.get_user_role('0xUser')
+    assert role == 'seller'
+    
+    # STEP 3: Create product
+    product = await product_module.create_product('0xUser', {'name': 'Test'})
+    assert product['seller'] == '0xUser'
+    
+    # STATE CONSISTENCY VALIDATED:
+    user_state = await user_module.get_user('0xUser')
+    role_state = await role_module.get_user_role('0xUser')
+    products = await product_module.get_products_by_seller('0xUser')
+    
+    assert user_state['activated'] is True
+    assert role_state == 'seller'
+    assert len(products) == 1
+```
