@@ -1,5 +1,7 @@
 ---
-alwaysApply: true
+description: "Vibe Coding: Human-AI co-reasoning method for content creation and structured thinking"
+globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md", "**/content/**", "**/posts/**"]
+alwaysApply: false
 ---
 
 # @Zeya888-Meta — Vibe Coding Rule
