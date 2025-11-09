@@ -691,18 +691,27 @@ acceptance_criteria:
   - [ ] Execution time < 5 seconds
   - [ ] No shared state between tests
   - [ ] Proper cleanup in afterEach hooks
+  - [ ] The “reuse vs new test” decision is captured in the working journal (AIJournal/coverage log)
 ```
+
+**Existing Test Adaptation Checklist (AIJournal.md):**
+1. First check whether a base scenario already covers the affected area; evaluate if it can be adapted instead of creating a new test.
+2. Analyze how the change impacts the current test pipeline, including regression risks.
+3. Create a new test only when adaptation is impossible because of a clear conflict or divergent preconditions.
+4. Align the coverage structure: separate what should remain integration-level vs unit-level and avoid duplicate scenarios.
+5. Briefly document the outcome (for example, in AIJournal or the coverage log) to track “insurance” tendencies.
+6. Update the plan afterwards so the change fits the overall test structure rather than living in isolation.
 
 **Example Smoke Tests:**
 
 **JavaScript (Mocha + Chai):**
 ```javascript
 describe('ContractManager', () => {
-  it('должен иметь метод deployUUPSContract', () => {
+  it('should expose deployUUPSContract method', () => {
     expect(contractManager.deployUUPSContract).to.be.a('function');
   });
   
-  it('должен инициализироваться с config', () => {
+  it('should initialize with config object', () => {
     expect(contractManager.config).to.be.an('object');
   });
 });
@@ -762,23 +771,26 @@ acceptance_criteria:
     - [ ] Line coverage > 80% for critical modules
     - [ ] Branch coverage > 70% for critical paths
     - [ ] Review uncovered lines (defer to integration if not unit-testable)
+  - [ ] The “reuse vs new test” decision is confirmed and documented before adding new scenarios
 ```
+
+> Use the adaptation checklist (see Phase 2.1) before writing new tests: look for opportunities to extend existing scenarios first, record the outcome in the journal, and only then add additional checks.
 
 **Example Real Tests:**
 
 **JavaScript (Mocha + Chai + Sinon):**
 ```javascript
 describe('ContractManager - Real Tests', () => {
-  it('должен деплоить UUPS контракт с Logic и Proxy', async () => {
-    // GIVEN: Mock для deployContract
+  it('should deploy a UUPS contract with Logic and Proxy', async () => {
+    // GIVEN: Mock for deployContract
     const deployStub = sinon.stub(contractManager, 'deployContract')
       .onFirstCall().resolves({ options: { address: '0xLogic' } })
       .onSecondCall().resolves({ options: { address: '0xProxy' } });
     
-    // WHEN: deployUUPSContract вызывается
+    // WHEN: deployUUPSContract is invoked
     const result = await contractManager.deployUUPSContract('SpiralEngine', [], []);
     
-    // THEN: Logic деплоится первым, затем Proxy
+    // THEN: Logic is deployed first, then Proxy
     expect(deployStub.callCount).to.equal(2);
     expect(deployStub.firstCall.args[0]).to.include('Logic');
     expect(result.options.address).to.equal('0xProxy');
@@ -793,16 +805,16 @@ from unittest.mock import patch, call
 class TestContractManager:
     @patch('module.contract_manager.deploy_contract')
     async def test_deploys_uups_with_logic_and_proxy(self, mock_deploy):
-        # GIVEN: Mock возвращает Logic, затем Proxy
+        # GIVEN: Mock returns Logic first and Proxy second
         mock_deploy.side_effect = [
             {'options': {'address': '0xLogic'}},
             {'options': {'address': '0xProxy'}}
         ]
         
-        # WHEN: deploy_uups_contract вызывается
+        # WHEN: deploy_uups_contract is called
         result = await contract_manager.deploy_uups_contract('SpiralEngine', [], [])
         
-        # THEN: Logic деплоится первым, затем Proxy
+        # THEN: Logic is deployed first, then Proxy
         assert mock_deploy.call_count == 2
         assert 'Logic' in mock_deploy.call_args_list[0][0][0]
         assert result['options']['address'] == '0xProxy'
@@ -813,27 +825,27 @@ class TestContractManager:
 **JavaScript (Mocha + Chai):**
 ```javascript
 // Pattern 1: Happy Path (async/await)
-it('должен загрузить на Arweave и вернуть CID', async () => {
+it('should upload to Arweave and return CID', async () => {
   const cid = await arweaveManager.upload('test data');
   expect(cid).to.match(/^[A-Za-z0-9_-]{43}$/);
 });
 
 // Pattern 2: Error Handling (rejectedWith)
-it('должен выбросить ошибку при невалидных данных', async () => {
+it('should throw an error for invalid data', async () => {
   await expect(
     arweaveManager.upload(null)
   ).to.be.rejectedWith('Invalid data');
 });
 
 // Pattern 3: Timeout Handling
-it('должен обработать длинную операцию', async function() {
+it('should handle a long-running operation', async function() {
   this.timeout(5000); // Increase timeout for this test
   const result = await slowOperation();
   expect(result).to.exist;
 });
 
 // Pattern 4: Promise.all (Batch Operations)
-it('должен обработать batch upload', async () => {
+it('should process batch upload', async () => {
   const files = ['file1', 'file2', 'file3'];
   const cids = await arweaveManager.uploadBatch(files);
   
@@ -844,7 +856,7 @@ it('должен обработать batch upload', async () => {
 });
 
 // Pattern 5: Async Error Propagation
-it('должен пробросить ошибку из async chain', async () => {
+it('should propagate an error from the async chain', async () => {
   const errorStub = sinon.stub(externalService, 'call').rejects(new Error('Service down'));
   
   await expect(
@@ -1004,6 +1016,7 @@ analysis_criteria:
   - [ ] NO_UNTESTED_CRITICAL_PATHS: Critical methods covered
   - [ ] CORRECT_LOGIC: Valid assertions, not tautologies
   - [ ] MINIMAL_MOCK_OVERUSE: Mocks only for external systems
+  - [ ] REUSE_DECISION_DOCUMENTED: The “reuse vs new test” decision is confirmed and documented using the AIJournal checklist
 
 threshold:
   minimum_score: 8.0
@@ -1015,11 +1028,13 @@ automatic_actions:
     decision: "Execute Phase 2.2 (Full Refactoring)"
     itemY_generated: "ItemY3-N for each critical module"
     focus: "Transform ALL smoke → real tests"
+    review: "Reinstate the reuse documentation checklist before re-running Gate 3"
   
   if_score_6_to_8:
     decision: "Execute Phase 2.2 (Targeted Improvements)"
     itemY_generated: "ItemY3-N for P0 gaps only"
     focus: "Fix critical path coverage"
+    review: "If the adaptation decision is not documented, add the note and revisit the test structure"
   
   if_score_above_8:
     decision: "SKIP Phase 2.2, proceed to Gate 4"
@@ -1029,6 +1044,7 @@ output:
   - Quality score report
   - Gap analysis (P0/P1/P2)
   - Phase 2.2 plan (if needed)
+  - Evidence: link to the journal/log containing the adaptation decision
   - Automatic progression to next phase
 ```
 
@@ -1141,9 +1157,9 @@ symptom:
 detection:
   method: "@test-qualification.mdc"
   red_flags:
-    - "Много existence checks, мало real tests"
-    - "Проверка побочных эффектов вместо core logic"
-    - "Тесты проходят даже с broken code"
+    - "Too many existence checks, not enough real tests"
+    - "Only side effects are verified instead of core logic"
+    - "Tests still pass even when the code is broken"
 
 fix:
   phase: "2.2 Real Functionality Tests"
@@ -1374,6 +1390,60 @@ result:
   team_velocity: Higher (shipping > perfecting)
 ```
 
+### **Anti-Pattern 4: Duplicate Coverage Syndrome**
+```yaml
+symptom:
+  - New tests duplicate the behavior of existing scenarios
+  - The journal/plan lacks a note about the “adapt vs new test” decision
+  - Two test levels end up with identical preconditions
+
+detection:
+  checklists:
+    - "Check AIJournal/coverage log — is the adaptation decision recorded?"
+    - "Gate 3: REUSE_DECISION_DOCUMENTED criterion was not satisfied"
+    - "Phase 2.1/2.2 acceptance: confirmation document is missing"
+
+fix:
+  approach: "Return to the adaptation checklist and modify or parameterize existing tests"
+  documentation: "Record the outcome in AIJournal or the coverage log so the rationale is visible to others"
+```
+
+**Code Example (Reuse vs Duplication):**
+
+**❌ BEFORE (Duplicate Tests):**
+
+```javascript
+// The new test fully duplicates an existing happy-path scenario
+describe('CatalogActions', () => {
+  it('should fetch catalog for country A', async () => {
+    const result = await actions.fetchCatalog('DE');
+    expect(result.items).to.have.length(3);
+  });
+
+  it('should fetch catalog for country B', async () => {
+    const result = await actions.fetchCatalog('FR');
+    expect(result.items).to.have.length(3); // ❌ Same logic, only the argument differs
+  });
+});
+```
+
+**✅ AFTER (Reuse Existing Scenario):**
+
+```javascript
+describe('CatalogActions', () => {
+  const countries = ['DE', 'FR'];
+
+  countries.forEach(country => {
+    it(`should fetch catalog for ${country}`, async () => {
+      const result = await actions.fetchCatalog(country);
+      expect(result.items).to.have.length(3);
+    });
+  });
+
+  // AIJournal log: decision recorded → extended the existing scenario instead of creating a new file
+});
+```
+
 ---
 
 ## 📖 SECTION 6: QUALITY CRITERIA & TEMPLATES
@@ -1461,17 +1531,17 @@ deliverables:
   - [ ] tests/ directory structure created
   - [ ] package.json updated with test dependencies
   - [ ] Mocha/Jest configured with 30s timeout
-  - [ ] setup.js с global before/after hooks
+  - [ ] setup.js with global before/after hooks
   - [ ] TestHarness class with setupTestEnvironment/teardownTestEnvironment
   - [ ] MockContractManager for Web3 contract mocks
   - [ ] MockArweaveManager for Arweave mocks
   - [ ] MockWeb3 for blockchain mocks
   - [ ] Fixtures directory with test data
-  - [ ] npm run test:unit works (даже без тестов)
+  - [ ] npm run test:unit works (even without tests)
 
 quality_checks:
   - [ ] 2-3 proof-of-concept tests passing
-  - [ ] Test execution < 1 second (для proof tests)
+  - [ ] Test execution < 1 second (for proof tests)
   - [ ] No errors in console
   - [ ] All helpers importable
 
@@ -1521,7 +1591,7 @@ quality_gates_passed:
   - [ ] MINIMAL_MOCK_OVERUSE: Mocks only external systems
 
 quantitative_metrics:
-  - [ ] Real tests ratio > 60% (из total tests)
+  - [ ] Real tests ratio > 60% (of total tests)
   - [ ] Critical path coverage > 80%
   - [ ] Quality score > 8/10 (@test-qualification)
   - [ ] Execution time < 60 seconds
@@ -1729,14 +1799,14 @@ reasoning: "Explanation"
 ### **Example 1: Create Tests from Scratch**
 ```
 USER PROMPT:
-"Создай production-ready unit tests для проекта scripts/
-Метод: @unit-test-build.mdc"
+"Create production-ready unit tests for the scripts project
+Method: @unit-test-build.mdc"
 
 AI AUTOMATIC EXECUTION:
 1. Context Detection → Scenario: NEW (no tests exist)
-2. Generate ItemY структуру:
+2. Generate ItemY structure:
    - ItemY1: Infrastructure Setup
-   - ItemY2: Smoke Tests (все модули)
+   - ItemY2: Smoke Tests (all modules)
    - ItemY3: Quality Gate 3 (@test-qualification auto-trigger)
    - ItemY4-7: Real Tests (ContractManager, ArweaveManager, CoreLogic, Web3Utils)
    - ItemY8: Gate 4 ROI Analysis
@@ -1760,8 +1830,8 @@ RESULT:
 ### **Example 2: Extend Tests for New Feature**
 ```
 USER PROMPT:
-"Добавил метод uploadBatch в ArweaveManager. Обнови тесты.
-Метод: @unit-test-build.mdc"
+"Added uploadBatch method to ArweaveManager. Update the tests.
+Method: @unit-test-build.mdc"
 
 AI AUTOMATIC EXECUTION:
 1. Context Detection → Scenario: EXTEND
@@ -1793,9 +1863,9 @@ RESULT:
 ### **Example 3: Improve Test Quality**
 ```
 USER PROMPT:
-"Проверь качество тестов в scripts/tests/unit/
-Если < 8/10, доведи до production ready.
-Метод: @unit-test-build.mdc"
+"Check test quality in scripts/tests/unit/.
+If score < 8/10, raise it to production-ready.
+Method: @unit-test-build.mdc"
 
 AI AUTOMATIC EXECUTION:
 1. Context Detection → Run @test-qualification first
@@ -1830,7 +1900,7 @@ RESULT:
 
 **BEFORE (with @run-task.mdc):**
 ```
-USER: "Создай tests через @run-task.mdc используя @unit-test-build.mdc"
+USER: "Create tests via @run-task.mdc using @unit-test-build.mdc"
 
 Process:
 1. User/AI creates ListX → ItemY structure
@@ -1847,7 +1917,7 @@ Quality gates: Manual
 
 **AFTER (only @unit-test-build.mdc):**
 ```
-USER: "Создай tests методом @unit-test-build.mdc"
+USER: "Create tests using @unit-test-build.mdc"
 
 Process:
 1. @unit-test-build AUTOMATICALLY:
