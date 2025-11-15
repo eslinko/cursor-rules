@@ -1,9 +1,6 @@
 ---
-description: "Vibe Coding: Human-AI co-reasoning method for content creation and structured thinking"
-globs: ["**/*.md", ".cursor/docs/**", "**/*.plan.md", "**/content/**", "**/posts/**"]
-alwaysApply: false
+alwaysApply: true
 ---
-
 # @Zeya888-Meta — Vibe Coding Rule
 
 ## 1. Purpose (why this exists)
@@ -38,11 +35,23 @@ The rule is considered complete if:
 
 **Respect the Rhythm.** Preserve preferred rhythm: short powerful phrases, clean logic + soft poetics (no purple prose).
 
+**Handshake & Intent.** Before any work, confirm the goal, artifact format, intervention boundaries, and explicit taboos; mirror them back to the operator and wait for explicit consent.
+
+**Fail-safe Pause.** Whenever ambiguity, conflicting requirements, or risk of exceeding authority appears, stop, list the available options with consequences, and request the operator’s decision before proceeding.
+
 ---
 
 ## 3. Cognitive Resonance Loop (CR-loop)
 
-Always execute a 6-step cycle. Don't skip, but keep it concise.
+Always execute a structured cycle. Keep it concise but never skip the checkpoints.
+
+0. **Mode Recognition** — detect the current state and select supporting rules:
+
+   | Mode | When to use | Supporting rules |
+   | --- | --- | --- |
+   | Observation | Requirement intake, clarifying unknowns | `@analysis`, `@itemy-understanding` |
+   | Structuring | Framing problem, planning work | `@analysis`, `@run-task`, `@listx-decomposition` |
+   | Resonance | Producing artifacts, iterative refinement | `@run-task`, output-specific kits, quality gates |
 
 1. **Intent** — what exactly is needed (format/audience/channel/goal).
 2. **Mirror** — 1–2 lines of precise mirroring of operator's thought/tone.
@@ -50,6 +59,7 @@ Always execute a 6-step cycle. Don't skip, but keep it concise.
 4. **Synthesis** — structure and content (skeleton → flesh).
 5. **Test** — self-check against criteria (checklist below).
 6. **Deliver** — final artifact + variants (if appropriate) + next step.
+7. **Micro-retro** — lock in what was achieved, list open clarifications, state what is expected from the operator before the next cycle.
 
 ### 3.1 CR-loop Example
 
@@ -99,6 +109,11 @@ Always execute a 6-step cycle. Don't skip, but keep it concise.
 
 **Vector extension**: if request narrows intelligence (e.g., foreign language), propose expansion (alternative formulations in native language).
 
+**Context synchronization**:
+- Re-sync with `AIJournal.md`, active blockers, and `AI-Navigator.md`.
+- Confirm manual-control expectations (no auto-runs, honest testing, pause on ambiguity).
+- Note any assumed gaps or pending confirmations before proceeding.
+
 ---
 
 ## 6. Output Kits (ready-made modes)
@@ -136,16 +151,23 @@ Always execute a 6-step cycle. Don't skip, but keep it concise.
 
 ## 7. Cursor Rules Integration (pipeline)
 
-Always suggest connecting/updating rules:
+Always use the meta-layer to route work into the right stack of rules.
 
-- **@analysis.mdc** — transforms vague idea into structural plan.
-- **@run-task.mdc** — execution cycle (understanding → knowledge check → plan → execution → validation → retro).
-- **@test-qualification.mdc** → **@test-to-success.mdc** — quality and improvements.
+### 7.1 Task type → Rule stack matrix
 
-When working with tasks:
+| Task type | Description | Recommended stack | Notes |
+| --- | --- | --- | --- |
+| Code / Refactor | Feature work, refactoring, bug fixes | `@analysis` → `@run-task` → `@unit-test-build` or `@integration-test-build.core` | Add `@quality-gates` when touching backend/API boundaries |
+| Unit Testing | Single module validation | `@analysis` → `@run-task` → `@unit-test-build` → `@test-qualification` | Rule includes anti-patterns/templates; no external suites needed |
+| Integration Testing | 2-4 modules, contract workflows | `@analysis` → `@run-task` → `integration-test-build suite` → `@quality-gates` → `@test-qualification` | Suite = core + appendix (phases/examples/templates/quality-gates/scenarios) |
+| E2E Testing | Full workflows on real infra | `@analysis` → `@run-task` → `e2e-test-build suite` → `@quality-gates` → `@test-qualification` → `@test-to-success` | Suite = core + appendix (harness + deploy/component/catalog phases + examples) |
+| Documentation / Meta | Journals, bridge files, rule maintenance | `@analysis` → `@run-task` → `@Zeya888-Meta` output kits / `@meta.create-rule` → `AIJournal` / `bridge` | For retrospectives use `@meta.extract`, `@meta.gap` |
+| Ops / Deploy | Infra setup, deploy playbooks | `@analysis` → `@run-task` → project docs (`scripts/docs/Deploy_Full.md`, `Deploy_Architecture.md`, `node-launch.txt`) + `@quality-gates` (infra) | No dedicated rule; rely on playbooks |
+| Incident / Test Fixing | Debug failing suites, ensure honesty | `@analysis` → `@run-task` → relevant build suite → `@fix-test-failure` (if applicable) → `@test-to-success` | Always confirm manual control + no auto runs |
 
-1. First produce brief **analysis.mdc** (1 screen), then atomize into **run-task**.
-2. Fix **Definition of Done** and **Acceptance Criteria** before generating code/text.
+### 7.2 Pipeline orchestration
+
+@Zeya888-Meta performs routing only: it frames intent (Handshake), recognizes mode, selects the stack from the matrix, syncs context (`AIJournal`, blockers, `AI-Navigator`, manual-control confirmations), then hands execution to specialized rules. It never duplicates or replaces their internal steps.
 
 ### 7.1 Rules Pipeline (dependency graph)
 
@@ -237,12 +259,19 @@ Create brief analysis.mdc on topic: <…>. Goal, criteria, risks, dependencies, 
 
 ## 12. Versioning
 
-**Rule**: `Zeya888_VibeCoding_Rule_v1.1`  
-**Last Updated**: 2025-10-15  
+**Rule**: `Zeya888_VibeCoding_Rule_v1.2`  
+**Last Updated**: 2025-11-13  
 **Author**: Evgeniya Slinko (Zeya888)  
 **Status**: Production
 
 ### Changelog
+
+**v1.2** (2025-11-13):
+- ✅ Added Handshake & Intent + Fail-safe Pause principles in Section 2
+- ✅ Expanded CR-loop with Mode Recognition matrix and Micro-retro step
+- ✅ Added Context Synchronization pattern and Task-type rule matrix
+- ✅ Documented integration/E2E rule suites and routing role of meta-layer
+- ✅ Extended Quality Checklist with boundaries, assumptions, user safeguards
 
 **v1.1** (2025-10-15):
 - ✅ Added Definition of Done (section 1.1)
