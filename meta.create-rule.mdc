@@ -1,0 +1,663 @@
+---
+apply: manual
+alwaysApply: false
+---
+
+# @meta.create-rule
+> Universal algorithm for transforming raw rule concepts into production-ready Cursor rules with proper syntax, structure, and English formatting
+
+## PURPOSE
+This rule captures the systematic process of creating high-quality Cursor rules from raw ideas or drafts, ensuring consistency, completeness, and integration with Zeya888 Methodology.
+
+## WHEN TO USE
+- User provides a raw rule concept or draft
+- Existing rule needs refactoring/enhancement
+- Converting methodology documentation to executable rule
+- Creating new cognitive mode switcher (@analysis, @run-task, etc.)
+
+## INPUT
+- **raw_content**: Initial rule concept (any format: text, markdown, mixed languages)
+- **rule_name**: Desired rule name (e.g., `meta.extract`, `test-qualification`)
+- **purpose**: High-level goal of the rule
+- **cognitive_mode**: (optional) analytical | execution | critical | meta-level
+
+## WORKFLOW
+
+### Phase 1: Retrospective Analysis
+**Goal**: Understand current state and identify issues
+
+#### Step 1.1: Content Analysis
+Scan raw content for:
+- **Structural issues**:
+  - Duplicated sections
+  - Nested templates
+  - Unclosed code blocks (```json without closing)
+  - Inconsistent indentation
+  - Missing sections
+
+- **Language issues**:
+  - Mixed languages (Russian + English)
+  - Inconsistent terminology
+  - Unclear instructions
+
+- **Logical issues**:
+  - Circular references
+  - Missing dependencies
+  - Incomplete workflows
+  - Vague instructions
+
+**Documentation format:**
+```yaml
+current_state:
+  syntax_errors:
+    - "Unclosed code block at line X"
+    - "Duplicate content lines X-Y"
+  language_issues:
+    - "Mixed Russian/English in sections A, B"
+  structural_gaps:
+    - "Missing Phase X in workflow"
+  logical_gaps:
+    - "Unclear input requirements"
+```
+
+#### Step 1.2: Extract Core Intent
+Identify:
+1. **Primary purpose** — what problem does this rule solve?
+2. **Target audience** — AI only, AI+User collaboration, User-initiated?
+3. **Cognitive mode** — analytical, execution, critical, meta-level?
+4. **Integration points** — which other rules does it work with?
+
+**Example from @meta.extract:**
+```yaml
+core_intent:
+  problem: "Need to capture metacognitive profile of dialogue for improvement tracking"
+  audience: "AI+User collaboration"
+  cognitive_mode: "meta-level (reflection on thinking)"
+  integration: ["@analysis.mdc", "@run-task.mdc", "@test-qualification.mdc"]
+```
+
+### Phase 2: Structure Design
+**Goal**: Create clear hierarchical structure
+
+#### Step 2.1: Define Sections
+Standard rule structure:
+```md
+---
+alwaysApply: false | false
+---
+
+# @rule-name
+> One-line description
+
+## PURPOSE
+Detailed explanation of why this rule exists
+
+## WHEN TO USE | INPUT | INTENT
+Context and triggers for rule activation
+
+## [DOMAIN-SPECIFIC SECTIONS]
+Core methodology content (varies by rule type)
+
+## WORKFLOW
+Step-by-step execution process
+
+## TEMPLATE (if applicable)
+Output format specification
+
+## OUTPUT FORMAT
+Expected results structure
+
+## NOTES & BEST PRACTICES
+Critical requirements and guidelines
+
+## INTEGRATION POINTS
+Related rules and methodology hooks
+
+---
+
+**Version**: X.Y
+**Last Updated**: YYYY-MM-DD
+**Compatibility**: Model requirements
+**Related Rules**: [@rule1, @rule2]
+```
+
+#### Step 2.2: Design Workflow Phases
+Break down into 3-7 phases:
+- **Phase 1**: Always initialization/input validation
+- **Phase 2-N**: Core processing logic
+- **Phase N**: Always output/validation
+
+**Principles:**
+- Each phase has clear input/output
+- Phases are sequential (no circular deps)
+- Each phase is testable independently
+
+### Phase 3: Content Refinement
+**Goal**: Transform raw content into polished rule
+
+#### Step 3.1: Syntax Correction
+Fix all technical issues:
+```yaml
+corrections:
+  markdown:
+    - Close all code blocks
+    - Fix table formatting
+    - Proper header hierarchy (# → ## → ###)
+    - Escape special chars in templates
+  
+  yaml:
+    - Validate front matter
+    - Proper indentation (2 spaces)
+    
+  json:
+    - Validate all JSON blocks
+    - Proper escaping in templates
+    
+  code:
+    - Syntax highlighting hints
+    - Proper indentation
+```
+
+#### Step 3.2: Language Unification
+If mixed languages detected:
+1. **Identify base language** — user preference or English default
+2. **Translate systematically**:
+   - Headers and section titles
+   - Descriptions and explanations
+   - Examples and comments
+   - Error messages
+3. **Preserve technical terms** — keep ListX, ItemY, MCP, etc.
+
+**Translation checklist:**
+```yaml
+translate:
+  - Headers (# Level 1-6)
+  - Section descriptions
+  - Workflow step descriptions
+  - Examples (comments, not code)
+  - Error messages
+  
+preserve:
+  - Technical terms (ListX, ItemY, MCP)
+  - Code syntax
+  - File paths
+  - Variable names
+  - JSON keys
+```
+
+#### Step 3.3: Structure Optimization
+Eliminate redundancy:
+```yaml
+optimization:
+  remove:
+    - Duplicate sections (exact copies)
+    - Redundant explanations
+    - Nested templates (template in template)
+    
+  consolidate:
+    - Similar examples → one comprehensive example
+    - Multiple workflows → single canonical workflow
+    - Scattered notes → centralized NOTES section
+    
+  enhance:
+    - Add missing examples
+    - Fill incomplete sections
+    - Add integration points
+```
+
+### Phase 4: Quality Gates
+**Goal**: Validate rule meets production standards
+
+#### Gate 4.1: Syntax Validity
+```yaml
+checks:
+  - [ ] Valid YAML front matter
+  - [ ] All code blocks closed
+  - [ ] Tables properly formatted
+  - [ ] No broken links
+  - [ ] Proper Markdown hierarchy
+```
+
+#### Gate 4.2: Completeness
+```yaml
+checks:
+  - [ ] PURPOSE clearly stated
+  - [ ] INPUT/WHEN TO USE defined
+  - [ ] WORKFLOW has 3+ phases
+  - [ ] Examples provided
+  - [ ] OUTPUT FORMAT specified
+  - [ ] Integration points listed
+```
+
+#### Gate 4.3: Clarity
+```yaml
+checks:
+  - [ ] Each section has single clear purpose
+  - [ ] Instructions are imperative, not passive
+  - [ ] Examples match description
+  - [ ] No circular references
+  - [ ] Terminology consistent throughout
+```
+
+#### Gate 4.4: Usability
+```yaml
+checks:
+  - [ ] Can be invoked with @rule-name
+  - [ ] Input requirements clear
+  - [ ] Expected output clear
+  - [ ] Error handling specified
+  - [ ] Integration with other rules documented
+```
+
+### Phase 5: Documentation Enhancement
+**Goal**: Make rule self-explanatory and discoverable
+
+#### Step 5.1: Add Context
+```md
+## CONTEXT (optional but recommended)
+- **Origin**: From which methodology/practice?
+- **Evolution**: Version history highlights
+- **Use Cases**: 3-5 concrete scenarios
+```
+
+#### Step 5.2: Add Examples
+For each major section:
+- **Good example** — correct usage
+- **Bad example** — common mistakes
+- **Edge case** — unusual but valid usage
+
+**Example template:**
+```md
+### Examples
+
+#### ✅ Correct Usage
+\`\`\`
+@meta.extract create snapshot with dialog_id="test-001"
+\`\`\`
+
+#### ❌ Common Mistake
+\`\`\`
+@meta.extract  # Missing dialog_id, will prompt
+\`\`\`
+
+#### 🔧 Edge Case
+\`\`\`
+@meta.extract for dialogue with <5 turns  # Triggers warning
+\`\`\`
+```
+
+#### Step 5.3: Add Integration Notes
+```md
+## INTEGRATION POINTS
+
+### Upstream Rules (trigger this rule)
+- **@analysis.mdc** → High StructuralThinking indicates need for extract
+- **@run-task.mdc** → After task completion, extract for retrospective
+
+### Downstream Rules (triggered by this rule)
+- **@meta.gap.mdc** → Uses extract files to compute GAP analysis
+- **@meta.rules.generate** → Converts Meta-Instructions to persistent rules
+
+### Parallel Rules (complementary usage)
+- **@test-qualification.mdc** → Both are critical analysis modes
+```
+
+### Phase 6: Finalization
+**Goal**: Prepare rule for production use
+
+#### Step 6.1: Version and Metadata
+```md
+---
+
+**Version**: 2.0
+**Last Updated**: 2025-10-10
+**Compatibility**: Claude Sonnet 4.5+, Zeya888 Methodology
+**Related Rules**: @analysis.mdc, @run-task.mdc
+**Status**: Production | Beta | Experimental
+```
+
+#### Step 6.2: Validation Checklist
+```yaml
+final_validation:
+  syntax:
+    - [ ] No linter errors
+    - [ ] All code blocks valid
+    - [ ] Markdown properly formatted
+  
+  content:
+    - [ ] All sections complete
+    - [ ] Examples provided
+    - [ ] Integration documented
+  
+  usability:
+    - [ ] Can be invoked with @
+    - [ ] Clear input/output
+    - [ ] Error cases handled
+  
+  methodology:
+    - [ ] Aligned with Zeya888
+    - [ ] Cognitive mode specified
+    - [ ] Quality gates defined
+```
+
+#### Step 6.3: Output File
+```bash
+# File location
+.cursor/rules/<rule-name>.mdc
+
+# Naming convention
+meta.<function>.mdc       # Meta-level rules
+<domain>.<action>.mdc     # Domain-specific rules
+<methodology>.mdc         # Methodology rules
+
+# Examples
+meta.extract.mdc
+meta.gap.mdc
+test-qualification.mdc
+analysis.mdc
+```
+
+## OUTPUT FORMAT
+
+After rule creation, print:
+
+```
+✅ RULE CREATED: @<rule-name>
+
+📄 File: /absolute/path/to/.cursor/rules/<rule-name>.mdc
+📊 Statistics:
+   - Lines: ${line_count}
+   - Sections: ${section_count}
+   - Examples: ${example_count}
+   - Integration points: ${integration_count}
+
+🎯 Quality Gates:
+   - Syntax: ✅ Valid
+   - Completeness: ✅ ${completeness_percent}%
+   - Clarity: ✅ ${clarity_score}/10
+   - Usability: ✅ ${usability_score}/10
+
+🔗 Integration:
+   - Upstream: ${upstream_rules}
+   - Downstream: ${downstream_rules}
+   - Parallel: ${parallel_rules}
+
+Status: ✅ PRODUCTION READY
+```
+
+## RETROSPECTIVE: @meta.extract CASE STUDY
+
+### Initial State (Raw Input)
+```yaml
+issues:
+  syntax:
+    - "Unclosed ```json block at line 48"
+    - "Template nested inside template (lines 50-142)"
+    - "Duplicate content: entire rule repeated twice"
+  
+  language:
+    - "Mixed Russian/English throughout"
+    - "Inconsistent terminology"
+  
+  structure:
+    - "Missing proper workflow phases"
+    - "Examples scattered, not consolidated"
+    - "No clear integration points"
+```
+
+### Transformation Process
+
+#### Iteration 1: Syntax + Structure
+**Changes:**
+- Removed duplicate lines 50-142
+- Closed unclosed code blocks
+- Fixed template escaping (\`\`\` inside template)
+- Created proper 5-phase workflow
+- Added detailed MCP dimension descriptions
+
+**Result:** 442 lines, syntactically valid, structured
+
+#### Iteration 2: Language Unification
+**Changes:**
+- Translated all Russian → English
+- Preserved technical terms (MCP, ListX, ItemY)
+- Unified terminology throughout
+- Enhanced examples with English comments
+
+**Result:** 385 lines, fully English, production-ready
+
+### Extracted Patterns
+
+#### Pattern 1: Syntax First
+Always fix syntax before content:
+1. Close code blocks
+2. Remove duplicates
+3. Fix nesting
+4. Validate front matter
+
+#### Pattern 2: Structure Before Details
+Build skeleton before flesh:
+1. Define main sections
+2. Create workflow phases
+3. Add subsections
+4. Fill with content
+
+#### Pattern 3: Language Last
+Translate after structure is solid:
+1. Ensures consistent structure first
+2. Prevents retranslation
+3. Easier to validate
+
+#### Pattern 4: Examples Throughout
+Add examples incrementally:
+1. After each major section
+2. Good/bad/edge cases
+3. Keep synchronized with description
+
+## QUALITY METRICS
+
+### Rule Quality Score (RQS)
+```javascript
+function calculateRQS(rule) {
+  const syntax = validateSyntax(rule);           // 0-10
+  const completeness = checkCompleteness(rule);  // 0-10
+  const clarity = assessClarity(rule);           // 0-10
+  const usability = testUsability(rule);         // 0-10
+  
+  return (syntax + completeness + clarity + usability) / 4;
+}
+
+// Target: RQS >= 8.0 for production
+// Minimum: RQS >= 6.0 for beta
+```
+
+### Completeness Checklist
+```yaml
+required_sections:
+  - [ ] Front matter (alwaysApply)
+  - [ ] Title and one-liner
+  - [ ] PURPOSE
+  - [ ] WHEN TO USE or INPUT
+  - [ ] WORKFLOW (3+ phases)
+  - [ ] OUTPUT FORMAT
+  - [ ] Version metadata
+
+recommended_sections:
+  - [ ] Examples (3+)
+  - [ ] Integration points
+  - [ ] Best practices
+  - [ ] Error handling
+  - [ ] Quality gates
+
+optional_sections:
+  - [ ] Context/origin
+  - [ ] Case studies
+  - [ ] Automation hooks
+  - [ ] Evolution tracking
+```
+
+## INTEGRATION WITH ZEYA888
+
+### Cognitive Mode Mapping
+```yaml
+rule_types:
+  analytical:
+    - @analysis.mdc
+    - @meta.extract.mdc
+    - @meta.gap.mdc
+    pattern: "Deep analysis → structured output"
+  
+  execution:
+    - @run-task.mdc
+    - @deploy.mdc
+    pattern: "Step-by-step → validation → next step"
+  
+  critical:
+    - @test-qualification.mdc
+    - @security-audit.mdc
+    pattern: "Honest assessment → actionable fixes"
+  
+  meta-level:
+    - @meta.create-rule.mdc
+    - @meta.rules.generate
+    pattern: "Reflection on process → optimization"
+```
+
+### Rule Creation Flow
+```
+Raw idea/draft
+    ↓
+@meta.create-rule (this rule)
+    ↓
+Production-ready rule
+    ↓
+@meta.extract (test with real dialogue)
+    ↓
+@meta.gap (validate effectiveness)
+    ↓
+Iterate if needed
+```
+
+## BEST PRACTICES
+
+### DO
+- ✅ Fix syntax before content
+- ✅ Build structure before details
+- ✅ Translate after structure is solid
+- ✅ Add examples incrementally
+- ✅ Validate at each phase
+- ✅ Document integration points
+- ✅ Use imperative language ("Create X", not "X should be created")
+
+### DON'T
+- ❌ Mix languages in same section
+- ❌ Nest templates inside templates
+- ❌ Leave code blocks unclosed
+- ❌ Duplicate content
+- ❌ Use vague instructions
+- ❌ Skip examples
+- ❌ Forget version metadata
+
+## ERROR HANDLING
+
+### Common Issues
+
+#### Issue 1: Circular Dependencies
+**Symptom:** Rule A calls Rule B calls Rule A
+**Solution:** Introduce mediator rule or redesign workflow
+
+#### Issue 2: Unclear Invocation
+**Symptom:** User doesn't know when/how to use rule
+**Solution:** Add explicit WHEN TO USE section with scenarios
+
+#### Issue 3: Missing Integration
+**Symptom:** Rule exists in isolation
+**Solution:** Map upstream/downstream/parallel rules
+
+#### Issue 4: Bloated Content
+**Symptom:** Rule > 500 lines, tries to do everything
+**Solution:** Split into multiple focused rules
+
+## EXAMPLES
+
+### Example 1: Creating Meta-Level Rule
+```
+User: "Create rule for tracking cognitive evolution"
+
+AI (using @meta.create-rule):
+1. Analyze intent → meta-level, tracking focus
+2. Design structure → INPUT (extracts) → WORKFLOW (compare) → OUTPUT (evolution graph)
+3. Create @meta.evolution.mdc
+4. Validate quality gates
+5. Document integration with @meta.extract
+```
+
+### Example 2: Refactoring Existing Rule
+```
+User: "@test-qualification needs English version"
+
+AI (using @meta.create-rule):
+1. Read current rule
+2. Identify language issues
+3. Translate systematically
+4. Preserve technical terms
+5. Validate completeness
+6. Update version to 2.0
+```
+
+### Example 3: Converting Documentation to Rule
+```
+User: "Convert Test-to-Success methodology to rule"
+
+AI (using @meta.create-rule):
+1. Extract core algorithm from docs
+2. Structure into phases
+3. Add acceptance criteria format
+4. Create workflow steps
+5. Add integration with @run-task
+6. Output @test-to-success.mdc
+```
+
+## AUTOMATION POTENTIAL
+
+### Future Enhancements
+```javascript
+// Auto-validate rule syntax
+function autoValidateRule(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const checks = {
+    frontMatter: validateYAML(extractFrontMatter(content)),
+    codeBlocks: validateCodeBlocks(content),
+    markdown: validateMarkdown(content),
+    structure: validateStructure(content)
+  };
+  return checks;
+}
+
+// Auto-generate integration graph
+function generateIntegrationGraph(rulesDir) {
+  const rules = loadAllRules(rulesDir);
+  const graph = buildDependencyGraph(rules);
+  return visualizeGraph(graph);
+}
+
+// Auto-compute RQS
+function computeRQS(rulePath) {
+  const rule = loadRule(rulePath);
+  return {
+    syntax: validateSyntax(rule),
+    completeness: checkCompleteness(rule),
+    clarity: assessClarity(rule),
+    usability: testUsability(rule),
+    overall: calculateRQS(rule)
+  };
+}
+```
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025-10-10  
+**Compatibility**: Claude Sonnet 4.5+, Zeya888 Methodology  
+**Related Rules**: @meta.extract.mdc, @meta.gap.mdc, @analysis.mdc  
+**Status**: Production

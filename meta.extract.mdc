@@ -1,0 +1,385 @@
+---
+apply: manual
+alwaysApply: false
+---
+
+# @meta.extract
+> Capture a snapshot of the current dialogue's meta-thinking and persist it to `meta/meta.extract.<dialogID>.<timestamp>.mdc`
+
+## PURPOSE
+The meta.extract system is designed to capture and analyze the **MetaCognitive Profile** (MCP) of the current dialogue, identify thinking patterns, and create a structured snapshot for further reflection and optimization.
+
+## INPUT
+- **dialog_id**: `<string>` — short dialogue identifier (if missing — ask user)
+- **timestamp**: `<ISO UTC>` — format: `20251010T153012Z`
+- **model**: `<string>` — LLM identifier (e.g., `claude-sonnet-4.5`)
+- **author**: `<string>` — user name (optional)
+
+## METACOGNITIVE PROFILE (MCP) — Dimensions
+
+### 1. StructuralThinking (0–10)
+**Definition:** Ability to organize information into clear hierarchical structures, use frameworks and decomposition.
+
+**Indicators:**
+- `0-3` (Chaotic): No structure, chaotic thoughts, no decomposition
+- `4-6` (Emerging): Basic structure exists but inconsistent
+- `7-8` (Structured): Clear hierarchy, using ListX → ItemY, frameworks
+- `9-10` (Systematic): Multi-level thinking architecture, automatic pattern application
+
+**Scoring Example:**
+```yaml
+score: 8
+descriptor: "Structured with clear decomposition"
+evidence: "Used ListX → ItemY, explicit dependencies, acceptance criteria"
+```
+
+### 2. Reflectivity (0–10)
+**Definition:** Capacity for self-reflection, analyzing own actions, identifying errors and correcting approach.
+
+**Indicators:**
+- `0-3` (Unreflective): No action analysis, ignoring errors
+- `4-6` (Surface): Superficial reflection, reacting only to obvious errors
+- `7-8` (Deep): Deep analysis of error causes, approach correction
+- `9-10` (Meta-reflexive): Constant self-reflection, problem anticipation, proactive optimization
+
+**Scoring Example:**
+```yaml
+score: 7
+descriptor: "Deep retrospective analysis"
+evidence: "After each ItemY conducted retrospective, identified root causes"
+```
+
+### 3. IntentClarity (0–10)
+**Definition:** Clarity of intentions and goals, ability to formulate concrete requests and expectations.
+
+**Indicators:**
+- `0-3` (Vague): Blurred goals, unclear requests, many clarifications needed
+- `4-6` (Functional): Basic clarity, but details unclear
+- `7-8` (Precise): Concrete goals, explicit acceptance criteria
+- `9-10` (Crystalline): Absolute clarity of intent, zero ambiguity
+
+**Scoring Example:**
+```yaml
+score: 9
+descriptor: "Crystalline intent with YAML criteria"
+evidence: "Each request contained acceptance_criteria in YAML format"
+```
+
+### 4. CognitiveDepth (0–10)
+**Definition:** Depth of problem analysis, ability to see not only symptoms but root causes.
+
+**Indicators:**
+- `0-3` (Surface): Only symptoms, superficial analysis
+- `4-6` (Intermediate): Sees some connections, but doesn't always find root cause
+- `7-8` (Deep): Systematic root cause analysis, multi-level connections
+- `9-10` (Systemic): Sees entire system, hidden patterns, second-order effects
+
+**Scoring Example:**
+```yaml
+score: 8
+descriptor: "Deep root cause analysis"
+evidence: "Didn't just fix the bug, analyzed why it occurred in contract logic"
+```
+
+### 5. EmotionalRegulation (0–10)
+**Definition:** Ability to manage emotional reactions during failures, maintain constructiveness under stress.
+
+**Indicators:**
+- `0-3` (Reactive): Emotional reactions, frustration, pessimism
+- `4-6` (Controlled): Basic control, but emotions affect decisions
+- `7-8` (Regulated): Stable constructiveness, emotions don't interfere
+- `9-10` (Mastered): Full control, using emotions as data
+
+**Scoring Example:**
+```yaml
+score: 7
+descriptor: "Regulated with constructive focus"
+evidence: "After 5 failures continued systematic analysis without destructive emotions"
+```
+
+### 6. CollaborativeSymmetry (0–10)
+**Definition:** Balance in AI ↔ User interaction, quality of synchronization, mutual understanding.
+
+**Indicators:**
+- `0-3` (Asymmetric): One-sided communication, misunderstanding
+- `4-6` (Functional): Basic collaboration, but gaps exist
+- `7-8` (Symmetric): High synchronicity, mutual understanding
+- `9-10` (Flow): Perfect synchronization, "flow" state of collaboration
+
+**Scoring Example:**
+```yaml
+score: 8
+descriptor: "High symmetry with flow moments"
+evidence: "User used @analysis.mdc → AI immediately switched to needed mode, zero ambiguity"
+```
+
+## WORKFLOW
+
+### Phase 1: Initialization
+1. Check for `meta/` folder in project root
+2. If missing — create it
+3. If `dialog_id` not specified — ask user:
+   ```
+   "Provide a short dialog_id tag (e.g., 'uups-deploy', 'test-fix-001')"
+   ```
+4. Generate timestamp in ISO UTC format: `YYYYMMDDTHHmmssZ`
+
+### Phase 2: Analysis
+**For each MCP dimension:**
+
+1. **Scan dialogue** — analyze all dialogue turns
+2. **Extract evidence** — find specific quotes and patterns
+3. **Score** — rate on 0–10 scale
+4. **Descriptor** — brief level description
+5. **Synthesize JSON** — structure for automation
+
+**Scoring Methodology:**
+```yaml
+scoring_approach:
+  - Objective: Use concrete indicators, not subjective feelings
+  - Evidence-based: Each score confirmed by dialogue quotes
+  - Comparative: Compare with typical patterns at each level
+  - Honest: Don't inflate scores, honestly acknowledge weaknesses
+```
+
+### Phase 3: GAP Analysis
+For each MCP dimension:
+
+1. **Target** — define desired level (usually 8-10)
+2. **Current** — current level from analysis
+3. **Gap** — difference between target and current
+4. **Meta-Instructions** — specific actions to close gap
+
+**Example:**
+```yaml
+StructuralThinking:
+  target: 9
+  current: 6
+  gap: 3
+  meta_instruction: "Always start with ListX → ItemY decomposition. Use @analysis.mdc for structuring."
+```
+
+### Phase 4: Synthesis
+1. Create final JSON representation of MCP
+2. Write 1–2 sentence summary of entire dialogue
+3. Collect evidence (quotes with turn numbers)
+4. Formulate 3-5 Meta-Instructions for improvement
+
+### Phase 5: Output
+1. Compose filename: `meta.extract.<dialog_id>.<timestamp>.mdc`
+2. Fill template (see below)
+3. Write file to `meta/` folder
+4. Print absolute path and status
+
+## TEMPLATE
+
+```md
+# META EXTRACT — ${dialog_id} — ${timestamp}
+
+## Meta
+- dialog_id: ${dialog_id}
+- timestamp: ${timestamp}
+- model: ${model}
+- author: ${author}
+- tokens_in: ${tokens_in} (if available)
+- tokens_out: ${tokens_out} (if available)
+- duration: ${duration} (if available)
+
+## MCP (MetaCognitive Profile)
+
+### Scores & Descriptors
+- **StructuralThinking**: ${mcp.struct.score}/10 (${mcp.struct.desc})
+- **Reflectivity**: ${mcp.reflect.score}/10 (${mcp.reflect.desc})
+- **IntentClarity**: ${mcp.intent.score}/10 (${mcp.intent.desc})
+- **CognitiveDepth**: ${mcp.depth.score}/10 (${mcp.depth.desc})
+- **EmotionalRegulation**: ${mcp.emotion.score}/10 (${mcp.emotion.desc})
+- **CollaborativeSymmetry**: ${mcp.symmetry.score}/10 (${mcp.symmetry.desc})
+
+### JSON Structured Data
+\`\`\`json
+{
+  "dialog_id": "${dialog_id}",
+  "timestamp": "${timestamp}",
+  "model": "${model}",
+  "mcp": {
+    "structural_thinking": {
+      "score": ${mcp.struct.score},
+      "descriptor": "${mcp.struct.desc}",
+      "evidence": "${mcp.struct.evidence}"
+    },
+    "reflectivity": {
+      "score": ${mcp.reflect.score},
+      "descriptor": "${mcp.reflect.desc}",
+      "evidence": "${mcp.reflect.evidence}"
+    },
+    "intent_clarity": {
+      "score": ${mcp.intent.score},
+      "descriptor": "${mcp.intent.desc}",
+      "evidence": "${mcp.intent.evidence}"
+    },
+    "cognitive_depth": {
+      "score": ${mcp.depth.score},
+      "descriptor": "${mcp.depth.desc}",
+      "evidence": "${mcp.depth.evidence}"
+    },
+    "emotional_regulation": {
+      "score": ${mcp.emotion.score},
+      "descriptor": "${mcp.emotion.desc}",
+      "evidence": "${mcp.emotion.evidence}"
+    },
+    "collaborative_symmetry": {
+      "score": ${mcp.symmetry.score},
+      "descriptor": "${mcp.symmetry.desc}",
+      "evidence": "${mcp.symmetry.evidence}"
+    }
+  },
+  "summary": "${mcp.summary}",
+  "gap_analysis": {
+    "structural_thinking": { "target": ${target.struct}, "gap": ${gap.struct} },
+    "reflectivity": { "target": ${target.reflect}, "gap": ${gap.reflect} },
+    "intent_clarity": { "target": ${target.intent}, "gap": ${gap.intent} },
+    "cognitive_depth": { "target": ${target.depth}, "gap": ${gap.depth} },
+    "emotional_regulation": { "target": ${target.emotion}, "gap": ${gap.emotion} },
+    "collaborative_symmetry": { "target": ${target.symmetry}, "gap": ${gap.symmetry} }
+  },
+  "meta_instructions": [
+    "${instr.1}",
+    "${instr.2}",
+    "${instr.3}"
+  ]
+}
+\`\`\`
+
+## Summary (1–2 sentences)
+
+${mcp.summary}
+
+## Evidence (quotes, turns, mini-threads)
+
+**[t${ref1}]** ${quote1}
+
+**[t${ref2}]** ${quote2}
+
+**[t${ref3}]** ${quote3}
+
+_...additional evidence as needed..._
+
+## GAP Analysis (Target vs Current)
+
+| Dimension | Target | Current | Gap | Priority |
+|-----------|--------|---------|-----|----------|
+| StructuralThinking | ${target.struct} | ${mcp.struct.score} | ${gap.struct} | ${priority.struct} |
+| Reflectivity | ${target.reflect} | ${mcp.reflect.score} | ${gap.reflect} | ${priority.reflect} |
+| IntentClarity | ${target.intent} | ${mcp.intent.score} | ${gap.intent} | ${priority.intent} |
+| CognitiveDepth | ${target.depth} | ${mcp.depth.score} | ${gap.depth} | ${priority.depth} |
+| EmotionalRegulation | ${target.emotion} | ${mcp.emotion.score} | ${gap.emotion} | ${priority.emotion} |
+| CollaborativeSymmetry | ${target.symmetry} | ${mcp.symmetry.score} | ${gap.symmetry} | ${priority.symmetry} |
+
+## Meta-Instructions (from GAP)
+
+### 1. ${instr.1.title}
+**Gap:** ${instr.1.dimension} (gap: ${instr.1.gap})  
+**Instruction:** ${instr.1.text}  
+**Actionable:** ${instr.1.actionable}
+
+### 2. ${instr.2.title}
+**Gap:** ${instr.2.dimension} (gap: ${instr.2.gap})  
+**Instruction:** ${instr.2.text}  
+**Actionable:** ${instr.2.actionable}
+
+### 3. ${instr.3.title}
+**Gap:** ${instr.3.dimension} (gap: ${instr.3.gap})  
+**Instruction:** ${instr.3.text}  
+**Actionable:** ${instr.3.actionable}
+
+_...additional instructions as needed..._
+
+## Next Steps
+
+- [ ] Review GAP analysis — validate targets
+- [ ] Convert Meta-Instructions → persistent rules (add to `.cursor/rules/`)
+- [ ] Re-run `@meta.extract` after implementing instructions (next phase)
+- [ ] Track improvement: compare MCP scores across sessions
+- [ ] Identify recurring patterns → convert to reusable rules
+
+## Integration with Zeya888 Methodology
+
+**Rules used in this dialogue:**
+${rules_used}
+
+**Cognitive modes activated:**
+${cognitive_modes}
+
+**Quality gates passed:**
+${quality_gates}
+
+---
+
+_Generated by @meta.extract.mdc v2.0 — Metacognitive Profile System_
+```
+
+## OUTPUT FORMAT
+
+After file creation, print:
+
+```
+✅ META EXTRACT CREATED
+
+📄 File: /absolute/path/to/meta/meta.extract.<dialog_id>.<timestamp>.mdc
+📊 MCP Summary:
+   - StructuralThinking: ${score}/10
+   - Reflectivity: ${score}/10
+   - IntentClarity: ${score}/10
+   - CognitiveDepth: ${score}/10
+   - EmotionalRegulation: ${score}/10
+   - CollaborativeSymmetry: ${score}/10
+
+🎯 Top GAP: ${top_gap_dimension} (gap: ${top_gap_value})
+💡 Key Meta-Instruction: ${top_instruction}
+
+Status: ✅ SUCCESS
+```
+
+## NOTES & BEST PRACTICES
+
+### Critical Requirements
+- **JSON validity**: JSON block must be **strictly valid** for automation
+- **Evidence-based scoring**: Each score confirmed by quotes
+- **Honesty over optimism**: Don't inflate scores, honestly acknowledge gaps
+- **Actionable instructions**: Meta-Instructions must be **concrete**, not abstract
+
+### Integration Points
+- **@analysis.mdc**: Used with high StructuralThinking
+- **@run-task.mdc**: Used with high IntentClarity and CognitiveDepth
+- **@test-qualification.mdc**: Used with high Reflectivity and CognitiveDepth
+
+### Automation Hooks
+```javascript
+// Example: parsing meta extract for automation
+const metaExtract = JSON.parse(extractJsonBlock(fileContent));
+const avgMCP = Object.values(metaExtract.mcp)
+  .reduce((sum, dim) => sum + dim.score, 0) / 6;
+  
+if (avgMCP < 6) {
+  console.warn("Low MCP detected. Review meta-instructions.");
+}
+```
+
+### Evolution Tracking
+Recommended to create meta extracts regularly for progress tracking:
+- **After each major task** (UUPS deployment, major refactoring)
+- **When switching context** (new project, new task type)
+- **When feeling stuck** (to identify blockers)
+
+### Error Handling
+- If `dialog_id` empty → ask user
+- If unable to assess dimension → use `null` in JSON + note in file
+- If dialogue too short (<5 turns) → warning + preliminary assessment
+- If `meta/` folder unavailable → error + suggest alternative location
+
+---
+
+**Version**: 2.0  
+**Last Updated**: 2025-10-10  
+**Compatibility**: Claude Sonnet 4.5+, Zeya888 Methodology  
+**Related Rules**: @analysis.mdc, @run-task.mdc, @test-qualification.mdc

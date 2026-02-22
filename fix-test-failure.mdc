@@ -1,0 +1,62 @@
+---
+description: 
+apply: manual
+globs: []
+alwaysApply: false
+---
+---
+description: End-to-end analysis and resolution of a failed test
+alwaysApply: false
+---
+
+# 🧪 Fix Workflow for Failed Test Case
+
+When a test fails unexpectedly and the cause is unclear, use this structure to fully analyze, isolate, fix, and document the case.
+
+## Fix Summary Log
+```yaml
+fix_summary:
+  test_case: [test name, e.g. test_onboarding_flow]
+  failure_signature:
+    message: >
+      TypeError: Exactly one of the passed values can be specified. Instead, values were: (None,), {'hexstr': None}
+    traceback_file: test_onboarding.py
+    failure_line: [line number if known]
+    system_context: InviteNFT / onboarding / web3.py
+
+  suspected_cause:
+    hypothesis: >
+      Function returns SignedTransaction instead of tx hash.
+    triggering_call: transact_contract_function()
+    risk_factor: mismatch with web3.py 7.x expectations
+
+  isolation_test:
+    file: test_alarm_mode.py
+    name: test_transact_contract_function_receipt_error
+    behavior: >
+      Confirms that returned object is not a string.
+    result: reproduced
+
+  root_cause:
+    description: >
+        [Describe the exact condition or mismatch that causes the failure.
+        Be specific about the code or integration that triggers it.]
+    source_file: [path/to/module]
+    line_modified: [line number]
+    version_note: [if library upgrade is involved, document it]
+
+
+  fix_action:
+    performed_change: >
+      Replaced all rawTransaction references with raw_transaction
+    validation: ✅ manual retest passed
+    regression_check: reran original test → ✅ passed
+
+  post_fix_notes:
+    new_test_added: test_transact_contract_function_receipt_error
+    log_clean: true
+    failure_type: fixed
+    lessons_learned:
+      - Always check return types of external integrations
+      - Validate attribute names during dependency upgrades
+      - Isolate test conditions to reproduce complex breakages

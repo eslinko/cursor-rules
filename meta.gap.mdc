@@ -1,0 +1,629 @@
+---
+apply: manual
+alwaysApply: false
+---
+
+# @meta.gap
+> Compare your MetaCognitive Profile (MCP) from one or more extracts with a Target Cognitive Profile (TCP) and produce a structured GAP report
+
+## PURPOSE
+The meta.gap system analyzes the difference between your current metacognitive state (from extract files) and a target profile (role-based or custom), generating actionable meta-instructions to close the gap. This enables systematic cognitive improvement aligned with specific role requirements.
+
+## WHEN TO USE
+- After collecting 1+ meta extracts
+- When preparing for a new role or project type
+- For tracking cognitive evolution over time
+- When feeling misaligned with project requirements
+- Before creating new persistent rules from meta-instructions
+
+## INPUT
+- **role**: `<CTO | CPO | CMO | CEO | Frontend | Backend | UX | Web3 | custom | ask>`
+- **target_profile_json**: (optional, required if role=custom) — JSON with 6 MCP axes
+- **extract_files**: `<list of meta.extract.*.mdc | ask>` — one or more extract files
+- **timestamp**: `<ISO UTC>` — default: auto-generated
+- **author**: `<string>` — optional user identifier
+
+## TARGET PROFILES (TCP Defaults)
+
+Built-in role profiles (can be overridden by `/meta/roles/<role>.json` files):
+
+```json
+{
+  "CTO": {
+    "profile": [9, 7, 8, 9, 7, 8],
+    "description": "Chief Technology Officer — high structure, deep technical analysis"
+  },
+  "CPO": {
+    "profile": [8, 8, 9, 8, 9, 9],
+    "description": "Chief Product Officer — clarity, user empathy, collaboration"
+  },
+  "CMO": {
+    "profile": [7, 9, 8, 7, 9, 9],
+    "description": "Chief Marketing Officer — reflection, emotional intelligence, flow"
+  },
+  "CEO": {
+    "profile": [8, 9, 10, 9, 8, 9],
+    "description": "Chief Executive Officer — absolute clarity, systemic thinking"
+  },
+  "Frontend": {
+    "profile": [8, 6, 7, 6, 7, 7],
+    "description": "Frontend Developer — structure, user focus, practical depth"
+  },
+  "Backend": {
+    "profile": [9, 6, 8, 8, 6, 7],
+    "description": "Backend Developer — high structure, deep technical analysis"
+  },
+  "Web3": {
+    "profile": [8, 7, 9, 9, 7, 8],
+    "description": "Web3 Developer — clarity, systemic depth, security focus"
+  },
+  "UX": {
+    "profile": [7, 8, 7, 8, 9, 8],
+    "description": "UX Designer — empathy, user understanding, collaboration"
+  }
+}
+```
+
+**Axis order**: `[StructuralThinking, Reflectivity, IntentClarity, CognitiveDepth, EmotionalRegulation, CollaborativeSymmetry]`
+
+## WORKFLOW
+
+### Phase 1: Input Resolution
+**Goal**: Collect all required inputs
+
+#### Step 1.1: Resolve Target Role
+If `role` not provided:
+1. Present menu with options:
+   ```
+   Select target role:
+   [1] CTO        [5] Frontend
+   [2] CPO        [6] Backend
+   [3] CMO        [7] UX
+   [4] CEO        [8] Web3
+   [9] custom     [0] ask me to define
+   ```
+
+2. If user selects **custom**:
+   - Request JSON in MCP format:
+   ```json
+   {
+     "StructuralThinking": 9,
+     "Reflectivity": 8,
+     "IntentClarity": 9,
+     "CognitiveDepth": 9,
+     "EmotionalRegulation": 7,
+     "CollaborativeSymmetry": 8
+   }
+   ```
+
+3. Normalize role_key (e.g., "backend" → "Backend", "cto" → "CTO")
+
+#### Step 1.2: Collect Extract Files
+If `extract_files` not provided:
+1. Search `/meta/` folder for `meta.extract.*.mdc` files
+2. List available files with metadata:
+   ```
+   Available extracts:
+   [1] meta.extract.security-refactor.20251010T143052Z.mdc (2 hours ago)
+   [2] meta.extract.uups-deploy.20251009T092314Z.mdc (1 day ago)
+   [3] meta.extract.test-fix.20251008T151203Z.mdc (2 days ago)
+   
+   Select 1-N files (comma-separated) or 'latest N':
+   ```
+
+3. Parse user input:
+   - Comma/space/newline separated file names
+   - Numbers from menu: `1,2`
+   - `latest 3` → use 3 most recent
+   - Full or partial paths
+   - JSON array: `["file1.mdc", "file2.mdc"]`
+
+4. Validate files exist and are readable
+
+### Phase 2: Parse MCP Data
+**Goal**: Extract current MCP from extract files
+
+#### Step 2.1: Read Extract Files
+For each selected file:
+1. Parse JSON block containing MCP data
+2. Extract 6-axis scores:
+   - StructuralThinking (0-10)
+   - Reflectivity (0-10)
+   - IntentClarity (0-10)
+   - CognitiveDepth (0-10)
+   - EmotionalRegulation (0-10)
+   - CollaborativeSymmetry (0-10)
+
+3. Collect descriptors for each axis
+4. Extract evidence quotes (if available)
+
+#### Step 2.2: Compute Average MCP
+If multiple extracts provided:
+1. Create 6-dimensional vectors for each extract
+2. Compute mean vector: `Current_MCP_avg`
+3. For descriptors: pick mode (most frequent) or most recent
+4. Collect all evidence quotes
+
+**Example calculation:**
+```javascript
+// Extract 1: [8, 7, 9, 8, 7, 9]
+// Extract 2: [7, 8, 9, 7, 8, 8]
+// Extract 3: [9, 7, 10, 9, 7, 9]
+// Average:    [8, 7.3, 9.3, 8, 7.3, 8.7]
+```
+
+### Phase 3: Load Target MCP
+**Goal**: Determine target profile for comparison
+
+#### Step 3.1: Load Role Profile
+1. If `role == "custom"`:
+   - Use provided `target_profile_json`
+
+2. Else, try loading from file:
+   - Check `/meta/roles/role.<role_key>.json`
+   - If exists → load custom override
+   - If missing → use built-in profile
+
+3. Validate profile has all 6 axes with scores 0-10
+
+#### Step 3.2: Document Target
+Include role description and rationale:
+```yaml
+target_role: "CTO"
+target_mcp: [9, 7, 8, 9, 7, 8]
+rationale: "High structure and deep technical analysis required for architecture decisions"
+```
+
+### Phase 4: Compute GAP Analysis
+**Goal**: Calculate and interpret differences
+
+#### Step 4.1: Calculate Deltas
+For each axis:
+```javascript
+GAP[axis] = Target[axis] - Current[axis]
+
+// Positive gap → need to grow this axis
+// Negative gap → over-expressed axis
+// Near zero → within tolerance
+```
+
+#### Step 4.2: Qualitative Assessment
+Classify each gap:
+```yaml
+classification:
+  large_positive: "> +1.5"  # Under-expressed, priority growth area
+  positive: "+0.5 to +1.5"  # Growth opportunity
+  balanced: "-0.5 to +0.5"  # Within tolerance
+  negative: "-0.5 to -1.5"  # Slight over-expression
+  large_negative: "< -1.5"  # Over-expressed, consider reducing
+```
+
+**Status labels:**
+- `🔴 Critical Gap` — large positive (>+1.5)
+- `🟡 Growth Area` — positive (+0.5 to +1.5)
+- `🟢 Balanced` — within tolerance (-0.5 to +0.5)
+- `🟠 Over-Expressed` — negative (<-0.5)
+
+#### Step 4.3: Prioritization
+Rank gaps by:
+1. **Magnitude** — larger gaps first
+2. **Role criticality** — axes critical for target role
+3. **Trend** — gaps widening vs narrowing (if historical data available)
+
+### Phase 5: Derive Meta-Instructions
+**Goal**: Generate actionable improvement steps
+
+#### Step 5.1: Map Gaps to Instructions
+For each significant gap, create specific instruction:
+
+**StructuralThinking gap examples:**
+```yaml
+gap_positive_2:
+  instruction: "Always start with ListX → ItemY decomposition. Use @analysis.mdc before any complex task."
+  actionable: "Add 'decompose into phases' as first step in workflow"
+
+gap_positive_1:
+  instruction: "Adopt modular planning; enforce 3-5 step plans for each task."
+  actionable: "Create planning template with min 3 steps"
+```
+
+**Reflectivity gap examples:**
+```yaml
+gap_positive_2:
+  instruction: "Add explicit retrospective after each ItemY completion. Document what worked and what didn't."
+  actionable: "Include '## Retrospective' section in @run-task.mdc workflow"
+
+gap_positive_1:
+  instruction: "Add pre-phase observer pause; reflect on approach before execution."
+  actionable: "Add 2-minute reflection step before starting any phase"
+```
+
+**IntentClarity gap examples:**
+```yaml
+gap_positive_2:
+  instruction: "Define acceptance criteria in YAML format before any implementation."
+  actionable: "Create acceptance_criteria template and use consistently"
+
+gap_positive_1:
+  instruction: "Upfront AC; define success metrics before code."
+  actionable: "Add 'success criteria' section to task templates"
+```
+
+**CognitiveDepth gap examples:**
+```yaml
+gap_positive_2:
+  instruction: "Always analyze root cause, not symptoms. Ask 'why' 3 times minimum."
+  actionable: "Add root cause analysis section to problem-solving workflow"
+
+gap_positive_1:
+  instruction: "Layered reasoning: concept → pattern → implementation."
+  actionable: "Structure analysis in 3 layers before coding"
+```
+
+**EmotionalRegulation gap examples:**
+```yaml
+gap_positive_2:
+  instruction: "After failure, take 5-minute break before retrying. Document emotional state."
+  actionable: "Add emotion check-in to failure handling protocol"
+
+gap_positive_1:
+  instruction: "Stabilize tone; avoid urgency-driven pivots."
+  actionable: "Use 'is this urgent?' checklist before context switching"
+```
+
+**CollaborativeSymmetry gap examples:**
+```yaml
+gap_positive_2:
+  instruction: "Use @rules consistently. Specify cognitive mode explicitly in each request."
+  actionable: "Create quick reference card for @rules usage"
+
+gap_positive_1:
+  instruction: "Rephrase for model; use role-aware DSL."
+  actionable: "Add 'clarity check' before submitting requests"
+```
+
+#### Step 5.2: Create Actionable Plan
+For top 3-5 gaps:
+1. **Immediate action** (apply today)
+2. **Persistent rule** (create new .cursor/rules/ file)
+3. **Tracking metric** (how to measure improvement)
+
+### Phase 6: Generate Report
+**Goal**: Create structured output file
+
+#### Step 6.1: Ensure Output Directory
+1. Check for `/meta/` folder
+2. Create if missing
+3. Validate write permissions
+
+#### Step 6.2: Compose Filename
+Format: `meta.gap.<role_key>.<timestamp>.mdc`
+
+Examples:
+- `meta.gap.CTO.20251010T143052Z.mdc`
+- `meta.gap.Backend.20251010T143052Z.mdc`
+- `meta.gap.custom.20251010T143052Z.mdc`
+
+#### Step 6.3: Fill Template
+Generate report using template below
+
+#### Step 6.4: Write File
+Write to `/meta/` folder with proper formatting
+
+### Phase 7: Output and Next Steps
+**Goal**: Inform user and suggest follow-up
+
+#### Step 7.1: Print Summary
+```
+✅ GAP ANALYSIS COMPLETE
+
+📄 File: /absolute/path/to/meta/meta.gap.<role>.<timestamp>.mdc
+📊 Summary:
+   Target Role: <role>
+   Extracts Analyzed: <N>
+   
+🎯 Top 3 Gaps:
+   1. <dimension>: Δ <gap> (<status>)
+   2. <dimension>: Δ <gap> (<status>)
+   3. <dimension>: Δ <gap> (<status>)
+
+💡 Priority Meta-Instruction:
+   <top_instruction>
+
+📋 Next Steps:
+   [ ] Review GAP report
+   [ ] Implement top 3 meta-instructions
+   [ ] Create persistent rules (@meta.rules.generate)
+   [ ] Re-run @meta.extract after 1 week
+   [ ] Compare new extract with this baseline
+
+Status: ✅ SUCCESS
+```
+
+#### Step 7.2: Suggest Next Actions
+- Convert meta-instructions to persistent rules
+- Schedule follow-up extract
+- Create role-specific workflow adaptations
+
+## REPORT TEMPLATE
+
+```md
+# META GAP ANALYSIS — ROLE: ${role_key} — ${timestamp}
+
+## Meta
+- **role**: ${role_key}
+- **author**: ${author}
+- **timestamp**: ${timestamp}
+- **extract_sources**: ${extract_count} file(s)
+  ${extract_list}
+
+## Current MCP (Averaged from ${extract_count} extract(s))
+
+| Axis | Score | Descriptor |
+|------|------:|------------|
+| StructuralThinking | ${cur.struct.score} | ${cur.struct.desc} |
+| Reflectivity | ${cur.reflect.score} | ${cur.reflect.desc} |
+| IntentClarity | ${cur.intent.score} | ${cur.intent.desc} |
+| CognitiveDepth | ${cur.depth.score} | ${cur.depth.desc} |
+| EmotionalRegulation | ${cur.emotion.score} | ${cur.emotion.desc} |
+| CollaborativeSymmetry | ${cur.symmetry.score} | ${cur.symmetry.desc} |
+
+## Target MCP — ${role_key}
+
+| Axis | Score | Rationale |
+|------|------:|-----------|
+| StructuralThinking | ${tgt.struct} | ${tgt.struct.rationale} |
+| Reflectivity | ${tgt.reflect} | ${tgt.reflect.rationale} |
+| IntentClarity | ${tgt.intent} | ${tgt.intent.rationale} |
+| CognitiveDepth | ${tgt.depth} | ${tgt.depth.rationale} |
+| EmotionalRegulation | ${tgt.emotion} | ${tgt.emotion.rationale} |
+| CollaborativeSymmetry | ${tgt.symmetry} | ${tgt.symmetry.rationale} |
+
+## GAP Analysis (Target − Current)
+
+| Axis | Current | Target | Δ | Status | Priority |
+|------|--------:|-------:|--:|--------|----------|
+| StructuralThinking | ${cur.struct.score} | ${tgt.struct} | ${gap.struct} | ${status.struct} | ${priority.struct} |
+| Reflectivity | ${cur.reflect.score} | ${tgt.reflect} | ${gap.reflect} | ${status.reflect} | ${priority.reflect} |
+| IntentClarity | ${cur.intent.score} | ${tgt.intent} | ${gap.intent} | ${status.intent} | ${priority.intent} |
+| CognitiveDepth | ${cur.depth.score} | ${tgt.depth} | ${gap.depth} | ${status.depth} | ${priority.depth} |
+| EmotionalRegulation | ${cur.emotion.score} | ${tgt.emotion} | ${gap.emotion} | ${status.emotion} | ${priority.emotion} |
+| CollaborativeSymmetry | ${cur.symmetry.score} | ${tgt.symmetry} | ${gap.symmetry} | ${status.symmetry} | ${priority.symmetry} |
+
+### Status Legend
+- 🔴 **Critical Gap** (Δ > +1.5) — Priority growth area
+- 🟡 **Growth Area** (Δ +0.5 to +1.5) — Improvement opportunity
+- 🟢 **Balanced** (Δ -0.5 to +0.5) — Within target tolerance
+- 🟠 **Over-Expressed** (Δ < -0.5) — Consider moderating
+
+## Qualitative Insights
+
+### Strengths (Balanced or Over-Expressed)
+${insight.strengths}
+
+### Growth Areas (Positive Gaps)
+${insight.growth_areas}
+
+### Priority Focus
+${insight.priority_focus}
+
+## Meta-Instructions (Actionable Improvements)
+
+### 1. ${instr.1.title}
+**Dimension**: ${instr.1.dimension} (gap: ${instr.1.gap})  
+**Instruction**: ${instr.1.text}  
+**Actionable**: ${instr.1.actionable}  
+**Tracking**: ${instr.1.tracking}
+
+### 2. ${instr.2.title}
+**Dimension**: ${instr.2.dimension} (gap: ${instr.2.gap})  
+**Instruction**: ${instr.2.text}  
+**Actionable**: ${instr.2.actionable}  
+**Tracking**: ${instr.2.tracking}
+
+### 3. ${instr.3.title}
+**Dimension**: ${instr.3.dimension} (gap: ${instr.3.gap})  
+**Instruction**: ${instr.3.text}  
+**Actionable**: ${instr.3.actionable}  
+**Tracking**: ${instr.3.tracking}
+
+_...additional instructions for other significant gaps..._
+
+## Implementation Plan
+
+### Immediate Actions (Today)
+- [ ] ${immediate.1}
+- [ ] ${immediate.2}
+- [ ] ${immediate.3}
+
+### Persistent Rules (This Week)
+- [ ] Create rule: ${rule.1}
+- [ ] Create rule: ${rule.2}
+
+### Tracking Metrics (Ongoing)
+- **Metric 1**: ${metric.1} (target: ${target.1})
+- **Metric 2**: ${metric.2} (target: ${target.2})
+
+### Re-evaluation
+- [ ] Run @meta.extract after 1 week
+- [ ] Compare new MCP with this baseline
+- [ ] Adjust meta-instructions based on progress
+
+## Evidence (Quotes from Extracts)
+
+**From: ${extract.1.name}**
+> ${quote.1}
+
+**From: ${extract.2.name}**
+> ${quote.2}
+
+**From: ${extract.3.name}**
+> ${quote.3}
+
+## JSON Structured Data
+
+\`\`\`json
+{
+  "role": "${role_key}",
+  "timestamp": "${timestamp}",
+  "meta_sources": ${json(extract_files)},
+  "current_mcp": {
+    "structural_thinking": ${cur.struct.score},
+    "reflectivity": ${cur.reflect.score},
+    "intent_clarity": ${cur.intent.score},
+    "cognitive_depth": ${cur.depth.score},
+    "emotional_regulation": ${cur.emotion.score},
+    "collaborative_symmetry": ${cur.symmetry.score}
+  },
+  "target_mcp": {
+    "structural_thinking": ${tgt.struct},
+    "reflectivity": ${tgt.reflect},
+    "intent_clarity": ${tgt.intent},
+    "cognitive_depth": ${tgt.depth},
+    "emotional_regulation": ${tgt.emotion},
+    "collaborative_symmetry": ${tgt.symmetry}
+  },
+  "gap": {
+    "structural_thinking": ${gap.struct},
+    "reflectivity": ${gap.reflect},
+    "intent_clarity": ${gap.intent},
+    "cognitive_depth": ${gap.depth},
+    "emotional_regulation": ${gap.emotion},
+    "collaborative_symmetry": ${gap.symmetry}
+  },
+  "descriptors": {
+    "structural_thinking": "${cur.struct.desc}",
+    "reflectivity": "${cur.reflect.desc}",
+    "intent_clarity": "${cur.intent.desc}",
+    "cognitive_depth": "${cur.depth.desc}",
+    "emotional_regulation": "${cur.emotion.desc}",
+    "collaborative_symmetry": "${cur.symmetry.desc}"
+  },
+  "meta_instructions": [
+    {
+      "dimension": "${instr.1.dimension}",
+      "gap": ${instr.1.gap},
+      "instruction": "${instr.1.text}",
+      "actionable": "${instr.1.actionable}",
+      "tracking": "${instr.1.tracking}"
+    }
+  ]
+}
+\`\`\`
+
+---
+
+_Generated by @meta.gap.mdc v2.0 — Cognitive GAP Analysis System_
+```
+
+## OUTPUT FORMAT
+
+After creating GAP report, print:
+
+```
+✅ GAP ANALYSIS COMPLETE
+
+📄 File: /absolute/path/to/meta/meta.gap.<role>.<timestamp>.mdc
+📊 Analysis Summary:
+   Target Role: <role>
+   Extracts Analyzed: <N>
+   Average Current MCP: [scores]
+   
+🎯 Top 3 Gaps (Priority):
+   1. <dimension>: Δ <gap> 🔴 Critical Gap
+   2. <dimension>: Δ <gap> 🟡 Growth Area
+   3. <dimension>: Δ <gap> 🟡 Growth Area
+
+💡 Priority Meta-Instruction:
+   "<top_instruction>"
+
+📋 Recommended Next Steps:
+   [ ] Review full GAP report in /meta
+   [ ] Implement top 3 meta-instructions immediately
+   [ ] Create persistent rules: @meta.rules.generate
+   [ ] Schedule follow-up extract in 1 week
+   [ ] Track improvement metrics
+
+Status: ✅ SUCCESS
+```
+
+## NOTES & BEST PRACTICES
+
+### Critical Requirements
+- **Valid extract files** — ensure extracts contain valid JSON MCP data
+- **Role alignment** — choose role that matches actual needs
+- **Multiple extracts** — use 2-3 recent extracts for better averaging
+- **Honest gaps** — don't dismiss negative gaps (over-expression matters)
+- **Actionable instructions** — each instruction must be concrete and trackable
+
+### Integration Points
+- **@meta.extract.mdc** → Upstream: provides MCP data
+- **@meta.rules.generate** → Downstream: converts instructions to persistent rules
+- **@analysis.mdc** → Parallel: both use structured analytical thinking
+
+### Common Use Cases
+
+#### Use Case 1: Role Transition
+```
+Scenario: Transitioning from Backend to CTO role
+Action: @meta.gap role=CTO extracts=last_3
+Result: Identify gaps in StructuralThinking and CollaborativeSymmetry
+Follow-up: Create rules for architecture thinking and team alignment
+```
+
+#### Use Case 2: Progress Tracking
+```
+Scenario: Tracking improvement over 1 month
+Action: @meta.gap role=CTO extracts=week1,week2,week3,week4
+Result: See StructuralThinking improve from 6→8→9
+Follow-up: Validate that meta-instructions are working
+```
+
+#### Use Case 3: Custom Profile
+```
+Scenario: Unique project needs (e.g., Security Auditor)
+Action: @meta.gap role=custom target_profile={...}
+Result: Custom gaps for security-specific cognitive requirements
+Follow-up: Create domain-specific workflow rules
+```
+
+### Error Handling
+- **No extracts found**: Prompt to run `@meta.extract` first
+- **Invalid role**: Show menu and ask to select valid option
+- **Custom role without JSON**: Request proper JSON format with example
+- **Parse errors in extract**: Skip corrupted file, warn user, continue with valid files
+- **Empty /meta folder**: Recommend creating first extract before GAP analysis
+
+### Automation Hooks
+```javascript
+// Example: Auto-generate rules from top gaps
+function autoGenerateRules(gapReport) {
+  const topGaps = gapReport.gaps
+    .filter(g => g.delta > 1.0)
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, 3);
+  
+  topGaps.forEach(gap => {
+    const ruleTemplate = generateRuleTemplate(gap);
+    writeFile(`.cursor/rules/${gap.dimension.toLowerCase()}.mdc`, ruleTemplate);
+  });
+}
+
+// Example: Track gap evolution
+function trackGapEvolution(currentGap, historicalGaps) {
+  const evolution = historicalGaps.map((past, i) => ({
+    week: i + 1,
+    gaps: past.gaps.map(g => g.delta)
+  }));
+  
+  return visualizeEvolution(evolution);
+}
+```
+
+---
+
+**Version**: 2.0  
+**Last Updated**: 2025-10-10  
+**Compatibility**: Claude Sonnet 4.5+, Zeya888 Methodology  
+**Related Rules**: @meta.extract.mdc, @meta.rules.generate, @analysis.mdc  
+**Status**: Production

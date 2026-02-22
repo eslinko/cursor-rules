@@ -1,0 +1,1012 @@
+---
+apply: manual
+alwaysApply: false
+---
+
+# @root.cpo-pipeline
+> CPO-style, intent-first, operator-in-the-loop pipeline that orchestrates analysis → execution → testing → documentation using existing rules, with checkpoints and meta-mirroring
+
+## PURPOSE
+The CPO Pipeline is a comprehensive orchestration system that combines multiple specialized rules into a cohesive workflow. It implements Chief Product Officer thinking: value-first approach, explicit intent definition, operator checkpoints at critical transitions, and continuous meta-cognitive mirroring. This ensures high-quality delivery with explicit human oversight and decision validation.
+
+## WHEN TO USE
+- Starting a complex feature or major refactoring
+- When explicit intent and acceptance criteria are critical
+- For work requiring multiple validation stages
+- When operator oversight is needed at decision points
+- For work spanning analysis → implementation → testing → documentation
+- When you need full traceability in AIJournal.md
+
+## INPUT
+- **intent_vector_json**: (optional) — Pre-defined intent structure; if missing, will be inferred and validated
+- **focus_epic**: (optional) — Specific epic to focus on; if missing, will be chosen after planning
+- **timebox**: `<duration>` — e.g., "120m", default: none (work until done)
+- **strictness**: `<low | medium | high>` — validation level, default: medium
+- **verbosity**: `<terse | normal | verbose>` — output detail level, default: terse
+
+## INTENT VECTOR STRUCTURE
+
+The Intent Vector is the foundation of CPO Pipeline execution. All phases validate against it.
+
+```json
+{
+  "problem": "What pain are we removing? For whom?",
+  "outcome": "Observable value delivered when complete",
+  "scope": {
+    "in": "What is included in this work",
+    "out": "What is explicitly excluded"
+  },
+  "constraints": [
+    "Technical constraints (e.g., 'use existing API')",
+    "Time constraints (e.g., 'must ship by Friday')",
+    "Budget/resource constraints",
+    "Compliance constraints (e.g., 'GDPR compliant')"
+  ],
+  "acceptance_criteria": [
+    "AC#1: Positive test (what must work)",
+    "AC#2: Another positive test",
+    "AC#N (negative): What should fail/be prevented"
+  ],
+  "risks": [
+    "Risk A: Description and mitigation",
+    "Risk B: Description and acceptance"
+  ],
+  "priority": "P0 | P1 | P2",
+  "timebox": "e.g., 120m total",
+  "stakeholders": ["user", "developer", "operations", "security"]
+}
+```
+
+## WORKFLOW
+
+### Phase 0: Initialize & Journal
+**Goal**: Establish intent and prepare tracking
+
+#### Step 0.1: Journal Setup
+1. Check for `docs/AIJournal.md`
+2. If missing → create with template structure
+3. Append new session header:
+   ```md
+   ## Session: ${timestamp} — ${brief_intent}
+   **Model**: ${model_id}
+   **Operator**: ${user_id}
+   ```
+
+#### Step 0.2: Intent Vector Collection
+1. **Scan context** — analyze open files, recent edits, user messages
+2. **Parse existing intent** — check for explicit intent in messages or docs
+3. **Identify gaps** — which Intent Vector fields are missing?
+
+4. If gaps exist → **Safety Questionnaire**:
+   ```
+   Let me understand the intent:
+   
+   1. Problem: What pain are we removing for whom?
+   2. Outcome: What will exist or change when we succeed?
+   3. Scope: One sentence "in" and one "out"
+   4. Acceptance Criteria: 3 lines of "done means...", include one negative test
+   5. Constraints: Tech/time/compliance limits?
+   6. Risks: Top 1-2 risks we accept?
+   7. Timebox/Priority: How much time? P0/P1/P2?
+   ```
+
+#### Step 0.3: Intent Validation
+1. Render complete Intent Vector
+2. Write to journal
+3. **META-MIRROR** (5-8 lines):
+   ```md
+   META-MIRROR (what I understood):
+   1. Core problem: ${summary_line_1}
+   2. Success means: ${summary_line_2}
+   3. Key constraint: ${summary_line_3}
+   
+   Open questions / assumptions:
+   - ${question_1}
+   - ${assumption_1}
+   
+   Decision options (if applicable):
+   - Option A: ${description}
+   - Option B: ${description}
+   ```
+
+#### Step 0.4: Checkpoint A
+```
+🔍 CHECKPOINT A: Intent Vector Validation
+
+[Display Intent Vector]
+
+Options:
+[1] Approve — proceed to planning
+[2] Adjust — modify intent before continuing
+[3] Abort — stop pipeline
+
+Your choice:
+```
+
+**Validation**: Operator must explicitly approve before proceeding
+
+### Phase 1: Two-Level Planning
+**Goal**: Create structured plan using @analysis.mdc
+
+#### Step 1.1: Invoke Analysis
+1. Construct analysis prompt:
+   ```
+   @analysis.mdc
+   
+   Intent: ${intent_vector.problem}
+   Outcome: ${intent_vector.outcome}
+   Constraints: ${intent_vector.constraints}
+   
+   Create 2-level decomposition:
+   - Level 1: Epics (major phases)
+   - Level 2: Sub-items per epic
+   
+   Anchor each item to acceptance criteria from Intent Vector.
+   ```
+
+2. Execute @analysis.mdc
+3. Capture structured output
+
+#### Step 1.2: Plan Documentation
+1. Write plan to `docs/AIJournal.md`:
+   ```md
+   ### Plan (2-Level Decomposition)
+   
+   ${epic_structure}
+   ```
+
+2. **META-MIRROR** of plan:
+   ```md
+   META-MIRROR (plan understanding):
+   1. Scope coverage: ${which_AC_covered}
+   2. Risks addressed: ${how}
+   3. Dependencies: ${explicit_deps}
+   4. Estimated effort: ${breakdown}
+   
+   Open questions:
+   - ${technical_unknowns}
+   
+   Critical paths:
+   - ${path_1}
+   ```
+
+#### Step 1.3: Checkpoint B
+```
+🔍 CHECKPOINT B: Plan Validation & Focus Selection
+
+[Display Plan Structure]
+
+Questions:
+1. Does plan cover all AC from Intent Vector?
+2. Are dependencies clear?
+3. Which epic should we tackle first?
+
+Options:
+[1] Approve plan → select focus epic
+[2] Adjust plan → modify structure
+[3] Abort pipeline
+
+Your choice + focus epic:
+```
+
+**Validation**: Operator selects focus_epic for execution
+
+### Phase 2: Execute Sub-Plan
+**Goal**: Implement selected epic using @run-task.mdc
+
+#### Step 2.1: Prepare Execution Context
+1. Extract selected epic/sub-item from plan
+2. Extract relevant AC from Intent Vector
+3. Identify dependencies and prerequisites
+4. Check timebox remaining (if set)
+
+#### Step 2.2: Invoke Run-Task
+1. Construct run-task prompt:
+   ```
+   @run-task.mdc
+   
+   Task: ${focus_epic.description}
+   Context: ${intent_vector.problem}
+   Acceptance Criteria:
+   ${relevant_AC}
+   
+   Constraints:
+   ${relevant_constraints}
+   
+   Execute with ItemY decomposition.
+   ASK before assumptions at ambiguous points.
+   ```
+
+2. Execute @run-task.mdc
+3. Track progress through ItemY phases
+4. Log each decision to journal
+
+#### Step 2.3: Decision Documentation
+For each critical decision during execution:
+1. Document decision in journal
+2. Include rationale and alternatives considered
+3. Note any assumptions made
+
+#### Step 2.4: Progress Meta-Mirror
+```md
+META-MIRROR (execution decisions):
+1. Approach chosen: ${technical_approach}
+2. Assumptions made: ${assumption_list}
+3. Trade-offs: ${what_sacrificed_for_what}
+
+Open risks:
+- ${new_risk_discovered}
+
+Files modified:
+- ${file_list}
+```
+
+#### Step 2.5: Checkpoint C
+```
+🔍 CHECKPOINT C: Execution Validation
+
+Decisions made:
+${decision_summary}
+
+Key assumptions:
+${assumption_list}
+
+Files modified:
+${file_list}
+
+Options:
+[1] Approve — proceed to testing
+[2] Review decision — modify approach
+[3] Rollback — undo changes
+
+Your choice:
+```
+
+**Validation**: Operator approves technical decisions
+
+### Phase 3: Testing & Qualification
+**Goal**: Ensure quality through systematic testing
+
+#### Step 3.1: Test Qualification
+1. Invoke @test-qualification.mdc:
+   ```
+   @test-qualification.mdc
+   
+   Test files: ${test_files_for_epic}
+   
+   Check for:
+   - NO_FALSE_SUCCESSES
+   - VALIDATE_REAL_FUNCTIONALITY
+   - NO_UNTESTED_CRITICAL_PATHS
+   - CORRECT_LOGIC
+   ```
+
+2. Capture qualification results:
+   - P0 issues (false successes, untested paths)
+   - P1 issues (logic problems)
+   - P2 issues (mock overuse, improvements)
+
+3. Document gaps in journal
+
+#### Step 3.2: Drive to Green (if gaps exist)
+If qualification found issues:
+1. Invoke @test-to-success.mdc:
+   ```
+   @test-to-success.mdc
+   
+   Issues identified:
+   ${qualification_issues}
+   
+   Drive to 100% success with:
+   - Fix false successes first (P0)
+   - Cover critical paths (P0)
+   - Fix logic issues (P1)
+   
+   Timebox: ${remaining_time}
+   ```
+
+2. Track iterations until green or timebox expires
+3. Log final test state
+
+#### Step 3.3: Test Results Documentation
+```md
+### Test Results
+
+**Qualification**:
+- P0 issues: ${count} (${status})
+- P1 issues: ${count} (${status})
+- P2 issues: ${count} (${status})
+
+**Final State**:
+- Tests run: ${tests_run}
+- Tests passed: ${tests_passed}
+- Coverage: ${coverage_metrics}
+- Success rate: ${percentage}%
+
+**Remaining gaps** (if any):
+${gap_list}
+```
+
+#### Step 3.4: Checkpoint D
+```
+🔍 CHECKPOINT D: Test Quality Gate
+
+Test Results:
+- Success rate: ${percentage}%
+- P0 issues: ${resolved/total}
+- Coverage: ${metrics}
+
+Options:
+[1] Accept — proceed to documentation
+[2] Strengthen — add more tests (will use timebox)
+[3] Defer gaps — document and proceed
+
+Your choice:
+```
+
+**Validation**: Operator accepts test quality level
+
+### Phase 4: Documentation
+**Goal**: Integrate outcomes into project documentation
+
+#### Step 4.1: Documentation Analysis
+1. Invoke @analysis.mdc for documentation:
+   ```
+   @analysis.mdc
+   
+   Task: Documentation Integration
+   
+   What was done:
+   ${execution_summary}
+   
+   Acceptance Criteria met:
+   ${AC_checklist}
+   
+   Files modified:
+   ${file_list}
+   
+   Plan documentation updates:
+   - Update existing docs where relevant
+   - Create new sections for new concepts
+   - Add examples if applicable
+   - Update architecture diagrams if needed
+   ```
+
+2. Execute analysis
+3. Capture documentation plan
+
+#### Step 4.2: Apply Documentation Changes
+1. For each documentation item in plan:
+   - Update existing files
+   - Create new sections/files
+   - Add cross-references
+   - Include examples
+
+2. Validate completeness:
+   - All AC mentioned in docs?
+   - Architecture changes documented?
+   - API changes documented?
+
+#### Step 4.3: Documentation Summary
+```md
+### Documentation Changes
+
+**Files updated**:
+- ${file_1}: ${change_summary}
+- ${file_2}: ${change_summary}
+
+**Files created**:
+- ${new_file_1}: ${purpose}
+
+**Cross-references added**:
+- ${link_1}
+```
+
+#### Step 4.4: Checkpoint E
+```
+🔍 CHECKPOINT E: Final Acceptance
+
+Deliverables:
+- Code changes: ${summary}
+- Tests: ${test_summary}
+- Documentation: ${doc_summary}
+
+Acceptance Criteria (from Intent Vector):
+${AC_checklist_with_status}
+
+Options:
+[1] Accept — close pipeline successfully
+[2] Revise — adjust artifacts
+[3] Defer — note gaps and close
+
+Your choice:
+```
+
+**Validation**: Final operator approval of all artifacts
+
+### Phase 5: Close & Metrics
+**Goal**: Document outcomes and learnings
+
+#### Step 5.1: Metrics Collection
+Aggregate metrics from all phases:
+
+```md
+## METRICS SUMMARY
+
+### Phase 0: Initialize & Journal
+- elapsed_time_s: ${phase0_time}
+- files_touched: docs/AIJournal.md
+- tokens: ${tokens_phase0}
+
+### Phase 1: Two-Level Planning
+- elapsed_time_s: ${phase1_time}
+- iterations: ${planning_iterations}
+- files_touched: ${files}
+- tokens: ${tokens_phase1}
+
+### Phase 2: Execute Sub-Plan
+- elapsed_time_s: ${phase2_time}
+- iterations: ${itemY_count}
+- files_touched: ${implementation_files}
+- tokens: ${tokens_phase2}
+
+### Phase 3: Testing
+- elapsed_time_s: ${phase3_time}
+- iterations: ${test_fix_iterations}
+- tests_run: ${total_tests}
+- tests_passed: ${passed_tests}
+- tokens: ${tokens_phase3}
+
+### Phase 4: Documentation
+- elapsed_time_s: ${phase4_time}
+- files_touched: ${doc_files}
+- tokens: ${tokens_phase4}
+
+### Phase 5: Close
+- elapsed_time_s: ${phase5_time}
+
+### TOTAL
+- total_elapsed: ${total_time}
+- total_iterations: ${sum_iterations}
+- total_files_touched: ${unique_files_count}
+- total_tokens: ${sum_tokens}
+- success_rate: ${tests_passed/tests_run}%
+```
+
+#### Step 5.2: Lessons Learned
+Document learnings for future sessions:
+
+```md
+## Lessons Learned
+
+### What Worked Well
+- ${positive_1}
+- ${positive_2}
+
+### What Could Improve
+- ${improvement_1}
+- ${improvement_2}
+
+### Discovered Patterns
+- ${pattern_1}
+- ${pattern_2}
+
+### Assumptions Validated/Invalidated
+- ✅ ${validated_assumption}
+- ❌ ${invalidated_assumption}
+```
+
+#### Step 5.3: Next Steps
+```md
+## Next Steps
+
+**Immediate**:
+- [ ] ${action_1}
+- [ ] ${action_2}
+
+**Follow-up**:
+- [ ] ${action_3}
+- [ ] ${action_4}
+
+**Deferred** (noted but not scheduled):
+- ${deferred_1}
+- ${deferred_2}
+```
+
+#### Step 5.4: Final Summary Print
+```
+✅ CPO PIPELINE COMPLETE
+
+📄 Session Log: docs/AIJournal.md
+📊 Metrics:
+   - Total time: ${total_time}
+   - Phases completed: 6/6
+   - Tests: ${tests_passed}/${tests_run} (${percentage}%)
+   - Files modified: ${count}
+
+🎯 Intent Vector Status:
+   ${AC_checklist_final}
+
+📋 Deliverables:
+   - Implementation: ${files}
+   - Tests: ${test_files}
+   - Documentation: ${doc_files}
+
+💡 Key Decision: ${most_critical_decision}
+
+🔗 Next Steps: See AIJournal.md
+
+Status: ✅ OPERATOR APPROVED
+```
+
+## TEMPLATES
+
+### Intent Vector Template
+```json
+{
+  "problem": "string",
+  "outcome": "string",
+  "scope": {
+    "in": "string",
+    "out": "string"
+  },
+  "constraints": ["string"],
+  "acceptance_criteria": ["string"],
+  "risks": ["string"],
+  "priority": "P0 | P1 | P2",
+  "timebox": "string",
+  "stakeholders": ["string"]
+}
+```
+
+### Meta-Mirror Template
+```md
+META-MIRROR (what I understood):
+1. ${key_point_1}
+2. ${key_point_2}
+3. ${key_point_3}
+
+Open questions / assumptions:
+- ${question_or_assumption_1}
+- ${question_or_assumption_2}
+
+Decision options (if applicable):
+- Option A: ${description_a}
+- Option B: ${description_b}
+```
+
+### Checkpoint Template
+```md
+🔍 CHECKPOINT ${letter}: ${checkpoint_name}
+
+${context_and_information}
+
+Options:
+[${option_number}] ${option_description}
+[${option_number}] ${option_description}
+[${option_number}] ${option_description}
+
+Your choice:
+```
+
+### Metrics Block Template
+```md
+METRICS:
+phase: ${phase_name}
+elapsed_time_s: ${seconds_or_estimate}
+iterations: ${iteration_count}
+files_touched: ${file_list_or_count}
+tests_run/tests_passed: ${run}/${passed}
+tokens_in/tokens_out: ${tokens_or_NA}
+model: ${model_id}
+```
+
+## OUTPUT FORMAT
+
+After pipeline completion:
+
+```
+✅ CPO PIPELINE COMPLETE
+
+📄 Session Log: /absolute/path/to/docs/AIJournal.md
+
+📊 Metrics Summary:
+   - Total time: ${duration}
+   - Phases: 6/6 ✅
+   - Files modified: ${count}
+   - Tests: ${passed}/${total} (${percentage}%)
+   - Tokens: ${total_tokens}
+
+🎯 Intent Vector → Acceptance Criteria:
+   ✅ AC#1: ${description}
+   ✅ AC#2: ${description}
+   ✅ AC#N: ${description}
+
+📋 Deliverables:
+   - Code: ${implementation_files}
+   - Tests: ${test_files}
+   - Docs: ${documentation_files}
+
+💡 Key Decisions:
+   - ${decision_1}
+   - ${decision_2}
+
+🔗 Next Steps:
+   ${next_action_summary}
+
+Status: ✅ OPERATOR APPROVED
+```
+
+## NOTES & BEST PRACTICES
+
+### Critical Requirements
+
+#### 1. No Silent Assumptions
+**Rule**: ASK before making assumptions at ambiguous points
+**Implementation**: Use stop-gap questions during Phase 2 execution
+**Example**:
+```
+⚠️ AMBIGUITY DETECTED
+
+Context: Choosing authentication method
+Options:
+A) JWT tokens (stateless, scalable)
+B) Session cookies (simpler, traditional)
+
+Which approach aligns with Intent Vector constraint: "must integrate with existing auth"?
+```
+
+#### 2. Operator-in-the-Loop
+**Rule**: All checkpoints require explicit operator confirmation
+**Implementation**: Present checkpoint, wait for choice, validate input
+**Do NOT**: Auto-approve checkpoints or assume operator intent
+
+#### 3. Intent-First
+**Rule**: No code execution until Intent Vector is confirmed (Checkpoint A)
+**Rationale**: Prevents wasted work on misunderstood requirements
+**Validation**: Phase 0 must complete before Phase 1
+
+#### 4. Timebox Awareness
+**Rule**: Track elapsed time, warn when approaching timebox
+**Implementation**:
+```javascript
+if (elapsed > timebox * 0.8) {
+  warn("80% of timebox consumed, consider prioritizing");
+}
+```
+
+#### 5. Traceability
+**Rule**: Every decision logged in AIJournal.md with rationale
+**Format**:
+```md
+**Decision**: ${what_was_decided}
+**Rationale**: ${why}
+**Alternatives considered**: ${other_options}
+**Trade-offs**: ${what_sacrificed}
+```
+
+### Integration Points
+
+#### Upstream Rules (orchestrated by this pipeline)
+- **@analysis.mdc** → Phase 1 (planning), Phase 4 (documentation)
+- **@run-task.mdc** → Phase 2 (execution with ItemY decomposition)
+- **@test-qualification.mdc** → Phase 3 (test quality assessment)
+- **@test-to-success.mdc** → Phase 3 (driving tests to green)
+
+#### Downstream Rules (can use pipeline outputs)
+- **@meta.extract.mdc** → Extract MCP from pipeline session for improvement tracking
+- **@meta.gap.mdc** → Compare pipeline execution against target profile
+
+#### Parallel Rules (complementary)
+- **@meta.create-rule.mdc** → Used to create/refactor rules including this one
+
+### Common Use Cases
+
+#### Use Case 1: Feature Implementation
+```
+Input:
+- intent_vector_json: {problem: "Users can't filter products", outcome: "Filter UI with 5 criteria"}
+- timebox: "180m"
+- verbosity: "normal"
+
+Flow:
+1. Checkpoint A: Confirm intent + AC
+2. Plan: Epic 1 (UI), Epic 2 (Backend), Epic 3 (Tests)
+3. Checkpoint B: Focus on Epic 1
+4. Execute: Build filter UI with ItemY decomposition
+5. Checkpoint C: Approve UI approach
+6. Test: Qualify + fix until green
+7. Checkpoint D: Accept test coverage
+8. Docs: Update UI docs + API specs
+9. Checkpoint E: Final approval
+10. Close: Metrics + lessons learned
+```
+
+#### Use Case 2: Refactoring
+```
+Input:
+- problem: "Authentication code duplicated in 8 files"
+- outcome: "Single AuthService, all callers updated"
+- constraints: ["no breaking changes", "maintain test coverage"]
+
+Flow:
+1-2. Intent + Plan (extract, refactor, migrate, test)
+3-4. Execute extraction phase
+5-6. Test: Ensure no regressions
+7-8. Document: Update architecture docs
+9. Close with migration guide
+```
+
+#### Use Case 3: Bug Fix with Root Cause Analysis
+```
+Input:
+- problem: "Orders failing silently in production"
+- outcome: "Bug fixed, monitoring added, similar bugs prevented"
+- priority: "P0"
+
+Flow:
+1. Intent: Fix + prevent recurrence
+2. Plan: Investigate → Fix → Test → Monitor → Document
+3. Execute: Root cause analysis using @analysis.mdc
+4. Checkpoint: Validate fix approach
+5. Test: Reproduce bug, fix, verify
+6. Docs: Post-mortem + prevention measures
+```
+
+### Error Handling
+
+#### Checkpoint Rejection
+```
+Scenario: Operator rejects Checkpoint B (plan)
+Action:
+1. Ask: "What needs to change in the plan?"
+2. Re-invoke @analysis.mdc with feedback
+3. Present revised plan
+4. Return to Checkpoint B
+```
+
+#### Timebox Expiry
+```
+Scenario: Timebox reached during Phase 3
+Action:
+1. Save current state to journal
+2. Document progress + remaining work
+3. Present checkpoint: "Continue (extend timebox) or Close (defer gaps)"
+4. If close: Skip Phase 4, go directly to Phase 5 with status="partial"
+```
+
+#### Test Failure Loop
+```
+Scenario: Tests not reaching green after N iterations
+Action:
+1. Log iterations and remaining issues
+2. Present Checkpoint: "Continue (how many more iterations?) or Defer (document gaps)"
+3. If defer: Note test gaps in journal, proceed to documentation
+```
+
+#### Missing Dependencies
+```
+Scenario: During Phase 2, discover missing dependency
+Action:
+1. STOP execution
+2. Document: "Blocker discovered: ${dependency_description}"
+3. Present Checkpoint: "Adjust plan to include dependency work?" or "Abort and reschedule"
+4. If adjust: Re-run Phase 1 with updated scope
+```
+
+### Safety Questionnaire (Detailed)
+
+When Intent Vector fields are missing:
+
+```
+Let me understand the intent to ensure we're aligned:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1️⃣ PROBLEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+What pain are we removing?
+For whom (user, developer, ops)?
+
+Example: "Users can't find products quickly → frustrated, abandon cart"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2️⃣ OUTCOME
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+What will exist when we succeed?
+How will we know it works?
+
+Example: "Search bar with autocomplete, <200ms response, 90% fewer support tickets"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3️⃣ SCOPE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IN: One sentence of what's included
+OUT: One sentence of what's explicitly excluded
+
+Example:
+IN: "Product search, cart search"
+OUT: "User search, admin panel search, order history search"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4️⃣ ACCEPTANCE CRITERIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3 lines of "done means...":
+- AC#1 (positive test)
+- AC#2 (positive test)
+- AC#3 (negative test: what should fail)
+
+Example:
+- "Searching 'laptop' returns relevant products in <200ms"
+- "Empty search shows helpful message, not error"
+- "SQL injection attempts are blocked and logged"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5️⃣ CONSTRAINTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Technical: Must use X? Can't change Y?
+Time: Deadline?
+Budget: Resource limits?
+Compliance: GDPR, SOC2, etc.?
+
+Example:
+- "Must use existing Elasticsearch cluster"
+- "Ship by end of week"
+- "No new dependencies without approval"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6️⃣ RISKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Top 1-2 risks and how we handle them:
+
+Example:
+- "Risk: Elasticsearch load spikes → mitigation: rate limiting + circuit breaker"
+- "Risk: Breaking existing search → mitigation: feature flag + gradual rollout"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7️⃣ TIMEBOX & PRIORITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+How much time can we spend?
+P0 (critical) / P1 (high) / P2 (nice-to-have)?
+
+Example: "120 minutes, P1"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Automation Hooks
+
+```javascript
+// Example: Auto-track pipeline metrics
+function trackPipelineSession(sessionData) {
+  return {
+    session_id: sessionData.timestamp,
+    intent_hash: hash(sessionData.intent_vector),
+    phases_completed: sessionData.metrics.phases.length,
+    total_time_s: sum(sessionData.metrics.phases.map(p => p.elapsed_time_s)),
+    test_success_rate: sessionData.metrics.tests_passed / sessionData.metrics.tests_run,
+    files_modified: unique(sessionData.metrics.files_touched).length,
+    checkpoints_passed: sessionData.checkpoints.filter(c => c.approved).length
+  };
+}
+
+// Example: Generate Intent Vector from project context
+function inferIntentVector(context) {
+  const recentEdits = analyzeRecentEdits(context.files);
+  const userMessages = parseUserMessages(context.chat);
+  const existingDocs = scanDocumentation(context.docs);
+  
+  return {
+    problem: extractProblemStatement(userMessages, existingDocs),
+    outcome: inferDesiredOutcome(recentEdits, userMessages),
+    scope: detectScope(recentEdits, existingDocs),
+    constraints: extractConstraints(existingDocs, userMessages),
+    acceptance_criteria: inferAC(userMessages, existingDocs),
+    risks: identifyRisks(context),
+    priority: inferPriority(userMessages),
+    timebox: extractTimebox(userMessages),
+    stakeholders: identifyStakeholders(context)
+  };
+}
+```
+
+## EXAMPLES
+
+### Example 1: Interactive Invocation
+```
+User: "run @root.cpo-pipeline"
+
+AI:
+Let me understand the intent to ensure we're aligned:
+
+1️⃣ PROBLEM
+What pain are we removing? For whom?
+
+User: "Users can't see their order history. For customers."
+
+AI:
+2️⃣ OUTCOME
+What will exist when we succeed?
+
+User: "Order history page showing last 50 orders, filterable by date and status"
+
+[... continues through questionnaire ...]
+
+AI:
+✅ Intent Vector Complete
+
+[Renders Intent Vector]
+
+META-MIRROR (what I understood):
+1. Core problem: Customers lack visibility into past orders
+2. Success means: Functional order history UI with filters
+3. Key constraints: Must use existing orders API, ship by Friday
+
+🔍 CHECKPOINT A: Intent Vector Validation
+[1] Approve
+[2] Adjust
+Your choice:
+
+User: "1"
+
+[Pipeline proceeds to Phase 1...]
+```
+
+### Example 2: Explicit Parameters
+```
+User: "run @root.cpo-pipeline timebox=120m verbosity=terse focus_epic='Epic 2: Backend'"
+
+AI:
+[Infers Intent Vector from context]
+[Presents Checkpoint A]
+
+User: "1"
+
+AI:
+[Generates plan with @analysis.mdc]
+[Auto-selects Epic 2 as focus]
+[Presents Checkpoint B with Epic 2 pre-selected]
+
+User: "1"
+
+[Pipeline executes Epic 2, terse output, mindful of 120m timebox...]
+```
+
+### Example 3: With Pre-defined Intent
+```
+User:
+```json
+{
+  "problem": "Payment webhooks failing silently, causing order status desync",
+  "outcome": "Robust webhook handling with retries, dead letter queue, monitoring",
+  "scope": {
+    "in": "Stripe webhooks, error handling, monitoring",
+    "out": "Other payment providers, webhook security audit"
+  },
+  "acceptance_criteria": [
+    "Webhook failures retry 3x with exponential backoff",
+    "Failed webhooks go to DLQ after retries exhausted",
+    "Dashboard shows webhook success/failure metrics",
+    "Malformed webhooks are rejected (negative test)"
+  ],
+  "constraints": ["Must not change existing Stripe integration", "Use existing queue infrastructure"],
+  "risks": ["Risk: Duplicate processing → mitigation: idempotency keys"],
+  "priority": "P0",
+  "timebox": "180m",
+  "stakeholders": ["operations", "finance", "developers"]
+}
+
+run @root.cpo-pipeline
+```
+
+AI:
+[Skips questionnaire, uses provided intent]
+[Proceeds directly to Checkpoint A]
+```
+
+---
+
+**Version**: 2.0  
+**Last Updated**: 2025-10-10  
+**Compatibility**: Claude Sonnet 4.5+, Zeya888 Methodology  
+**Related Rules**: @analysis.mdc, @run-task.mdc, @test-qualification.mdc, @test-to-success.mdc, @meta.extract.mdc  
+**Status**: Production
