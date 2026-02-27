@@ -1,0 +1,18 @@
+# Файлы только в ветке 888 (отсутствуют в main) — не коммитим в main
+# Список для надёжности и diff. Сгенерировано по diff main vs 888.
+
+cpo-pipeline-demo.md
+docs/AIJournal.md
+docs/puppeteer-UI.md
+fix-test-failure.mdc
+meta.create-rule.mdc
+meta.extract.mdc
+meta.gap.mdc
+mockups-to-components.mdc
+root.cpo-pipeline.mdc
+self-identification-cosmic.mdc
+self-identification-cto.mdc
+self-identification.mdc
+space-starter.mdc
+testing-method.mdc
+transformation-starter.mdc
