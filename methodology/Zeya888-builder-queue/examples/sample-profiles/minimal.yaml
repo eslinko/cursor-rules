@@ -1,0 +1,20 @@
+# Teaching-only sample profile — не для production CLI без доработки путей
+
+projects:
+  demo:
+    enabled: false
+    focus_folder: demo-app
+    tasks_dir: demo-app/docs/tasks
+    active_packages_dir: demo-active-packages
+    current_pointer: demo-active-package.current.yaml
+    build_windows_subdir: run-reports/demo-build-windows
+    build_window_prefix: demo-cursor-build-window
+    next_readme_dotfile: .demo-next-readme
+    pkg_path_prefix: demo-app/docs/tasks/
+    plan_file: .cursor/plans/Demo_builder.plan.md
+    pipeline_doc: demo-app/docs/tasks/demo-execution-pipeline.md
+    default_input_kind: task_list_linear
+    input_package_yaml_key: demo_input_package
+    artifact_kind: demo_cursor_build_window
+    build_window_title: Demo Cursor build window
+    test_command: "cd demo-app && npm test"
