@@ -47,4 +47,6 @@
 
 ## Обучение
 
-Маршрут: [`curriculum/learning-path.md`](./curriculum/learning-path.md)
+**Старт (человеческий слой):** [`curriculum/00-guide-for-humans.md`](./curriculum/00-guide-for-humans.md)
+
+Маршрут модулей 0–6: [`curriculum/learning-path.md`](./curriculum/learning-path.md) · Architect Studio и три P1: [`curriculum/06-architect-studio-and-p1-intakes.md`](./curriculum/06-architect-studio-and-p1-intakes.md)
