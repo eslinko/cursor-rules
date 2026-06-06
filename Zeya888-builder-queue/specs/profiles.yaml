@@ -1,0 +1,75 @@
+# Реестр Builder Queue — SSOT путей для builder_resolve_queue.py, workflow, starter.
+# Ключ --project в CLI должен совпадать с именем профиля ниже.
+
+projects:
+  gateway:
+    enabled: true
+    focus_folder: doge-complaints-gateway
+    tasks_dir: doge-complaints-gateway/docs/tasks
+    active_packages_dir: gateway-active-packages
+    current_pointer: gateway-active-package.current.yaml
+    build_windows_subdir: run-reports/gateway-build-windows
+    build_window_prefix: gateway-cursor-build-window
+    next_readme_dotfile: .gateway-next-readme
+    pkg_path_prefix: doge-complaints-gateway/docs/tasks/
+    plan_file: .cursor/plans/Gateway_builder.plan.md
+    pipeline_doc: doge-complaints-gateway/docs/tasks/m2-epic-story-execution-pipeline.md
+    default_input_kind: epic_story_tree
+    input_package_yaml_key: gateway_input_package
+    artifact_kind: gateway_cursor_build_window
+    build_window_title: Gateway Cursor build window
+    test_command: "cd doge-complaints-gateway && python3 -m pytest -q"
+
+  gpt:
+    enabled: true
+    focus_folder: "GPT UI"
+    tasks_dir: GPT UI/docs/analysis/tasks
+    active_packages_dir: gpt-active-packages
+    current_pointer: gpt-active-package.current.yaml
+    build_windows_subdir: run-reports/gpt-build-windows
+    build_window_prefix: gpt-cursor-build-window
+    next_readme_dotfile: .gpt-next-readme
+    pkg_path_prefix: "GPT UI/docs/analysis/tasks/"
+    plan_file: .cursor/plans/GPT_builder.plan.md
+    pipeline_doc: GPT UI/docs/analysis/tasks/gpt-story-execution-pipeline.md
+    default_input_kind: task_list_linear
+    input_package_yaml_key: gpt_input_package
+    artifact_kind: gpt_cursor_build_window
+    build_window_title: GPT Cursor build window
+    test_command: "cd \"GPT UI\" && npm test"
+
+  spa:
+    enabled: false
+    focus_folder: spa-app
+    tasks_dir: spa-app/docs/tasks
+    active_packages_dir: spa-active-packages
+    current_pointer: spa-active-package.current.yaml
+    build_windows_subdir: run-reports/spa-build-windows
+    build_window_prefix: spa-cursor-build-window
+    next_readme_dotfile: .spa-next-readme
+    pkg_path_prefix: spa-app/docs/tasks/
+    plan_file: .cursor/plans/Spa_builder.plan.md
+    pipeline_doc: spa-app/docs/tasks/spa-story-execution-pipeline.md
+    default_input_kind: task_list_linear
+    input_package_yaml_key: spa_input_package
+    artifact_kind: spa_cursor_build_window
+    build_window_title: Spa Cursor build window
+    test_command: "cd spa-app && npm test"
+
+  identity:
+    enabled: true
+    focus_folder: doge-identity-service
+    tasks_dir: doge-identity-service/docs/tasks
+    active_packages_dir: identity-active-packages
+    current_pointer: identity-active-package.current.yaml
+    build_windows_subdir: run-reports/identity-build-windows
+    build_window_prefix: identity-cursor-build-window
+    next_readme_dotfile: .identity-next-readme
+    pkg_path_prefix: doge-identity-service/docs/tasks/
+    plan_file: .cursor/plans/ID_builder.plan.md
+    pipeline_doc: doge-identity-service/docs/tasks/ids-epic-execution-pipeline.md
+    default_input_kind: epic_story_tree
+    input_package_yaml_key: identity_input_package
+    artifact_kind: identity_cursor_build_window
+    build_window_title: Identity Cursor build window
+    test_command: 'cd doge-identity-service && python3 -m pytest -q -m "not live_integration"'
