@@ -146,6 +146,64 @@ def _get_profile(root: Path, project_key: str) -> ProjectProfile:
     return ProjectProfile.from_registry(root, project_key, projects[project_key])
 
 
+def _is_queueless_profile(root: Path, project_key: str) -> bool:
+    projects = _load_profiles(root)
+    raw = projects.get(project_key) or {}
+    return bool(raw.get("queueless"))
+
+
+def _parse_yaml_list_under_key(text: str, parent_key: str) -> list[str]:
+    """Extract `- item` list values under `parent_key:` (minimal YAML for profiles.yaml)."""
+    items: list[str] = []
+    in_list = False
+    parent_re = re.compile(rf"^{re.escape(parent_key)}:\s*$")
+    item_re = re.compile(r"^\s+-\s+(.+)$")
+    for line in text.splitlines():
+        if parent_re.match(line.strip()):
+            in_list = True
+            continue
+        if not in_list:
+            continue
+        item_match = item_re.match(line)
+        if item_match:
+            items.append(item_match.group(1).strip().strip("'\""))
+            continue
+        if line.strip() and not line.startswith(" "):
+            break
+        if line.strip() and re.match(r"^\S", line):
+            break
+    return items
+
+
+def _verify_queueless(root: Path, project_key: str) -> None:
+    profiles_path = root / "docs/methodology/Zeya888-builder-queue/specs/profiles.yaml"
+    profiles_text = profiles_path.read_text(encoding="utf-8")
+    projects = _load_profiles(root)
+    raw = projects[project_key]
+    plan_rel = str(raw.get("plan_file", ".cursor/plans/Taxonomy_builder.plan.md"))
+    verify_paths = raw.get("verify_paths") or []
+    if not verify_paths:
+        # Simple YAML parser does not load list nodes — read from file directly.
+        section_start = profiles_text.find(f"  {project_key}:")
+        section = profiles_text[section_start:] if section_start >= 0 else profiles_text
+        verify_paths = _parse_yaml_list_under_key(section, "verify_paths")
+    missing: list[str] = []
+    plan_path = root / plan_rel
+    if not plan_path.is_file():
+        missing.append(plan_rel)
+    for rel in verify_paths:
+        rel_str = str(rel).replace("\\", "/")
+        if not (root / rel_str).is_file():
+            missing.append(rel_str)
+    if missing:
+        print("FAIL missing files:", file=sys.stderr)
+        for p in missing:
+            print(" ", p, file=sys.stderr)
+        sys.exit(1)
+    total = len(verify_paths) + 1
+    print(f"ok taxonomy verify ({total} paths)")
+
+
 def _parse_pkg_scalar(text: str, key: str) -> str | None:
     for line in text.splitlines():
         s = line.strip()
@@ -501,6 +559,15 @@ def main() -> None:
         sys.exit(2)
 
     root = _repo_root()
+
+    if _is_queueless_profile(root, args.project):
+        if not args.verify:
+            raise SystemExit(
+                f"Профиль '{args.project}' (queueless) поддерживает только --verify."
+            )
+        _verify_queueless(root, args.project)
+        return
+
     profile = _get_profile(root, args.project)
     rel_pkg = _read_package_file_pointer(profile)
     pkg_path = profile.tasks_dir / rel_pkg

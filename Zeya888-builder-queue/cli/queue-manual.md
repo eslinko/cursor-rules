@@ -6,7 +6,7 @@
 
 ## 0. Откуда всё читается
 
-1. Выберите `--project` (`gateway`, `gpt`, `identity`, …).
+1. Выберите `--project` (`gateway`, `gpt`, `identity`, `spa`, `taxonomy`, …).
 2. Скрипт читает `{tasks_dir}/*-active-package.current.yaml` → `package_file` → `pkg-*.yaml`.
 3. Запуск **из корня workspace** (где есть `docs/methodology/Zeya888-builder-queue/specs/profiles.yaml`).
 
@@ -127,11 +127,40 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 
 ## 5. Профиль `spa`
 
-`--project spa` завершится ошибкой, пока в `profiles.yaml` стоит `enabled: false`. Включите после `spa-active-packages/` и Build plan.
+`--project spa` — активен. До первого **P1.3** `pkg-bootstrap-pending.yaml` даёт пустую очередь; `--verify` → **FAIL** (ожидаемо). После P1 — flat window: `--write-build-window --window-flat-start 1 --window-flat-end N`. Контракт: [spa-operator-contract.md](../contracts/spa-operator-contract.md). Runtime plan: `.cursor/plans/Spa_builder.plan.md`.
 
 ---
 
-## 6. Troubleshooting
+## 6. Профиль `taxonomy` (queueless meta-script)
+
+**Taxonomy Cycle Builder** — ручной цикл обновления меток (телеметрия → решения → патчи gateway + spa). **Не** pkg-очередь: нет `--list`, `--write-build-window`, `pkg-*.yaml`.
+
+Runtime plan: [`.cursor/plans/Taxonomy_builder.plan.md`](../../../../.cursor/plans/Taxonomy_builder.plan.md)  
+Runbook: `doge-complaints-gateway/docs/runtime-docs/appendix/taxonomy-update-process-ru.md`
+
+### Verify (единственная CLI-команда для профиля)
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project taxonomy --verify
+```
+
+Успех: `ok taxonomy verify (N paths)` — plan + scripts + schema + `taxonomy-cycles/README.md` на диске.
+
+Любой другой флаг → ошибка: *«Профиль taxonomy (queueless) поддерживает только --verify»*.
+
+### Запуск цикла в Cursor
+
+```text
+@.cursor/plans/Taxonomy_builder.plan.md
+@doge-complaints-gateway/docs/runtime-docs/appendix/taxonomy-update-process-ru.md
+Taxonomy cycle TC0–TC7. cycle_id=YYYYMMDD. Claims из кода.
+```
+
+**Зависимости:** GW-L10N-03 (`POST /telemetry/label-misses`); SPA-отправитель telemetry (GL-5) — отдельная spa-задача. До GL-5 operational cycle (TC1+) ждёт живых misses или ручного POST.
+
+---
+
+## 7. Troubleshooting
 
 | Симптом | Действие |
 |---------|----------|
@@ -143,13 +172,13 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 
 ---
 
-## 7. Override в Build plan
+## 8. Override в Build plan
 
 YAML — default. Hardcoded override в `*_builder.plan.md` — только по **явной** команде оператора в чате. После mini-wave — убрать override, снова verify + list.
 
 ---
 
-## 8. Связанные файлы
+## 9. Связанные файлы
 
 | Файл | Зачем |
 |------|-------|

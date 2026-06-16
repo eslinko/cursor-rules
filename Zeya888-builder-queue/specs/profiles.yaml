@@ -39,7 +39,7 @@ projects:
     test_command: "cd \"GPT UI\" && npm test"
 
   spa:
-    enabled: false
+    enabled: true
     focus_folder: spa-app
     tasks_dir: spa-app/docs/tasks
     active_packages_dir: spa-active-packages
@@ -55,6 +55,21 @@ projects:
     artifact_kind: spa_cursor_build_window
     build_window_title: Spa Cursor build window
     test_command: "cd spa-app && npm test"
+
+  taxonomy:
+    enabled: true
+    queueless: true
+    focus_folder: doge-complaints-gateway
+    tasks_dir: doge-complaints-gateway/docs/tasks
+    plan_file: .cursor/plans/Taxonomy_builder.plan.md
+    test_command: "cd doge-complaints-gateway && python3 -m pytest -q tests/test_supabase_required_tables.py tests/test_taxonomy_classify_candidates.py"
+    verify_paths:
+      - doge-complaints-gateway/scripts/taxonomy_fetch_misses.py
+      - doge-complaints-gateway/scripts/taxonomy_classify_candidates.py
+      - doge-complaints-gateway/scripts/taxonomy_apply_gateway.py
+      - doge-complaints-gateway/scripts/taxonomy_apply_spa_i18n.py
+      - doge-complaints-gateway/docs/runtime-docs/appendix/taxonomy-decisions-schema.md
+      - doge-complaints-gateway/docs/tasks/run-reports/taxonomy-cycles/README.md
 
   identity:
     enabled: true

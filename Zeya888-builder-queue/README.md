@@ -43,10 +43,11 @@
 | `gateway` | активен |
 | `gpt` | активен |
 | `identity` | активен |
-| `spa` | зарезервирован (`enabled: false`) |
+| `spa` | активен |
+| `taxonomy` | активен (**queueless** — только `--verify`; meta-script TC0–TC7, без `pkg-*.yaml`) |
 
 ## Обучение
 
 **Старт (человеческий слой):** [`curriculum/00-guide-for-humans.md`](./curriculum/00-guide-for-humans.md)
 
-Маршрут модулей 0–6: [`curriculum/learning-path.md`](./curriculum/learning-path.md) · Architect Studio и три P1: [`curriculum/06-architect-studio-and-p1-intakes.md`](./curriculum/06-architect-studio-and-p1-intakes.md)
+Маршрут модулей 0–6: [`curriculum/learning-path.md`](./curriculum/learning-path.md) · PA + Studio: [`curriculum/06-architect-studio-and-p1-intakes.md`](./curriculum/06-architect-studio-and-p1-intakes.md) · operative §PA: [`core/workflow.md`](./core/workflow.md)
