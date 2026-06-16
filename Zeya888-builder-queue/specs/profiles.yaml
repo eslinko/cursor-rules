@@ -19,6 +19,9 @@ projects:
     artifact_kind: gateway_cursor_build_window
     build_window_title: Gateway Cursor build window
     test_command: "cd doge-complaints-gateway && python3 -m pytest -q"
+    stack_label: Python
+    execution_skill_primary: python-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/python-pro/SKILL.md
 
   gpt:
     enabled: true
@@ -37,6 +40,9 @@ projects:
     artifact_kind: gpt_cursor_build_window
     build_window_title: GPT Cursor build window
     test_command: "cd \"GPT UI\" && npm test"
+    stack_label: GPT Actions
+    execution_skill_primary: openai-custom-gpt-builder
+    execution_skill_path: .cursor/skills/openai-custom-gpt-builder/SKILL.md
 
   spa:
     enabled: true
@@ -55,6 +61,10 @@ projects:
     artifact_kind: spa_cursor_build_window
     build_window_title: Spa Cursor build window
     test_command: "cd spa-app && npm test"
+    stack_label: React/JS
+    execution_skill_primary: react-expert
+    execution_skill_fallback: javascript-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/react-expert/SKILL.md
 
   taxonomy:
     enabled: true
@@ -70,6 +80,9 @@ projects:
       - doge-complaints-gateway/scripts/taxonomy_apply_spa_i18n.py
       - doge-complaints-gateway/docs/runtime-docs/appendix/taxonomy-decisions-schema.md
       - doge-complaints-gateway/docs/tasks/run-reports/taxonomy-cycles/README.md
+    stack_label: Python (scripts)
+    execution_skill_primary: python-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/python-pro/SKILL.md
 
   identity:
     enabled: true
@@ -88,3 +101,6 @@ projects:
     artifact_kind: identity_cursor_build_window
     build_window_title: Identity Cursor build window
     test_command: 'cd doge-identity-service && python3 -m pytest -q -m "not live_integration"'
+    stack_label: Python
+    execution_skill_primary: python-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/python-pro/SKILL.md

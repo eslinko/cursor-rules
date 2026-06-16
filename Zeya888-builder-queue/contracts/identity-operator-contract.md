@@ -105,3 +105,27 @@ Override-волна (`run_mode=epic_ids_*_audit_*` / `*_reaudit_*`) — отде
 | `run_mode=…` (audit override) | Факт-код vs findings в audit report + AC тасков override-списка | workflow §P4b по audit report |
 
 Build plan (`ID_builder.plan.md`) **не** содержит таблицу P4 — только эта секция и workflow.
+
+---
+
+## 6. P1.3 `backlog_story` (identity appendix)
+
+Используется с [workflow.md](../core/workflow.md) §P1.3 (`$p13Appendix` для `builder_project: identity`).
+
+| Параметр | Значение |
+|----------|----------|
+| Epic prefix | `EPIC-IDS-*` |
+| Materialize path | `doge-identity-service/docs/tasks/epics/` |
+| Pipeline story | `epics/<EPIC>/stories/<STORY-KEY>/STORY-*.md` |
+| Task naming | `task-ids-NN-YY-tNN-<slug>/README.md` |
+| Active pointer | `identity-active-package.current.yaml` |
+| Execution skill | `python-pro` |
+
+**Epic materialize (из backlog Meta.Epic):**
+
+- EPIC уже в `epics/` → использовать.
+- EPIC только в `backlog-stories/EPIC-*.md` → materialize `EPIC-IDS-NN-*.md` (следующий свободный номер) + bullrun.
+- EPIC только «в коде» (AUTH-CORE/OAUTH/EID) → `EPIC-IDS-NN-<slug>.md` по Meta + runtime-docs из «Парадигма-якорь»; не дублировать EPIC-IDS-01..06.
+
+**Пример:** `STORY-IDS-EID-01` → `EPIC-IDS-09` / `pkg-000015`.
+

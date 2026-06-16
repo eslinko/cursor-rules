@@ -1,6 +1,6 @@
 # Zeya888 Builder Queue — старт чистой сессии
 
-Операторский playbook для **нового чата**: onboarding фокусного проекта, затем P1–P8.
+Операторский playbook для **нового чата**: onboarding фокусного проекта, затем **PA** (опционально) и P1–P8.
 
 **SSOT маршрута:** [workflow.md](./workflow.md) (короткие фазы) · [workflow-legacy.md](./workflow-legacy.md) (полные промпты)  
 **Реестр путей:** [profiles.yaml](../specs/profiles.yaml)  
@@ -18,7 +18,7 @@ pipeline_profile: builder_full
 
 | Поле | Значение | Примечание |
 |------|----------|------------|
-| `builder_project` | `gateway` \| `gpt` \| `identity` \| `spa` | Ключ из `profiles.yaml` (`spa` пока disabled) |
+| `builder_project` | `gateway` \| `gpt` \| `identity` \| `spa` | Ключ из `profiles.yaml` |
 | `workspace_root` | абсолютный путь к корню workspace | где лежит `docs/methodology/Zeya888-builder-queue/` |
 | `pipeline_profile` | `builder_full` \| `generic_repo` | `builder_full` — P1–P8; иначе только Phase 0 |
 
@@ -27,6 +27,7 @@ pipeline_profile: builder_full
 - `focus_folder`, `tasks_dir`, `plan_file`, `pipeline_doc` — по ключу `builder_project`
 - `focus_root` = `{workspace_root}/{focus_folder}`
 - `verify_cmd` = `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project {builder_project} --verify`
+- `execution_skill_primary`, `execution_skill_path`, `stack_label` — по ключу `builder_project` ([profiles.yaml](../specs/profiles.yaml)); резолв в [builder-session/SKILL.md](../../../../.cursor/skills/builder-session/SKILL.md) §Execution skill resolution
 
 ---
 
@@ -40,10 +41,10 @@ workspace_root: /Users/eslinko/Development/DOGEstonia
 pipeline_profile: builder_full
 
 Выполни Phase 0 (onboarding) по AGENT CONTRACT ниже. Не меняй код.
-После Onboarding summary — жди фазу (P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8).
+После Onboarding summary — жди фазу (PA | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8).
 ```
 
-Для GPT — `builder_project: gpt`, [workflow.md](./workflow.md) §P1–P8 и [gpt-operator-contract.md](../contracts/gpt-operator-contract.md) (resolve from index, `run_mode`, sync index). Для **doge-identity-service** — `builder_project: identity`, [identity-operator-contract.md](../contracts/identity-operator-contract.md). В первом сообщении оператор указывает **один** режим: `input_mode: epic_story` \| `requirement` \| `backlog_story` (identity) или `run_mode=…` / default pkg (gpt).
+Для GPT — `builder_project: gpt`, [workflow.md](./workflow.md) §P1–P8 и [gpt-operator-contract.md](../contracts/gpt-operator-contract.md) (resolve from index, `run_mode`, sync index). Для **doge-identity-service** — `builder_project: identity`, [identity-operator-contract.md](../contracts/identity-operator-contract.md). Для **spa-app** — `builder_project: spa`, [spa-operator-contract.md](../contracts/spa-operator-contract.md); типичный intake **P1.3** `backlog_story`. В первом сообщении оператор указывает **один** режим: `input_mode: epic_story` \| `requirement` \| `backlog_story` (identity/spa) или `run_mode=…` / default pkg (gpt).
 
 ---
 
@@ -58,7 +59,7 @@ pipeline_profile: builder_full
 #### Общий чеклист
 
 1. `focus_root`, `focus_git_root`
-2. Стек: `pyproject.toml` / `package.json` в `focus_root`
+2. Стек: `stack_label` + `test_command` из profiles; execution skill — `execution_skill_primary` @ `execution_skill_path`
 3. Layout кода и точка входа
 4. `docs/requirements/` или аналог
 5. Тесты — команда из `test_command` в `profiles.yaml` для профиля
@@ -88,22 +89,24 @@ P1–P8 недоступны — локальный процесс проект�
 ## Onboarding summary — {builder_project}
 
 - Git root: …
-- Stack / tests: …
+- Stack / tests: … (`stack_label`, `test_command`)
+- Execution skill: … (`execution_skill_primary` @ `execution_skill_path`)
 - Active pkg / verify: …
 - Plan: …
 
 ## Ready for
 
-P1 | P2 | … — жду указание оператора.
+P1 | P2 | … — жду указание оператора. (PA — в отдельном Studio-чате до P1; см. workflow §PA.)
 ```
 
-### 3.4 Фазы P1–P8
+### 3.4 Фазы PA, P1–P8
 
 Тексты — [workflow.md](./workflow.md). Карта (синхронизирована с workflow):
 
 | Фаза | Режим | Суть |
 |------|-------|------|
-| P1 | Plan | P1.1 epic / P1.2 requirement / P1.3 backlog (identity) → tasks + pkg + index |
+| **PA** | Intake Analysis | PA.1 epic / PA.2 requirement / PA.3 backlog → `$intakeArtifact` на диске; **без pkg**; часто отдельный Studio-чат |
+| P1 | Plan | P1.1 epic / P1.2 requirement / P1.3 backlog → tasks + pkg + index; **предпосылка:** canonical intake |
 | P2 | Build window | verify + `--write-build-window` |
 | P3 | Execute | plan + window; bullrun + run-task |
 | P4 | Audit (external) | cross-audit |
@@ -123,7 +126,9 @@ P1 | P2 | … — жду указание оператора.
 | P4 | Scaffold only — без pytest/runtime |
 | Plans | `.cursor/plans/*.plan.md` — не редактировать без запроса |
 | Commits | git-commit.md; push только по запросу |
-| Identity | [identity-operator-contract.md](../contracts/identity-operator-contract.md) — index/pkg verify, epic registry, per-task index sync; `backlog_story` → §4 |
+| Execution skill | [builder-session/SKILL.md](../../../../.cursor/skills/builder-session/SKILL.md) §Execution skill resolution — profile SSOT; task README overrides |
+| Identity | [identity-operator-contract.md](../contracts/identity-operator-contract.md) — index/pkg verify; `backlog_story` → §4, P1.3 → §6 |
+| Spa | [spa-operator-contract.md](../contracts/spa-operator-contract.md) — bootstrap verify FAIL до P1; `backlog_story` → §4, P1.3 → §6 |
 
 ### 3.6 SSOT при противоречии
 
@@ -142,6 +147,8 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gateway --write-build-window --story-key STORY-M2-XX-YY
 python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project identity --list
 python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project identity --write-build-window --story-key STORY-IDS-01-01
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project spa --verify
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project spa --write-build-window --window-flat-start 1 --window-flat-end N
 ```
 
 См. [queue-manual.md](../cli/queue-manual.md).
@@ -156,6 +163,7 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 | Skill | `.cursor/skills/builder-session/SKILL.md` |
 | Rule | `.cursor/rules/builder-operator-habits.mdc` |
 | Identity contract | `docs/methodology/Zeya888-builder-queue/contracts/identity-operator-contract.md` |
+| Spa contract | `docs/methodology/Zeya888-builder-queue/contracts/spa-operator-contract.md` |
 
 ---
 

@@ -7,6 +7,8 @@
 
 **Пути CLI/skill обновлены** под Builder Queue (`builder_resolve_queue.py --project …`, `builder-session`). Подставьте `builder_project: gateway` или `gpt` (см. [`profiles.yaml`](../specs/profiles.yaml)).
 
+**Execution skill:** данные в `profiles.yaml` (`execution_skill_primary`, `execution_skill_path`); логика — [builder-session/SKILL.md](../../../../.cursor/skills/builder-session/SKILL.md) §Execution skill resolution. P1.3 epic naming — [identity-operator-contract.md](../contracts/identity-operator-contract.md) §6 / [spa-operator-contract.md](../contracts/spa-operator-contract.md) §6. Не хардкодить `python-pro` в универсальных промптах — см. [`workflow.md`](../core/workflow.md) §P1.3.
+
 ---
 
 # Workflow: Requirement → Pipeline → Audit (полная версия)
@@ -125,6 +127,82 @@ Wave checkpoint — $storyKey (builder_project: $builderProject)
 
 Используйте, если **не** делали Phase 0 или нужен самодостаточный блок в новом чате.  
 Для gateway в примерах ниже подставьте пути `doge-complaints-gateway/…`; для gpt — из [`profiles.yaml`](../specs/profiles.yaml).
+
+Короткие operative промпты PA/P1–P8: [`workflow.md`](./workflow.md).
+
+---
+
+## PA — Intake Analysis (полные промпты)
+
+**Когда:** сырой или неполный intake-файл; **до** P1. **Не** создавать pkg, task README, pipeline story. **Выход:** `$intakeArtifact` на диске → handoff в P1.1 / P1.2 / P1.3.
+
+**Skip:** файл уже canonical (метаданные, verified state, AC — как соседи в `$etalonDir`).
+
+### PA.2-full — Requirement shaping (self-contained)
+
+Типичный кейс: GPT `REQ-42` → canonical requirement → P1.2.
+
+```text
+@.cursor/rules/analysis.mdc
+
+PA Intake Analysis — requirement shaping. builder_project: gpt
+@GPT UI/docs/requirements/REQ-42.md
+
+Эталон стиля: папка GPT UI/docs/requirements/ — ориентир REQ-40, REQ-41 (метаданные, §1 verified state, §2 целевое, AC, dependencies).
+
+Задача: довести @$intakeDraft до Builder-ready requirement ($intakeArtifact = тот же файл на диске после записи).
+
+Правила:
+- Analysis / shaping only — без pkg, без bullrun, без task README, без P3.
+- @.cursor/rules/analysis.mdc — каждый claim о коде/instructions с path; без assumptions.
+- Интерактивное интервью на КАЖДОМ decision point (scope, boundaries, AC, dependencies, verified current state).
+- Язык: человечески, с расшифровкой терминов.
+- Протокол Other: если оператор в «Other» задаёт встречный вопрос — сначала полный ответ, затем повтор исходного вопроса или адаптация к обновлённому контексту.
+- Не переходить к декомпозиции в tasks — это P1.2.
+
+Шаги:
+1) Прочитать REQ-42 и 2 эталонных REQ из той же папки — таблица «чего не хватает» (метаданные, verified §, AC структура, парные REQ).
+2) Для секций verified state — grep/read instructions и код; только facts с paths.
+3) Интервью по gaps в документе; фиксировать решения оператора в тексте requirement.
+4) Записать обновлённый файл на диск.
+5) Handoff: «PA.2 завершён. P1.2 input_mode=requirement. @GPT UI/docs/requirements/REQ-42.md»
+```
+
+### PA.1-full — Epic shaping (self-contained)
+
+```text
+@.cursor/rules/analysis.mdc
+
+PA Intake Analysis — epic shaping. builder_project: $builderProject
+@$intakeDraft
+Эталон: $tasksRoot/epics/ — 1–2 соседних EPIC-*.md
+
+Довести epic до canonical (Goal, Stories, AC, out of scope, метаданные) для P1.1.
+Analysis only — без pkg, без tasks, без P3.
+Интерактивное интервью + Other-протокол (см. PA.2-full).
+Verified claims — paths (analysis.mdc).
+Записать @$intakeArtifact (= @$epicFile).
+Handoff: «PA.1 → P1.1 epic_story. @$epicFile»
+```
+
+### PA.3-full — Backlog story shaping (self-contained)
+
+```text
+@.cursor/rules/analysis.mdc
+
+PA Intake Analysis — backlog story. builder_project: identity
+@$intakeDraft
+Эталон: doge-identity-service/docs/tasks/backlog-stories/ + опционально INDEX.md
+
+Довести story до canonical (Meta, Scope, AC, «Точки в коде», «Вне scope») для P1.3.
+Analysis only — без pipeline story, без pkg, без P3.
+Gap-to-code для «Точки в коде» — paths из grep/read.
+Интерактивное интервью + Other-протокол (см. PA.2-full).
+Записать @$intakeArtifact (= @$storyFile).
+Handoff: «PA.3 → P1.3 backlog_story. @$storyFile»
+```
+
+---
 
 ### P1 — Plan mode: декомпозиция requirement
 

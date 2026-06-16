@@ -20,12 +20,21 @@
 | `artifact_kind` | Тип build window artifact |
 | `build_window_title` | Заголовок в генерируемом окне |
 | `test_command` | Команда тестов для Phase 0 |
+| `stack_label` | Человекочитаемый стек (Python, React/JS, GPT Actions) |
+| `execution_skill_primary` | Slug execution skill для P1/P3 (напр. `python-pro`, `react-expert`) |
+| `execution_skill_fallback` | Опционально: запасной slug (напр. `javascript-pro` для spa) |
+| `execution_skill_path` | Путь к SKILL.md от корня workspace — SSOT для `@` attach при code changes |
+| `queueless` | `true` — только `--verify` (напр. `taxonomy`) |
+| `verify_paths` | Список файлов для queueless verify |
+
+**Execution skill:** данные в `profiles.yaml`; логика резолва и override task README — [builder-session/SKILL.md](../../../../.cursor/skills/builder-session/SKILL.md) §Execution skill resolution.
 
 ## Добавление нового проекта
 
 1. Скопировать блок существующего профиля
-2. Создать `{project}-active-packages/` и `{project}-active-package.current.yaml`
-3. Создать `.cursor/plans/{Project}_builder.plan.md`
-4. `python3 …/cli/builder_resolve_queue.py --project {key} --verify`
+2. Заполнить `stack_label`, `execution_skill_primary`, `execution_skill_path`
+3. Создать `{project}-active-packages/` и `{project}-active-package.current.yaml`
+4. Создать `.cursor/plans/{Project}_builder.plan.md`
+5. `python3 …/cli/builder_resolve_queue.py --project {key} --verify`
 
 Пример минимального профиля: [`../examples/sample-profiles/minimal.yaml`](../examples/sample-profiles/minimal.yaml)

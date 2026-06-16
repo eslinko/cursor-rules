@@ -1,9 +1,11 @@
-# Модуль 3 — Фазы workflow P0–P8 (для человека)
+# Модуль 3 — Фазы workflow P0–PA–P8 (для человека)
 
-**Operative SSOT:** [`../core/workflow.md`](../core/workflow.md) · полные промпты: [`../core/workflow-legacy.md`](../core/workflow-legacy.md)  
+**Operative SSOT:** [`../core/workflow.md`](../core/workflow.md) §PA + §P1–P8 · полные промпты: [`../core/workflow-legacy.md`](../core/workflow-legacy.md)  
 **Контекст:** [`00-guide-for-humans.md`](./00-guide-for-humans.md)
 
 Каждая секция — *что происходит* и *роль архитектора*. Промпты для вставки — только в workflow.
+
+**Два skill:** [`builder-session/SKILL.md`](../../../../.cursor/skills/builder-session/SKILL.md) — процесс (pkg, verify, фазы); **execution skill** — язык проекта (`python-pro`, `react-expert`, …) из [`profiles.yaml`](../specs/profiles.yaml), резолв в builder-session §Execution skill resolution. Workflow-промпты универсальны; стек не зашит в §P1–P8.
 
 ---
 
@@ -18,11 +20,26 @@
 
 ---
 
+## PA — Intake Analysis (перед P1)
+
+**Что происходит:** сырой или неполный intake-файл (requirement, epic, backlog story) доводится до **Builder-ready** формы — метаданные, verified state, AC, стиль как у соседей в папке. Интерактивное интервью на decision points; gap-to-code при секциях verified state.
+
+**Архитектор:** отдельный Studio-чат (Plan/Ask); фиксирует решения **в файле на диске**, не в чате.  
+**Typical mistake:** смешать PA с P1 (shape + decompose в одном сообщении) или с P3 (код до canonical intake).
+
+**Skip PA:** файл уже canonical (напр. готовый REQ-41 vs сырой REQ-42).
+
+**Operative:** workflow §PA.1–PA.3 · human context: [`06-architect-studio-and-p1-intakes.md`](./06-architect-studio-and-p1-intakes.md).
+
+**Не путать с P4:** P4 — audit **после** execution; PA — shaping **до** P1.
+
+---
+
 ## P1 — Plan (три входа)
 
-P1 **только планирует**: EPIC/STORY/tasks, pkg, index. Без pytest, без merge в main.
+P1 **только планирует**: EPIC/STORY/tasks, pkg, index. **Предпосылка:** intake прошёл PA или уже canonical. P1 не проводит интервью черновика.
 
-**Как выбрать intake после Architect Studio:** decision tree и handoff — [`06-architect-studio-and-p1-intakes.md`](./06-architect-studio-and-p1-intakes.md).
+**Handoff после Studio (PA):** decision tree — [`06-architect-studio-and-p1-intakes.md`](./06-architect-studio-and-p1-intakes.md).
 
 ### P1.1 — `input_mode=epic_story`
 
@@ -35,21 +52,21 @@ P1 **только планирует**: EPIC/STORY/tasks, pkg, index. Без pyt
 
 ### P1.2 — `input_mode=requirement`
 
-**Что происходит:** вход — REQ-файл. Сначала **найти существующий эпик** по домену (index + `epics/`), не создавать параллельный дубль. Requirement → story(ies) внутри эпика → tasks → pkg.
+**Что происходит:** вход — **canonical** REQ-файл (после PA.2, если был черновик). Найти существующий эпик → stories → tasks → pkg.
 
-**Архитектор:** reuse эпиков — системная целостность домена.  
-**Typical mistake:** новый EPIC-M2-99 на каждый REQ.
+**Архитектор:** перед P1.2 при сыром REQ — **PA.2** в Studio; reuse эпиков в P1.  
+**Typical mistake:** P1.2 на сыром REQ-42 без PA; новый EPIC-M2-99 на каждый REQ.
 
 **Operative:** workflow §P1.2.
 
-### P1.3 — `input_mode=backlog_story` (типично identity)
+### P1.3 — `input_mode=backlog_story` (типично identity или spa)
 
-**Что происходит:** вход — story из `backlog-stories/`. Materialize epic (если нет), pipeline story, deep task decomposition, pkg `epic_story_tree`, sync index. Backlog-файл не удаляется.
+**Что происходит:** вход — story из `backlog-stories/`. Materialize epic (если нет), pipeline story, deep task decomposition, pkg `epic_story_tree`, sync index. Backlog-файл не удаляется. Epic/task naming — operator contract §6.
 
 **Архитектор:** intake одной story без полного epic-decompose всего домена.  
-**Typical mistake:** смешать с P1.1/P1.2 в одной волне без команды.
+**Typical mistake:** смешать с P1.1/P1.2 в одной волне без команды; `python-pro` в spa (нужен `react-expert` из profile).
 
-**Operative:** workflow §P1.3, [`identity-operator-contract.md`](../contracts/identity-operator-contract.md) §4.
+**Operative:** workflow §P1.3 · [`identity-operator-contract.md`](../contracts/identity-operator-contract.md) §6 · [`spa-operator-contract.md`](../contracts/spa-operator-contract.md) §6.
 
 ---
 
