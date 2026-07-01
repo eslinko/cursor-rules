@@ -1,0 +1,51 @@
+---
+description: Zeya888 Builder Queue operator habits for gateway, GPT UI, identity, spa-app, and scripts (Web3)
+globs:
+  - doge-complaints-gateway/**
+  - GPT UI/**
+  - doge-identity-service/**
+  - spa-app/**
+  - scripts/**
+alwaysApply: false
+---
+
+# Builder operator habits
+
+When the operator names `builder_project` (gateway, gpt, identity, spa, scripts) or works on Zeya888 Builder Queue / pkg / build window:
+
+1. **Before Build execution:** from workspace root run  
+   `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project <key> --verify`  
+   Use `gateway` or `gpt` from context; stop on FAIL.
+2. **Artifact dates:** never invent `created_at`, gate `Date:`, or run-summary timestamps — run `--print-utc-now` first; after P1 scaffold / before story Done run `--verify --check-dates` (stop on FAIL). SSOT: [builder-artifact-dates.md](../../docs/methodology/Zeya888-builder-queue/guides/builder-artifact-dates.md).
+3. **YAML SSOT** — do not rewrite immutable `pkg-*.yaml`; `run_mode` only on explicit operator request.
+4. **P4** — scaffold gap tasks only; no pytest/runtime implementation.
+5. **Claims** — cite file paths (analysis.mdc); no memory-only assertions.
+6. **Plans** — do not edit `.cursor/plans/*_builder.plan.md` unless the operator asks.
+7. **Epic reuse (P1/P4)** — before creating `EPIC-M2-XX`, search `doge-complaints-gateway/docs/tasks/epics/` and `bullrun-launch-index.md` for an in-scope epic (e.g. intake → EPIC-M2-02). Add a **story + tasks** under that epic; if the epic is closed but the domain matches, **reopen** it in the epic file and index — do not spawn a parallel epic.
+8. **Gateway (`builder_project: gateway`)** — полный контракт: [gateway-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/gateway-operator-contract.md):
+   - перед batch-run: `bullrun-launch-index.md` §«Актуальная точка» + `gateway-active-package.current.yaml` + `--verify`; очередь из pkg или `run_mode=…` (§safe-override в plan);
+   - эпик `EPIC-M2-*` без task queue в индексе → не декомпозирован → P1 + `bullrun-epic-decompose`, не P3;
+   - после каждого закрытого task/story — обновить индекс в той же итерации;
+   - не редактировать `.cursor/plans/Gateway_builder.plan.md` без запроса оператора.
+9. **GPT (`builder_project: gpt`)** — полный контракт: [gpt-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/gpt-operator-contract.md):
+   - перед batch-run: `bullrun-launch-index.md` + `gpt-active-package.current.yaml` + `--verify`; очередь из pkg или `run_mode=…` (§safe-override);
+   - эпик `EPIC-M1-*` без строки в индексе → не декомпозирован → `bullrun-epic-decompose`, не P3;
+   - после каждого закрытого task/story — обновить индекс в той же итерации;
+   - не редактировать `.cursor/plans/GPT_builder.plan.md` без запроса оператора.
+10. **Identity (`builder_project: identity`)** — полный контракт: [identity-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/identity-operator-contract.md):
+   - перед batch-run: `bullrun-launch-index.md` + `identity-active-package.current.yaml` + `--verify`; только `EPIC-IDS-*` из `doge-identity-service/docs/tasks/epics/`;
+   - эпик-файл без строки в индексе → не декомпозирован → `@.cursor/commands/bullrun-epic-decompose.md`, не P3;
+   - после каждого закрытого task/story — обновить индекс в той же итерации;
+   - оператор задаёт `input_mode: epic_story | requirement | backlog_story` (или `run_mode=…` для audit override) — не смешивать в одном pkg; P1/P4 — [identity-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/identity-operator-contract.md) §4–§5.
+11. **Scripts (`builder_project: scripts`)** — полный контракт: [scripts-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/scripts-operator-contract.md):
+   - перед batch-run: `bullrun-launch-index.md` + `scripts-active-package.current.yaml` + `--verify`; до первого P1 ожидаемо FAIL (bootstrap);
+   - primary intake: P1.3 `STORY-SCR-*` из `scripts/docs/tasks/backlog-stories/`; shaping — `scripts/docs/runtime-infrastructure/`;
+   - эпик `EPIC-SCR-*` без task queue в индексе → не декомпозирован → P1, не P3;
+   - после каждого закрытого task/story — обновить индекс в той же итерации;
+   - execution skill: `javascript-pro`; tests: `npm run test:unit` из корня workspace;
+   - не редактировать `.cursor/plans/Scripts_builder.plan.md` без запроса оператора.
+12. **Fixed builder plans (`*_builder.plan.md`):** execution — @attach в **текущем** project-чате + [workflow.md](../../docs/methodology/Zeya888-builder-queue/core/workflow.md) §P3/P6; **не** нажимать Build / Execute plan на файле плана ([fixed-builder-plan-execution.md](../../docs/methodology/Zeya888-builder-queue/guides/fixed-builder-plan-execution.md)). Ephemeral P1/P5 plans — Plan mode только в том project-чате, где идёт волна.
+
+Session onboarding: `@docs/methodology/Zeya888-builder-queue/core/session-starter.md`  
+Workflow phases: `@docs/methodology/Zeya888-builder-queue/core/workflow.md`  
+Skill: `@.cursor/skills/builder-session/SKILL.md`
