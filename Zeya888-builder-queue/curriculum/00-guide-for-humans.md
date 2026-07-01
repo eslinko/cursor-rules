@@ -49,16 +49,16 @@ flowchart LR
 
 ## 3. Как работает один цикл (язык процессов)
 
-1. **Вход** — requirement, epic или backlog story ([`workflow.md`](../core/workflow.md) §P1.1–P1.3).
-2. **P1 Plan** — декомпозиция в EPIC → STORY → task README по [`task-standard.md`](../../task-standard.md). Создаётся **immutable** `pkg-*.yaml` и обновляется `*-active-package.current.yaml`.
-3. **Verify** — CLI проверяет, что каждый path из pkg **существует на диске**. FAIL = стоп, правка контракта, не «ещё один промпт».
-4. **P2 Build window** — из pkg вырезается slice (одна story, flat диапазон, GIM-slice для GPT). Файл окна — для attach в P3, не SSOT очереди.
-5. **P3 Execute** — attach operative builder plan (`.cursor/plans/*_builder.plan.md`) + build window. Шаг 0 снова verify. Агент идёт по README из окна.
-6. **P4 Audit** — внешний cross-audit по **фактическому коду** (часто Claude вне Cursor). Findings, severity, без реализации.
-7. **P5 Gap scaffold** — только task-папки и index/plan override; **без pytest и без fix**. Порог: мало gaps → safe-override в plan; много → новый pkg.
-8. **P6 Execute gaps** — исправление по override или повтор P2+P3 по YAML.
-9. **P7 Re-audit** — проверка закрытия каждого gap.
-10. **P8 Commits** — scope anchor (REQ / STORY / EPIC), [`git-commit.md`](../../git-commit.md); task docs по умолчанию не коммитятся.
+0. **Architect Studio (опционально)** — отдельный чат для **PA Intake Analysis**: сырой черновик → canonical intake на диске ([`workflow.md`](../core/workflow.md) §PA). Skip, если файл уже Builder-ready.
+1. **PA → P1** — intake-якорь (requirement, epic или backlog story) → декомпозиция в EPIC → STORY → task README ([`workflow.md`](../core/workflow.md) §P1.1–P1.3).
+2. **P1 Plan** — immutable `pkg-*.yaml` и `*-active-package.current.yaml`.
+3. **Verify** — CLI проверяет paths из pkg. FAIL = стоп.
+4. **P2 Build window** — slice для одной сессии Cursor.
+5. **P3 Execute** — builder plan + build window; шаг 0 verify.
+6. **P4 Audit** — cross-audit по коду; findings, без fix.
+7. **P5 Gap scaffold** — task-папки; без pytest.
+8. **P6 Execute gaps** · **P7 Re-audit**
+9. **P8 Commits** — scope anchor; task docs по умолчанию не коммитятся.
 
 Подробнее по каждой фазе: [`03-workflow-phases-explained.md`](./03-workflow-phases-explained.md).
 
@@ -131,7 +131,7 @@ Solo builder не обязан помнить 40 task README — достато�
 | 5 | [`05-connect-your-project.md`](./05-connect-your-project.md) | [`../integration/cursor-setup.md`](../integration/cursor-setup.md) |
 | 6 | [`06-architect-studio-and-p1-intakes.md`](./06-architect-studio-and-p1-intakes.md) | [`../core/workflow.md`](../core/workflow.md) §P1 |
 
-**Architect Studio vs Builder:** отдельный per-project чат для архитектуры и gap analysis — без pkg и без P3. Выход Studio — один файл на диске (epic, requirement или backlog story); затем Builder-сессия с **одним** `input_mode` (P1.1 / P1.2 / P1.3). Подробно — модуль 6.
+**Architect Studio vs Builder:** отдельный per-project чат для **PA (Intake Analysis)** — дозреть intake-файл; без pkg и без P3. Builder-сессия: P1+ с одним `input_mode`. Подробно — модуль 6 · operative §PA в [`workflow.md`](../core/workflow.md).
 
 Полная карта: [`learning-path.md`](./learning-path.md).
 

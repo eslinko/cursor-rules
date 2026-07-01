@@ -9,30 +9,34 @@
 Оператор задаёт `**builder_project`** (`gateway` | `gpt` | `identity` | …) в [starter](./session-starter.md) или в wave checkpoint.
 
 
-| Переменная         | Подстановка                                                                                                                                                                                                       |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `$builderProject`  | `gateway` / `gpt` / …                                                                                                                                                                                             |
-| `$verifyCmd`       | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project $builderProject --verify`                                                                                                  |
-| `$inputMode`       | `requirement`                                                                                                                                                                                                     |
-| `$requirementDoc`  | файл требования (для `input_mode=requirement`)                                                                                                                                                                    |
-| `$epicFile`        | файл эпика (для `input_mode=epic_story`)                                                                                                                                                                          |
-| `$storyFile`       | для `input_mode=backlog_story` — готовая story из `backlog-stories/` (напр. `doge-identity-service/docs/tasks/backlog-stories/STORY-IDS-*.md`); для `input_mode=epic_story` — опционально одна story внутри эпика |
-| `$backlogIndex`    | опционально для `input_mode=backlog_story`: `doge-identity-service/docs/tasks/backlog-stories/INDEX.md` (порядок/зависимости; не подменяет AC story)                                                              |
-| `$planFile`        | см. `plan_file` в `[profiles.yaml](../specs/profiles.yaml)`                                                                                                                                                       |
-| `$tasksRoot`       | см. `tasks_dir` в profiles                                                                                                                                                                                        |
-| `$storyKey`        | ключ story (gateway), напр. `STORY-M2-14-07`                                                                                                                                                                      |
-| `$buildWindowFile` | путь к `*-cursor-build-window--*.md` в `run-reports/*-build-windows/` (строка `build_window_file:` в stdout после P2; для Cmd+click — `build_window_abs:`)                                                        |
-| `$buildWindowCmd`  | см. §P2 — флаги `--write-build-window` для `$builderProject`                                                                                                                                                      |
-| `$auditReport`     | `{focus_project}/docs/analysis/*.md`                                                                                                                                                                              |
-| `$artifactKind`    | `requirement`                                                                                                                                                                                                     |
-| `$intakeDraft`     | сырой или неполный intake-файл (может совпадать с `$requirementDoc` / `$epicFile` / `$storyFile` при refine-in-place)                                                                                             |
-| `$etalonDir`       | папка эталонов стиля: `…/requirements/`, `$tasksRoot/epics/`, `…/backlog-stories/` — см. profiles и §PA                                                                                                           |
-| `$intakeArtifact`  | **выход PA** — canonical file на диске (= `$requirementDoc` \| `$epicFile` \| `$storyFile`)                                                                                                                        |
-| `$currentPointer`  | `current_pointer` в profiles (напр. `spa-active-package.current.yaml`)                                                                                                                                            |
-| `$executionSkillPrimary` | `execution_skill_primary` в profiles (напр. `python-pro`, `react-expert`)                                                                                                                                     |
-| `$executionSkillPath`    | `execution_skill_path` в profiles — путь к execution SKILL.md                                                                                                                                                 |
-| `$executionSkillDeclared` | строка для task README: `Skill declared: $executionSkillPrimary` (или fallback из profile / README таска)                                                                                                  |
-| `$p13Appendix`     | operator contract §6 P1.3 (`spa` / `identity`) — epic naming, materialize rules                                                                                                                                   |
+| Переменная                | Подстановка                                                                                                                                                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `$builderProject`         | `gateway` / `gpt` / …                                                                                                                                                                                             |
+| `$verifyCmd`              | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project $builderProject --verify`                                                                                                  |
+| `$verifyDatesCmd`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project $builderProject --verify --check-dates`                                                                                    |
+| `$printUtcNowCmd`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --print-utc-now`                                                                                                                     |
+| `$inputMode`              | `requirement`                                                                                                                                                                                                     |
+| `$requirementDoc`         | файл требования (для `input_mode=requirement`)                                                                                                                                                                    |
+| `$epicFile`               | файл эпика (для `input_mode=epic_story`)                                                                                                                                                                          |
+| `$storyFile`              | для `input_mode=backlog_story` — готовая story из `backlog-stories/` (напр. `doge-identity-service/docs/tasks/backlog-stories/STORY-IDS-*.md`); для `input_mode=epic_story` — опционально одна story внутри эпика |
+| `$backlogIndex`           | опционально для `input_mode=backlog_story`: `doge-identity-service/docs/tasks/backlog-stories/INDEX.md` (порядок/зависимости; не подменяет AC story)                                                              |
+| `$planFile`               | см. `plan_file` в `[profiles.yaml](../specs/profiles.yaml)`                                                                                                                                                       |
+| `$tasksRoot`              | см. `tasks_dir` в profiles                                                                                                                                                                                        |
+| `$storyKey`               | ключ story (gateway), напр. `STORY-M2-14-07`                                                                                                                                                                      |
+| `$buildWindowFile`        | путь к `*-cursor-build-window--*.md` в `run-reports/*-build-windows/` (строка `build_window_file:` в stdout после P2; для Cmd+click — `build_window_abs:`)                                                        |
+| `$buildWindowCmd`         | см. §P2 — флаги `--write-build-window` для `$builderProject`                                                                                                                                                      |
+| `$auditReport`            | `{focus_project}/docs/analysis/*.md`                                                                                                                                                                              |
+| `$artifactKind`           | `requirement`                                                                                                                                                                                                     |
+| `$intakeDraft`            | сырой или неполный intake-файл (может совпадать с `$requirementDoc` / `$epicFile` / `$storyFile` при refine-in-place)                                                                                             |
+| `$etalonDir`              | папка эталонов стиля: `…/requirements/`, `$tasksRoot/epics/`, `…/backlog-stories/` — см. profiles и §PA                                                                                                           |
+| `$intakeArtifact`         | **выход PA** — canonical file на диске (= `$requirementDoc`                                                                                                                                                       |
+| `$currentPointer`         | `current_pointer` в profiles (напр. `spa-active-package.current.yaml`)                                                                                                                                            |
+| `$executionSkillPrimary`  | `execution_skill_primary` в profiles (напр. `python-pro`, `react-expert`)                                                                                                                                         |
+| `$executionSkillPath`     | `execution_skill_path` в profiles — путь к execution SKILL.md                                                                                                                                                     |
+| `$executionSkillDeclared` | строка для task README: `Skill declared: $executionSkillPrimary` (или fallback из profile / README таска)                                                                                                         |
+| `$p13Appendix`            | operator contract §6/§7 P1.3 (`spa` / `identity` / `scripts`) — epic naming, materialize rules                                                                                                                    |
+
+
 
 
 ### Профили (быстрая таблица)
@@ -60,17 +64,34 @@
 
 
 
-|                 | `spa` (doc-gap backlog / legacy DASH)                                                                              |
-| --------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `$planFile`     | `.cursor/plans/Spa_builder.plan.md`                                                                                |
-| `$tasksRoot`    | `spa-app/docs/tasks`                                                                                               |
-| `$storyFile`    | напр. `spa-app/docs/tasks/backlog-stories/STORY-SPA-G1-gateway-endpoint-alignment.md` (`input_mode=backlog_story`) |
-| `$backlogIndex` | `spa-app/docs/tasks/backlog-stories/INDEX.md`                                                                      |
-| Окно flat       | `--write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                                 |
-| Pipeline        | `spa-app/docs/tasks/spa-story-execution-pipeline.md`                                                               |
+|                        | `spa` (doc-gap backlog / legacy DASH)                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `$planFile`            | `.cursor/plans/Spa_builder.plan.md`                                                                                       |
+| `$tasksRoot`           | `spa-app/docs/tasks`                                                                                                      |
+| `$storyFile`           | напр. `spa-app/docs/tasks/backlog-stories/STORY-SPA-G1-gateway-endpoint-alignment.md` (`input_mode=backlog_story`)        |
+| `$backlogIndex`        | `spa-app/docs/tasks/backlog-stories/INDEX.md`                                                                             |
+| Окно flat              | `--write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                                        |
+| Pipeline               | `spa-app/docs/tasks/spa-story-execution-pipeline.md`                                                                      |
+| `$uiVisualPipelineDoc` | `docs/methodology/Zeya888-builder-queue/guides/spa-ui-visual-pipeline.md` — полный SSOT UI-0..UI-3                        |
+| `$uiPipelineDoc`       | `spa-app/docs/tasks/spa-story-execution-pipeline.md` §UI task hard gates; copy-paste P3 UI — workflow §P3 spa UI appendix |
+
+
+
+|                 | `scripts` (Web3 / Node.js infrastructure)                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
+| `$planFile`     | `.cursor/plans/Scripts_builder.plan.md`                                                                 |
+| `$tasksRoot`    | `scripts/docs/tasks`                                                                                    |
+| `$storyFile`    | напр. `scripts/docs/tasks/backlog-stories/STORY-SCR-01-web3-connection.md` (`input_mode=backlog_story`) |
+| `$backlogIndex` | `scripts/docs/tasks/backlog-stories/INDEX.md`                                                           |
+| Окно по story   | `--write-build-window --story-key STORY-SCR-01-01`                                                      |
+| Окно flat       | `--write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                      |
+| Pipeline        | `scripts/docs/tasks/scripts-story-execution-pipeline.md`                                                |
+| Intake docs     | `scripts/docs/runtime-infrastructure/README.md` (shaping only, не очередь)                              |
 
 
 ---
+
+
 
 ## Базовый маршрут
 
@@ -86,6 +107,8 @@
 10. **P8 — Finalize** — `[git-commit.md](../git-commit.md)`
 
 ---
+
+
 
 ## Предпосылка: Phase 0
 
@@ -103,7 +126,7 @@
 | Analysis | `.cursor/rules/analysis.mdc`                |
 
 
-Rule подмешивается при работе в `doge-complaints-gateway/`**, `GPT UI/`**, `doge-identity-service/**`, `spa-app/**`.
+Rule подмешивается при работе в `doge-complaints-gateway/`**,** `GPT UI/`, `doge-identity-service/`**,** `spa-app/`, `scripts/`**.
 
 ### Wave checkpoint
 
@@ -117,6 +140,8 @@ Wave checkpoint — $storyKey (builder_project: $builderProject)
 ```
 
 ---
+
+
 
 ## Короткие промпты (после Phase 0)
 
@@ -160,6 +185,8 @@ artifact_kind=epic. @$intakeDraft (или @$epicFile при refine-in-place)
 5) Handoff: «PA.1 завершён → P1.1 input_mode=epic_story. @$epicFile»
 ```
 
+
+
 #### PA.2 — Requirement shaping
 
 ```text
@@ -179,6 +206,8 @@ artifact_kind=requirement. @$intakeDraft (или @$requirementDoc при refine-
 
 мышление @ai-2-web3-bootstrap/.cursor/rules/analysis.mdc 
 ```
+
+
 
 #### PA.3 — Backlog story shaping
 
@@ -223,7 +252,11 @@ input_mode=epic_story. @$epicFile
 Требование analysis.mdc: каждый claim подтверждать путём к файлу. Plan only — без execution.
 В конце: таблица Story -> task -> файлы -> статус + список созданных/изменённых путей.
 
+Artifact dates: см. §P1 appendix (artifact dates) — $printUtcNowCmd перед pkg/gate; после scaffold $verifyDatesCmd.
+
 ```
+
+
 
 ## P1.2 (Requirement, обязательный порядок):
 
@@ -242,7 +275,11 @@ input_mode=epic_story. @$epicFile
 и эпик подбери из существующих
 
 По skill: Plan only — без execution. Все claims с путями к файлам (analysis.mdc). В конце — список созданных/изменённых путей.
+
+Artifact dates: см. §P1 appendix (artifact dates) — $printUtcNowCmd перед pkg/gate; после scaffold $verifyDatesCmd.
 ```
+
+
 
 ## P1.3 (Backlog story, обязательный порядок):
 
@@ -250,6 +287,7 @@ input_mode=epic_story. @$epicFile
 @.cursor/skills/builder-session/SKILL.md
 @.cursor/rules/builder-operator-habits.mdc
 @.cursor/rules/analysis.mdc
+@$storyFile=
 
 P1 Plan mode. builder_project: $builderProject (типично identity или spa).
 input_mode=backlog_story. @$storyFile
@@ -262,7 +300,7 @@ Epic/task naming и materialize: $p13Appendix (operator contract §6 для spa 
 4) Глубокая декомпозиция в task-папки (@docs/methodology/task-standard.md):
    - каждый пункт Scope → 1+ atomic task (implement/fix/tests);
    - каждый AC → traceability в task AC/DoD;
-   - финальный task — story acceptance-verification;
+   - финальный task — story acceptance-verification; story gate — `[story-acceptance-gate-template.md](../templates/story-acceptance-gate-template.md)`;
    - naming task-папок — по $p13Appendix;
    - каждый README: Purpose, Code Facts (verify exists), AC/DoD, Where to change, Verification commands;
    - $executionSkillDeclared (по builder-session / profiles.yaml).
@@ -278,7 +316,53 @@ Epic/task naming и materialize: $p13Appendix (operator contract §6 для spa 
 Не смешивать в этой волне с input_mode=requirement|epic_story без явной команды оператора.
 Plan only — без execution. Claims с путями (analysis.mdc).
 В конце: mapping `backlog_story -> epic -> story -> tasks -> pkg paths` + список созданных/изменённых путей.
+
+Artifact dates: см. §P1 appendix (artifact dates) — $printUtcNowCmd перед pkg/gate; после scaffold $verifyDatesCmd.
 ```
+
+--- P1 appendix: artifact dates (обязательно при создании pkg / gate / run-summary) ---
+
+```text
+Перед записью дат выполни из корня workspace:
+  $printUtcNowCmd
+Используй ТОЛЬКО значения из stdout (utc_now, utc_date, pkg_filename_date, run_summary_prefix).
+Запрещено: выдумывать дату, T12:00:00Z без live-run, дата раньше gate зависимостей.
+pkg: created_at = utc_now; имя pkg-NNNNNN-<pkg_filename_date>-slug.yaml.
+story-acceptance-gate Date: — только после live pytest + --verify в ЭТОЙ сессии.
+После scaffold: $verifyDatesCmd (при FAIL — исправить до handoff P2).
+SSOT: guides/builder-artifact-dates.md
+```
+
+--- P1 appendix: UX mockup brief (spa visual/mixed story only) ---
+
+```text
+Если story затрагивает UI (Scope: BoardPage, components/, mockup, drawer, FilterPanel, SearchInput и т.п.) или ui_scope ∈ {visual, mixed}:
+
+После materialize pipeline story + task README + pkg создай один файл рядом с pipeline story:
+
+  @$tasksRoot/epics/<EPIC>/stories/<STORY-KEY>/STORY-UX-MOCKUP-BRIEF.md
+
+Содержимое — готовый промпт для отдельного UX-диалога (не для разработки). Пиши от второго лица («Ты UX-специалист…»), чтобы оператор мог скопировать файл целиком в новый чат.
+
+Структура файла (обязательно):
+
+1) **Роль и задача** — UX/UI spec writer для spa-app; цель: mockup *-spec.md для P3 @mockup:, без кода.
+2) **Контекст story** — verbatim из pipeline story: Meta, Зачем, Scope, Вне scope, UI-relevant AC (не перефразировать AC).
+3) **Code facts** — таблица «зона UI | файл | что сейчас»; только проверенные пути (analysis.mdc, read/grep).
+4) **Уже есть** — ссылки на существующие mockup-NN-*-spec.md, которые можно extends; viewport 1536×1024; UI routes (/#/board и т.д.).
+5) **Что нарисовать / описать** — таблица screen/state | описание | must/should; минимум default + 1 interactive state; mobile — если в Scope/AC.
+6) **Deliverables** — каталог `spa-app/docs/UX/mockups/<epic-folder>/`; имя `mockup-NN-<slug>-spec.md`; структура как mockup-01-dashboard-main-spec.md (layout, tokens, components, states, selectors/data-testid).
+7) **Handoff** — блок copy-paste для P3:
+   @mockup: spa-app/docs/UX/mockups/...
+8) **Checklist DoD** — каждый UI AC покрыт; selectors для puppeteer; нет противоречий «Вне scope»; operator gate «принято» до P3.
+
+Правила:
+- Plan only: в P1 не создавать сами mockup spec PNG/файлы — только STORY-UX-MOCKUP-BRIEF.md.
+- Если ui_scope: none / story без DOM — appendix skip, файл не создавать.
+- В конце P1 отчёта: путь к brief + «следующий шаг: отдельный UX-чат по STORY-UX-MOCKUP-BRIEF.md → затем P2/P3».
+```
+
+
 
 ### P2 — Build window (`$buildWindowFile`)
 
@@ -288,12 +372,13 @@ Plan only — без execution. Claims с путями (analysis.mdc).
 2. Сгенерировать окно (ровно **один** режим из таблицы):
 
 
-| `$builderProject` | Команда (подставьте `$storyKey` / диапазон по `--list`)                                                                                                                                                                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gateway`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gateway --write-build-window --story-key $storyKey` **или** `--window-flat-start 1 --window-flat-end K` |
-| `gpt`             | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gpt --write-build-window --window-flat-start 1 --window-flat-end 5` (или `--gim-slice GIM-102,GIM-103` для среза по GIM)                                               |
-| `identity`        | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project identity --write-build-window --story-key STORY-IDS-01-02` **или** `--window-flat-start 1 --window-flat-end K` (в зависимости от active pkg и выбранного `input_mode`) |
-| `spa`             | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project spa --write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`; `task_list_linear` после P1.3)                                                   |
+| `$builderProject` | Команда (подставьте `$storyKey` / диапазон по `--list`)                                                                                                                                                                                                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gateway`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gateway --write-build-window --window-flat-start 1 --window-flat-end 5``--write-build-window --story-key $storyKey` **или** `--window-flat-start 1 --window-flat-end K`                                           |
+| `gpt`             | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gpt --write-build-window --window-flat-start 1 --window-flat-end 5` (или `--gim-slice GIM-102,GIM-103` для среза по GIM)                                                                                            |
+| `identity`        | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project identity --window-flat-start 1 --window-flat-end K``--write-build-window --story-key STORY-IDS-01-02` **или** `--window-flat-start 1 --window-flat-end K` (в зависимости от active pkg и выбранного `input_mode`) |
+| `spa`             | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project spa --write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`; `task_list_linear` после P1.3)                                                                                                |
+| `scripts`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --write-build-window --window-flat-start 1 --window-flat-end K``--write-build-window --story-key $storyKey`                                                                                               |
 
 
 1. В stdout после `ok build-window`: `**build_window_abs:`** / `**vscode_file_uri:`** — открыть из терминала (Cmd+click); `**quick_open_basename:`** или `**quick_open_pointer:`** (`latest-cursor-build-window.md` в `*-active-packages/`) — для **Cmd+P**; `**cursor_attach:`** — для P3. Symlink обновляется при каждой генерации. **Не** вставлять путь в Go-to-File целиком — `GPT UI/…` обрезается до `UI/docs/…`.
@@ -310,6 +395,8 @@ P2 Build window only. builder_project: $builderProject.
 Зафиксируй $buildWindowFile из stdout (`build_window_file:` или `cursor_attach:`). Без execution тасков.
 ```
 
+
+
 ### P3 — Execute
 
 ```text
@@ -319,7 +406,84 @@ P2 Build window only. builder_project: $builderProject.
 P3 Execute. builder_project: $builderProject. @$planFile + @$buildWindowFile
 Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epicFile / @$storyFile; input_mode=backlog_story -> @$storyFile
 По skill/rule: шаг 0 — $verifyCmd из корня workspace; при FAIL — стоп. Загрузить @$executionSkillPath перед code changes (task README `Skill declared` overrides profile). Очередь YAML default (immutable pkg не переписывать). Все README из окна по порядку; bullrun-start + run-task; полные артефакты тасков. Claims из кода, не из памяти чата.
+
+P3 appendix (dates): gate/run-summary `Date:` — только post live-run; `$verifyDatesCmd` перед story Done.
 ```
+
+
+
+### P3 — Execute (spa UI appendix)
+
+Только `builder_project: spa` — для pkg с visual/mixed tasks: copy-paste блок ниже **вместо** базового P3. Build window для spa **автоматически** вставляет этот блок (см. `builder_resolve_queue.py --write-build-window`). Детали — `$uiVisualPipelineDoc`; hard gates — `$uiPipelineDoc`.
+
+```text
+@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+
+P3 Execute. builder_project: spa. @$planFile + @$buildWindowFile
+Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epicFile / @$storyFile; input_mode=backlog_story -> @$storyFile
+По skill/rule: шаг 0 — $verifyCmd из корня workspace; при FAIL — стоп.
+Шаг 0b (spa visual pkg, после verify):
+  cd spa-app && npx puppeteer browsers install chrome   # если test:ui: Could not find Chrome
+  cd spa-app && npm run <puppeteer_gate-from-anchor-task>   # напр. test:ui:filters
+Стоп при FAIL шага 0b — до UI-2 implement visual tasks. Chrome: spa-app/docs/runtime-docs/frontend-run-and-environment.md §8.
+Загрузить @$executionSkillPath перед code changes (task README `Skill declared` overrides profile). Очередь YAML default (immutable pkg не переписывать). Все README из окна по порядку; bullrun-start + run-task; полные артефакты тасков. Claims из кода, не из памяти чата.
+
+--- UI Visual Pipeline (spa; story-anchor model) ---
+ui_gate: auto
+@mockup: spa-app/docs/UX/mockups/mockup-01-dashboard-main-spec.md
+@mockup: spa-app/docs/UX/mockups/mockup-10-dashboard-filter-status-spec.md
+@mockup: spa-app/docs/UX/mockups/mockup-13-dashboard-filter-reset-spec.md
+
+Правила ui_gate:
+- auto (default) — pipeline по ui_scope/ui_complexity в task README, ui_anchor, или эвристике Scope
+- off — skip UI pipeline (doc-only / ui_scope: none)
+
+Story-anchor (один на story wave):
+- Anchor task (ui_anchor: true или первый ui_scope: visual) — полный UI-0..UI-1 в task-folder
+- Dependent visual tasks — extends ui-mockup: <anchor>/ui-mockup-spec.md; UI-0 skip; UI-3 partial при смене DOM
+- Story gate — acceptance-verification §UI + anchor ui-baseline/post-implement/*.png
+
+Anchor task (до UI-2 implement):
+UI-0 Baseline (MCP primary): npm run dev (spa-app :4173) → MCP user-puppeteer navigate + screenshot → ui-baseline/ (1536x1024); ui-baseline/README.md
+UI-1 Target mockup: @mockup → ui-mockup-spec.md; иначе AskQuestion → ui-mockup-spec.md от baseline → STOP human gate (принято/исправить)
+UI-2 Implement: run-task + react-expert (после gate)
+UI-3 Verify: npm test + npm run <puppeteer_gate> (обязательно) + post-implement PNG; acceptance-verification §UI
+
+STOP (hard):
+- Story Done запрещён без story-gate acceptance §UI + post-implement PNG (anchor)
+- UI-2 запрещён без human gate на ui-mockup-spec.md (Path B) или @mockup refs (Path A)
+- Retroactive exception — только retroactive_closure в ui-baseline/README.md + operator sign-off / run_mode=spa_*_ui_audit_*; не default path
+
+SSOT: @$uiVisualPipelineDoc; @$uiPipelineDoc
+
+--- UI screenshots delivery (mandatory) ---
+ui_screenshot_root: <anchor-task-folder>/ui-baseline/
+ui_screenshot_states: all M123 states A|B|C|D (или перечислить из ui-mockup-spec)
+viewport: 1536x1024
+
+Правила capture:
+1. UI-0 (ДО UI-2): ui-baseline/pre-implement/<state>-<slug>-1536x1024.png + ui-baseline/README.md (route, selectors, utc)
+2. UI-3 (ПОСЛЕ implement): ui-baseline/post-implement/<state>-<slug>-1536x1024.png для КАЖДОГО state
+3. Сохранять ТОЛЬКО в папку anchor task story (не /tmp, не tests/output)
+4. Имена: kebab-case, префикс state (not-supported, form, joined, error)
+5. Способ: node script в spa-app/tests/puppeteer/ ИЛИ MCP user-puppeteer — но output path = ui_screenshot_root
+
+Hard deliverable в конце P3 (обязательный блок ответа):
+
+## UI Screenshots
+| State | Phase | File |
+|-------|-------|------|
+| A | post-implement | @spa-app/docs/tasks/.../ui-baseline/post-implement/not-supported-....png |
+| B | post-implement | @spa-app/docs/tasks/.../ui-baseline/post-implement/form-....png |
+| ... | ... | ... |
+
++ ссылка на ui-mockup-spec.md и acceptance §UI
+STOP story Done если post-implement PNG для anchor state A отсутствует на диске (ls verify).
+```
+
+Примечания (не в copy-paste): `@mockup:` — 0..N строк; без них — UI-1 Path B (interview). Doc-only pkg: `ui_gate: off`. Build window должен содержать этот блок (CLI auto-inject). Dry-run: SEARCH-03 P3.
 
 ### P4 — Claude external (cross-audit)
 
@@ -335,6 +499,7 @@ doge-complaints-gateway/docs/tasks/bullrun-launch-index.md
 doge-identity-service/docs/tasks/bullrun-launch-index.md
 spa-app/docs/tasks/bullrun-launch-index.md
 GPT UI/docs/analysis/tasks/bullrun-launch-index.md
+scripts/docs/tasks/bullrun-launch-index.md
 
 мышление @.cursor/rules/analysis.mdc  
 
@@ -353,12 +518,15 @@ GPT UI/docs/analysis/tasks/bullrun-launch-index.md
 - default остаётся YAML SSOT;
 - список путей в override — нумерованный и проверяемый, без выдумывания.
 
+
+
 ### P5 — Plan: Gap scaffold only
 
 ```text
 @.cursor/skills/builder-session/SKILL.md
 @.cursor/rules/builder-operator-habits.mdc
 @.cursor/rules/analysis.mdc
+$planFile=
 
 P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport (гапы временной рабочей документации (не runtime, perssistent) игнорируй)
 По skill/rule: не выполняй код и pytest; не закрывай gap implementation. Gap → task-папки (@docs/methodology/task-standard.md), @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
@@ -372,14 +540,67 @@ P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport 
 2) нумерованным списком `README.md` (каждый path — exists на диске),
 3) правилом: при `run_mode` исполняется **только** этот список, без смены active pkg.
 P5 checklist: уникальный run_mode; нет мёртвых run_mode без секции; gap-таблица; `activation: run_mode=…` или `activation: none`.
+P5 appendix (dates): новые gap-task gates — те же правила дат (§P1 appendix artifact dates); $printUtcNowCmd после live verify.
 В конце: таблица `gap -> task -> файлы -> status`. Claims с путями к файлам.
 ```
 
+
+
 ### P6 — Builder после P5
 
-Перед запуском: почистить в $planFile лишние «явно прописанные таски», оставить только свежие override.
-Если в волне задан `run_mode=<wave_name>` — исполняй список из safe-override как source-of-truth (build-window из YAML не обязателен).
-Если `run_mode` не задан — стандартно повторить **P2** (verify + `--write-build-window`) и работать по YAML окну.
+**Не** нажимать **Build / Execute plan** на `$planFile` — Cursor откроет «домашний» чат из локального registry ([fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md)). Copy-paste промпт ниже в **текущий** project-чат (`builder_project` уже задан в Phase 0).
+
+Перед запуском (оператор): в `$planFile` оставить только актуальный §«Явно прописанный safe-override»; убрать устаревшие волны.
+
+#### P6 — Execute (safe-override, `run_mode=<wave_name>`)
+
+Когда после P5 в плане есть §safe-override с нумерованным списком `README.md` — **источник очереди только этот список**; build window из YAML не обязателен; **не** менять `*-active-package.current.yaml`.
+
+```text
+@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+
+run_mode=<wave_name>
+builder_project: $builderProject
+@$planFile
+@<first-readme-from-plan-safe-override-list>
+
+P6 Execute — gap closure only; immutable active pkg unchanged (см. §safe-override в @$planFile).
+По skill/rule: шаг 0 — $verifyCmd из корня workspace (контроль default pkg, не смена current); при FAIL — стоп.
+Загрузить @$executionSkillPath перед code changes (task README `Skill declared` overrides profile).
+Исполнять **только** numbered list из §safe-override @$planFile — **строго по порядку** в плане (не по frontmatter todos).
+После **каждого** закрытого gap-task: sync @$tasksRoot/bullrun-launch-index.md + backlog INDEX при наличии; bullrun-start + run-task; acceptance-verification-*.md.
+Claims из кода, не из памяти чата. Не редактировать @$planFile без явной команды оператора.
+
+P6 appendix (dates): gate/run-summary `Date:` — только post live-run; $verifyDatesCmd перед закрытием story/gap wave.
+```
+
+**Подстановка оператором:**
+
+| Поле | Откуда |
+|------|--------|
+| `<wave_name>` | Метка из §safe-override, напр. `capy01_audit_followup` |
+| `<first-readme-from-plan-safe-override-list>` | **Первый** path из нумерованного списка §safe-override (порядок P6 — как в плане, напр. t08 → t09 → t07) |
+| Следующие таски | Новое сообщение с `@<next-readme>` или чекпоинт «следующий в очереди: …/README.md» |
+
+**Пример (scripts, CAPY-01 audit):**
+
+```text
+run_mode=capy01_audit_followup
+builder_project: scripts
+@.cursor/plans/Scripts_builder.plan.md
+@scripts/docs/tasks/epics/EPIC-SCR-01-capybara/stories/STORY-SCR-CAPY-01-sweep-balance-to-parent/task-scr-capybara-t08-audit-l2-zero-amount-distinction/README.md
+
+P6 Execute — gap closure only; pkg-000002 unchanged
+```
+
+#### P6 — Execute (без `run_mode`, YAML default)
+
+Если оператор **не** задал `run_mode` в сообщении — стандартная очередь из active pkg:
+
+1. Повторить **P2** (`$verifyCmd` + `--write-build-window` → `$buildWindowFile`).
+2. Copy-paste **P3** с `@$planFile` + `@$buildWindowFile`.
 
 ### P7 — Claude: Re-audit
 
@@ -388,6 +609,8 @@ P5 checklist: уникальный run_mode; нет мёртвых run_mode бе
 проведи подробный re-audit по закрытию каждого gap по фактическому коду
 @.cursor/rules/analysis.mdc
 ```
+
+
 
 ### P8 — Commits
 
@@ -403,6 +626,8 @@ feat → test → docs; не коммить: docs/tasks/**, BULLRUN, acceptance-
 
 ---
 
+
+
 ## Чек-лист перед запуском
 
 - `*-active-package.current.yaml` → нужный `pkg-*.yaml`
@@ -410,6 +635,8 @@ feat → test → docs; не коммить: docs/tasks/**, BULLRUN, acceptance-
 - `$buildWindowFile` соответствует активному pkg
 - Не смешаны override-run и YAML default
 - В execution: `$planFile` + `$buildWindowFile`
+
+
 
 ## Анти-ошибки
 
@@ -419,6 +646,9 @@ feat → test → docs; не коммить: docs/tasks/**, BULLRUN, acceptance-
 - Claims «по памяти» → analysis.mdc
 - P1 на сыром черновике → сначала PA; P1 не shape intake
 - PA смешан с P3 → разделить чаты (Studio PA vs Builder P1+)
+- Build / Execute plan на `*_builder.plan.md` → Cursor откроет «домашний» чат из локального registry, не активный project-чат; для fixed plans — только @attach + workflow §P3/P6 ([fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md))
+
+
 
 ## Старт сессии
 

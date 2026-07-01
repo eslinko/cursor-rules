@@ -1,5 +1,45 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.8 — 2026-06-04
+
+- [`guides/fixed-builder-plan-execution.md`](./guides/fixed-builder-plan-execution.md) — fixed `*_builder.plan.md`: @attach + workflow P3/P6; запрет Build / Execute plan (Cursor local registry)
+- Propagation: `builder-plan-template.md` §Build, `workflow.md` §анти-ошибки, `session-starter.md`, `builder-operator-habits.mdc`, `builder-session/SKILL.md`, `cursor-setup.md`, `curriculum/01-first-session.md`, все `contracts/*-operator-contract.md` §1
+
+## 1.4.7 — 2026-06-20
+
+- Профиль **`scripts`** (Node.js / Hardhat / Web3) в [`profiles.yaml`](./specs/profiles.yaml)
+- Bootstrap: `scripts/docs/tasks/` (active pkg, bullrun, backlog INDEX first)
+- [`scripts-operator-contract.md`](./contracts/scripts-operator-contract.md), [`scripts-story-execution-pipeline.md`](../../../scripts/docs/tasks/scripts-story-execution-pipeline.md)
+- [Scripts_builder.plan.md](../../../.cursor/plans/Scripts_builder.plan.md); propagation workflow, session-starter, queue-manual, builder-session, operator-habits
+
+## 1.4.6 — 2026-06-20
+
+- [`guides/builder-artifact-dates.md`](./guides/builder-artifact-dates.md) — SSOT дат артефактов (pkg, gate, run-summary, bullrun)
+- [`builder_resolve_queue.py`](./cli/builder_resolve_queue.py) — `--print-utc-now`, `--verify --check-dates`, `--strict-dates`; [`date-gate-grandfather.txt`](./specs/date-gate-grandfather.txt)
+- workflow §P1/P3/P5 date appendix; templates story-acceptance-gate + pkg-scaffold-snippet; sync gateway-operator-contract, builder-session, operator-habits
+
+## 1.4.5 — 2026-06-17
+
+- [`templates/story-ux-mockup-brief-template.md`](./templates/story-ux-mockup-brief-template.md) — UX-brief в папке materialized story
+- [`core/workflow.md`](./core/workflow.md) §P1.3 п.8 + §P1.UX; sync spa-ui-visual-pipeline, spa-operator-contract, spa-story-execution-pipeline
+
+## 1.4.4 — 2026-06-17
+
+- Новый SSOT: [`guides/spa-ui-visual-pipeline.md`](./guides/spa-ui-visual-pipeline.md) — extract UI Visual Pipeline из Spa_builder.plan
+- [Spa_builder.plan.md](../../../.cursor/plans/Spa_builder.plan.md) — каркас связки; `ui_visual_pipeline_doc` в profiles.yaml
+
+## 1.4.3 — 2026-06-17
+
+- Post SEARCH-02 UI pipeline patch: [`workflow.md`](./core/workflow.md) §P3 spa UI appendix — шаг 0b pre-flight Puppeteer, story-anchor model, MCP UI-0, hard STOP rules
+- [`builder_resolve_queue.py`](./cli/builder_resolve_queue.py) — auto-inject UI appendix в spa build window (`--ui-appendix auto|force|off`); anchor/mockup/`puppeteer_gate` из task README
+- Sync [Spa_builder.plan.md](../../../.cursor/plans/Spa_builder.plan.md), [spa-story-execution-pipeline.md](../../../spa-app/docs/tasks/spa-story-execution-pipeline.md) §P3 attach checklist, [queue-manual.md](./cli/queue-manual.md) §spa
+- Источник: [methodology-spa-ui-pipeline-gaps-search-02-2026-06-17.md](../../../spa-app/docs/analysis/methodology-spa-ui-pipeline-gaps-search-02-2026-06-17.md)
+
+## 1.4.2 — 2026-06-17
+
+- [`core/workflow.md`](./core/workflow.md) §P3 — **spa UI appendix**: полный клон базового P3 + блок UI Visual Pipeline (`ui_gate`, `@mockup:`, UI-0..UI-3, human gate, puppeteer verify)
+- Переменная `$uiPipelineDoc` в spa-таблице workflow; sync [Spa_builder.plan.md](../../../.cursor/plans/Spa_builder.plan.md) §P3 и [spa-story-execution-pipeline.md](../../../spa-app/docs/tasks/spa-story-execution-pipeline.md)
+
 ## 1.4.1 — 2026-06-16
 
 - Hybrid **execution skill**: `execution_skill_*` + `stack_label` в [`profiles.yaml`](./specs/profiles.yaml); резолв в [builder-session/SKILL.md](../../../../.cursor/skills/builder-session/SKILL.md) §Execution skill resolution

@@ -11,6 +11,8 @@
 
 **Перед** batch-run, Build window или P3 Execute:
 
+**Fixed plan:** `@attach` [`.cursor/plans/ID_builder.plan.md`](../../../.cursor/plans/ID_builder.plan.md) + workflow §P3/P6 в **этом** чате — **не** Build / Execute plan на файле ([fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md)).
+
 1. Прочитать [`doge-identity-service/docs/tasks/bullrun-launch-index.md`](../../../doge-identity-service/docs/tasks/bullrun-launch-index.md) §«Актуальная точка» и §«Epic registry».
 2. Прочитать [`identity-active-package.current.yaml`](../../../doge-identity-service/docs/tasks/identity-active-package.current.yaml) → `package_file`.
 3. Из корня workspace:  

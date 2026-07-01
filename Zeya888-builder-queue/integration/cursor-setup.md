@@ -38,6 +38,8 @@ workspace_root: /path/to/repo
 pipeline_profile: builder_full
 ```
 
+**Fixed builder plans:** не используйте кнопку Build на `*_builder.plan.md` — см. [fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md).
+
 ## 7. Verify path
 
 CLI ищет корень workspace по наличию:

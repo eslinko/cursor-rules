@@ -46,15 +46,20 @@ flowchart TB
 | Файл | Роль |
 |------|------|
 | [`core/session-starter.md`](./core/session-starter.md) | Phase 0 onboarding, OPERATOR CONFIG |
-| [`core/workflow.md`](./core/workflow.md) | Короткие промпты P1–P8 |
+| [`core/workflow.md`](./core/workflow.md) | Короткие промпты **PA**, P1–P8 |
 | [`core/workflow-legacy.md`](./core/workflow-legacy.md) | Полные self-contained промпты |
 | [`cli/queue-manual.md`](./cli/queue-manual.md) | Справочник CLI |
 | [`specs/input-package-spec.md`](./specs/input-package-spec.md) | Контракт YAML пакета |
 | [`specs/profiles.yaml`](./specs/profiles.yaml) | Реестр проектов |
 | [`examples/reference-plans/`](./examples/reference-plans/) | Teaching snapshots — не runtime SSOT |
+| [`guides/spa-ui-visual-pipeline.md`](./guides/spa-ui-visual-pipeline.md) | Spa UI Visual Pipeline — полный SSOT UI-0..UI-3 (visual/mixed tasks) |
+| [`guides/builder-artifact-dates.md`](./guides/builder-artifact-dates.md) | Дисциплина дат pkg / gate / run-summary; `--print-utc-now`, `--check-dates` |
+| [`guides/fixed-builder-plan-execution.md`](./guides/fixed-builder-plan-execution.md) | Fixed `*_builder.plan.md`: @attach, не Build; отвязка от чужого чата Cursor |
+| [`templates/story-acceptance-gate-template.md`](./templates/story-acceptance-gate-template.md) | Шаблон story gate с Date discipline |
 | [`curriculum/00-guide-for-humans.md`](./curriculum/00-guide-for-humans.md) | Wrapping: метод для человека, роль архитектора |
-| [`curriculum/06-architect-studio-and-p1-intakes.md`](./curriculum/06-architect-studio-and-p1-intakes.md) | Architect Studio vs Builder; gap analysis; три P1 intakes |
+| [`curriculum/06-architect-studio-and-p1-intakes.md`](./curriculum/06-architect-studio-and-p1-intakes.md) | Studio = PA chat; gap; три P1 intakes |
 | [`curriculum/learning-path.md`](./curriculum/learning-path.md) | Маршрут модулей 0–6 (Human + Operative) |
+| [`contracts/scripts-operator-contract.md`](./contracts/scripts-operator-contract.md) | Operator contract для `builder_project: scripts` (Web3 / Node.js) |
 
 ## Исторические пути
 

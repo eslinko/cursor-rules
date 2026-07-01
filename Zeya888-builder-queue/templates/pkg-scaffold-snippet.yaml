@@ -1,0 +1,16 @@
+# Fragment for P1 scaffold — paste utc_now from --print-utc-now
+schema_version: 1
+package_sequence: <NNNNNN>
+created_at: '<paste utc_now here>'
+label: <short wave label>
+input_kind: epic_story_tree
+tasks_root: <from profiles pkg_path_prefix>
+epic_file: <path to EPIC-*.md>
+decision_ref: <backlog or requirement source>
+story_groups:
+  - story_key: <STORY-KEY>
+    paths:
+      - <task README paths in order>
+
+# Filename MUST match: pkg-<package_sequence>-<pkg_filename_date>-<slug>.yaml
+# where pkg_filename_date = date part of created_at (YYYYMMDD)

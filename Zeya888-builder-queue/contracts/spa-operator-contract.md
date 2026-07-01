@@ -11,6 +11,8 @@
 
 **Перед** batch-run, Build window или P3 Execute:
 
+**Fixed plan:** `@attach` [`.cursor/plans/Spa_builder.plan.md`](../../../.cursor/plans/Spa_builder.plan.md) + workflow §P3/P6 в **этом** чате — **не** Build / Execute plan на файле ([fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md)).
+
 1. Прочитать [`spa-app/docs/tasks/bullrun-launch-index.md`](../../../spa-app/docs/tasks/bullrun-launch-index.md) §«Актуальная точка».
 2. Прочитать [`spa-active-package.current.yaml`](../../../spa-app/docs/tasks/spa-active-package.current.yaml) → `package_file`, `activation`.
 3. Из корня workspace:  
@@ -122,4 +124,6 @@ Build plan **не** содержит таблицу P4 — только эта �
 - Не создавать `EPIC-IDS-*` или gateway epics в spa tree.
 
 **Backlog INDEX:** обновить `backlog-stories/INDEX.md` при закрытии story.
+
+**Visual / mixed tasks:** UI-0..UI-3 — [`guides/spa-ui-visual-pipeline.md`](../guides/spa-ui-visual-pipeline.md); hard gates — [`spa-story-execution-pipeline.md`](../../../spa-app/docs/tasks/spa-story-execution-pipeline.md) §UI task hard gates.
 

@@ -26,6 +26,21 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 
 Успех: `ok N paths (project=gateway, pkg …)`.
 
+**Дисциплина дат (P1 scaffold / перед story Done):**
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --print-utc-now
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gateway --verify --check-dates
+```
+
+| Режим | Exit code | Поведение |
+|-------|-----------|-----------|
+| `--verify --check-dates` | 0 | ok paths; только WARN (grandfather allowlist) допустим |
+| `--verify --check-dates` | 1 | есть FAIL — стоп P2/P3 |
+| `--verify --check-dates --strict-dates` | 1 | allowlist игнорируется; remediation mode |
+
+SSOT: [`guides/builder-artifact-dates.md`](../guides/builder-artifact-dates.md) · allowlist: [`date-gate-grandfather.txt`](../specs/date-gate-grandfather.txt).
+
 ### Шаг 2 — build window
 
 **Gateway (по story):**
@@ -65,6 +80,9 @@ Story parent AC / epic AC по pipeline проекта. Следующая story
 | Задача | Команда |
 |--------|---------|
 | Verify | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project {proj} --verify` |
+| Verify + dates | `… --project {proj} --verify --check-dates` |
+| UTC now (P1/P3) | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --print-utc-now` |
+| Strict dates | `… --verify --check-dates --strict-dates` |
 | List | `… --project {proj} --list` |
 | ACTIVE_TASK_PATH | `… --project {proj} --export-active-task-path` |
 | Next path | `… --project {proj} --print-next` |
@@ -128,6 +146,41 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 ## 5. Профиль `spa`
 
 `--project spa` — активен. До первого **P1.3** `pkg-bootstrap-pending.yaml` даёт пустую очередь; `--verify` → **FAIL** (ожидаемо). После P1 — flat window: `--write-build-window --window-flat-start 1 --window-flat-end N`. Контракт: [spa-operator-contract.md](../contracts/spa-operator-contract.md). Runtime plan: `.cursor/plans/Spa_builder.plan.md`.
+
+**UI Visual Pipeline (visual pkg):** SSOT процесса — [guides/spa-ui-visual-pipeline.md](../guides/spa-ui-visual-pipeline.md). Build window **автоматически** вставляет блок из [workflow.md](../core/workflow.md) §P3 spa UI appendix (`ui_gate`, `@mockup`, UI-0..UI-3). Флаг `--ui-appendix auto|force|off` (default `auto`). P3 шаг **0b:** `cd spa-app && npx puppeteer browsers install chrome` + `npm run <puppeteer_gate>` — см. [frontend-run-and-environment.md](../../../spa-app/docs/runtime-docs/frontend-run-and-environment.md) §8 и [spa-story-execution-pipeline.md](../../../spa-app/docs/tasks/spa-story-execution-pipeline.md) §P3 attach checklist.
+
+---
+
+## 5b. Профиль `scripts` (Web3 / Node.js)
+
+`--project scripts` — активен. До первого **P1.3** `pkg-bootstrap-pending.yaml` даёт пустую очередь; `--verify` → **FAIL** (`Очередь README пуста` — ожидаемо). После P1 — story-key или flat window. Контракт: [scripts-operator-contract.md](../contracts/scripts-operator-contract.md). Runtime plan: `.cursor/plans/Scripts_builder.plan.md`.
+
+### Verify / list (bootstrap)
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --verify
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --list
+```
+
+До первого P1 **verify и list ожидаемо FAIL** — норма (empty `linear_paths`).
+
+### Build window
+
+**Одна Story:**
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts \
+  --write-build-window --story-key STORY-SCR-01-01
+```
+
+**Flat slice:**
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts \
+  --write-build-window --window-flat-start 1 --window-flat-end K
+```
+
+`K` — из `--list`. Tests: `npm run test:unit` (корень workspace). Pipeline — [scripts-story-execution-pipeline.md](../../../scripts/docs/tasks/scripts-story-execution-pipeline.md).
 
 ---
 

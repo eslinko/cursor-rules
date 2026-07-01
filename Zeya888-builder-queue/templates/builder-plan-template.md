@@ -1,6 +1,6 @@
 # Builder plan template (унифицированный скелет)
 
-SSOT структуры для [Gateway_builder.plan.md](../../../.cursor/plans/Gateway_builder.plan.md), [GPT_builder.plan.md](../../../.cursor/plans/GPT_builder.plan.md), [ID_builder.plan.md](../../../.cursor/plans/ID_builder.plan.md).
+SSOT структуры для [Gateway_builder.plan.md](../../../.cursor/plans/Gateway_builder.plan.md), [GPT_builder.plan.md](../../../.cursor/plans/GPT_builder.plan.md), [ID_builder.plan.md](../../../.cursor/plans/ID_builder.plan.md), [Scripts_builder.plan.md](../../../.cursor/plans/Scripts_builder.plan.md).
 
 **Эталон §INPUT SOURCE и ниже:** нормализованный Gateway plan (2026-06-04).  
 **Анализ зеркала:** [builder-plans-unification-analysis.md](./builder-plans-unification-analysis.md)  
@@ -67,6 +67,39 @@ isProject: false
 - {{P13_NOTE}}
 - Этот plan — **P3/P6 runtime** (pkg, build window, run_mode, режим A/B). Промпты P1 **не** дублировать.
 - Локальный pipeline: [{{PIPELINE_DOC}}]({{PIPELINE_DOC}})
+```
+
+---
+
+## §Поведение при Build / Execute plan (Cursor) — fixed runtime
+
+```markdown
+## Поведение при Build / Execute plan (Cursor)
+
+**Fixed runtime plan (`*_builder.plan.md`):** markdown SSOT для **@attach** в project-чате. Исполнение — [session-starter.md](docs/methodology/Zeya888-builder-queue/core/session-starter.md) Phase 0 + промпты [workflow.md](docs/methodology/Zeya888-builder-queue/core/workflow.md) §P3/P6. Подробно: [fixed-builder-plan-execution.md](docs/methodology/Zeya888-builder-queue/guides/fixed-builder-plan-execution.md).
+
+**Запрет:** не нажимать **Build / Execute plan** на этом файле. Cursor привязывает план к conversation ID в локальном registry; Build откроет «домашний» чат, а не активный project-чат.
+
+**Как агент ведёт работу после @attach:** читает YAML с диска (`{{CURRENT_POINTER}}` → pkg); **TASK_BATCH** по нормализованной очереди; шаг 0 — `builder_resolve_queue.py --project {{CLI_PROJECT}} --verify`.
+
+**Hardcoded / operator override:** метка `run_mode=…` — только из §«Явно прописанный safe-override»; **не** подменяет YAML SSOT.
+
+### Границы ответственности
+
+- **@attach fixed plan** — контекст LLM-агенту в **текущем** чате; нет встроенного диспетчера по каждому `README.md`.
+- **Исполнение одного таска** — Режим A, bullrun/run-task; gates — `{{PIPELINE_DOC}}`.
+
+### Frontmatter todos
+
+Три элемента `todos` — **напоминания процесса**, не чеклист Plan UI Build. Прогресс — bullrun-launch-index в `{{TASKS_DIR}}`.
+
+**Шаг 0 — сразу после @attach (корень workspace):**
+
+\`\`\`bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project {{CLI_PROJECT}} --verify
+\`\`\`
+
+При missing paths — стоп. Шаг 0b: `--verify --check-dates` ([builder-artifact-dates.md](docs/methodology/Zeya888-builder-queue/guides/builder-artifact-dates.md)).
 ```
 
 ---

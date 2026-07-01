@@ -132,11 +132,40 @@ Execution (P3) опирается на immutable pkg и build window. Если p
 
 ---
 
+## Шаг 5 — P3 через workflow attach, не Build на plan file
+
+### Что происходит
+
+Для fixed runtime plans (`Gateway_builder`, `Scripts_builder`, …) исполнение идёт через copy-paste [workflow.md](../core/workflow.md) §P3 + `@$planFile` + `@$buildWindowFile` в **текущем** project-чате.
+
+### Зачем это архитектору
+
+Кнопка **Build / Execute plan** на `*_builder.plan.md` открывает чат из локального registry Cursor — часто не тот, где вы ведёте проект. Новый чат ≠ Build на вкладке плана.
+
+### Что делает оператор
+
+1. Новый чат → Phase 0 ([шаг 1](#шаг-1--открыть-новый-чат-и-вставить-starter)).
+2. P2 → build window.
+3. P3 → промпт из workflow + attach plan и window. **Не** жать Build на `.cursor/plans/*_builder.plan.md`.
+
+Подробно: [fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md).
+
+### Признак успеха
+
+P3 выполняется в чате с правильным `builder_project:`; старый «домашний» чат плана не переоткрывается.
+
+### Типичная ошибка мышления
+
+«Открою Scripts_builder.plan.md и нажму Build» — исполнение уйдёт в другой диалог.
+
+---
+
 ## Проверка модуля
 
 - [ ] Onboarding summary получен
 - [ ] Код не менялся в Phase 0
 - [ ] Вы явно назвали следующую фазу
+- [ ] P3 — через workflow attach, не Build на `*_builder.plan.md`
 
 ## Дальше
 

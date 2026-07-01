@@ -18,7 +18,7 @@ pipeline_profile: builder_full
 
 | Поле | Значение | Примечание |
 |------|----------|------------|
-| `builder_project` | `gateway` \| `gpt` \| `identity` \| `spa` | Ключ из `profiles.yaml` |
+| `builder_project` | `gateway` \| `gpt` \| `identity` \| `spa` \| `scripts` | Ключ из `profiles.yaml` |
 | `workspace_root` | абсолютный путь к корню workspace | где лежит `docs/methodology/Zeya888-builder-queue/` |
 | `pipeline_profile` | `builder_full` \| `generic_repo` | `builder_full` — P1–P8; иначе только Phase 0 |
 
@@ -33,6 +33,8 @@ pipeline_profile: builder_full
 
 ## 2. Вставка в новый чат
 
+**Один project-чат на `builder_project`.** Fixed runtime plan (`profiles.yaml` → `plan_file`, например `Scripts_builder.plan.md`) — **@attach** в этом чате + промпт из [workflow.md](./workflow.md) §P3/P6. **Не** нажимать **Build / Execute plan** на файле плана: Cursor привязывает план к другому диалогу в локальном registry ([fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md)).
+
 ```text
 @docs/methodology/Zeya888-builder-queue/core/session-starter.md
 
@@ -44,7 +46,7 @@ pipeline_profile: builder_full
 После Onboarding summary — жди фазу (PA | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8).
 ```
 
-Для GPT — `builder_project: gpt`, [workflow.md](./workflow.md) §P1–P8 и [gpt-operator-contract.md](../contracts/gpt-operator-contract.md) (resolve from index, `run_mode`, sync index). Для **doge-identity-service** — `builder_project: identity`, [identity-operator-contract.md](../contracts/identity-operator-contract.md). Для **spa-app** — `builder_project: spa`, [spa-operator-contract.md](../contracts/spa-operator-contract.md); типичный intake **P1.3** `backlog_story`. В первом сообщении оператор указывает **один** режим: `input_mode: epic_story` \| `requirement` \| `backlog_story` (identity/spa) или `run_mode=…` / default pkg (gpt).
+Для GPT — `builder_project: gpt`, [workflow.md](./workflow.md) §P1–P8 и [gpt-operator-contract.md](../contracts/gpt-operator-contract.md) (resolve from index, `run_mode`, sync index). Для **doge-identity-service** — `builder_project: identity`, [identity-operator-contract.md](../contracts/identity-operator-contract.md). Для **spa-app** — `builder_project: spa`, [spa-operator-contract.md](../contracts/spa-operator-contract.md); типичный intake **P1.3** `backlog`. Для **scripts** (Web3 / Node.js) — `builder_project: scripts`, [scripts-operator-contract.md](../contracts/scripts-operator-contract.md); типичный intake **P1.3** `backlog_story` из shaping [`runtime-infrastructure`](../../../scripts/docs/runtime-infrastructure/README.md). В первом сообщении оператор указывает **один** режим: `input_mode: epic_story` \| `requirement` \| `backlog_story` (identity/spa/scripts) или `run_mode=…` / default pkg (gpt).
 
 ---
 
@@ -125,8 +127,10 @@ P1 | P2 | … — жду указание оператора. (PA — в отд�
 | `run_mode` | Только по явной команде |
 | P4 | Scaffold only — без pytest/runtime |
 | Plans | `.cursor/plans/*.plan.md` — не редактировать без запроса |
+| Fixed builder plans | `*_builder.plan.md` — @attach + workflow P3/P6; **не** Build / Execute plan ([fixed-builder-plan-execution.md](../guides/fixed-builder-plan-execution.md)) |
 | Commits | git-commit.md; push только по запросу |
 | Execution skill | [builder-session/SKILL.md](../../../../.cursor/skills/builder-session/SKILL.md) §Execution skill resolution — profile SSOT; task README overrides |
+| Gateway | [gateway-operator-contract.md](../contracts/gateway-operator-contract.md) — index §«Актуальная точка» + pkg verify; missing epic → decompose; sync index per task/story |
 | Identity | [identity-operator-contract.md](../contracts/identity-operator-contract.md) — index/pkg verify; `backlog_story` → §4, P1.3 → §6 |
 | Spa | [spa-operator-contract.md](../contracts/spa-operator-contract.md) — bootstrap verify FAIL до P1; `backlog_story` → §4, P1.3 → §6 |
 
@@ -162,6 +166,7 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 | Starter | `docs/methodology/Zeya888-builder-queue/core/session-starter.md` |
 | Skill | `.cursor/skills/builder-session/SKILL.md` |
 | Rule | `.cursor/rules/builder-operator-habits.mdc` |
+| Gateway contract | `docs/methodology/Zeya888-builder-queue/contracts/gateway-operator-contract.md` |
 | Identity contract | `docs/methodology/Zeya888-builder-queue/contracts/identity-operator-contract.md` |
 | Spa contract | `docs/methodology/Zeya888-builder-queue/contracts/spa-operator-contract.md` |
 
