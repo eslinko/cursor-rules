@@ -27,6 +27,7 @@
 | `gpt` | `GPT UI/docs/analysis/tasks` | `gpt-active-package.current.yaml` | `gpt-active-packages/` |
 | `spa` | `spa-app/docs/tasks` | `spa-active-package.current.yaml` (будущее) | `spa-active-packages/` |
 | `identity` | `doge-identity-service/docs/tasks` | `identity-active-package.current.yaml` | `identity-active-packages/` |
+| `scripts` | `scripts/docs/tasks` | `scripts-active-package.current.yaml` | `scripts-active-packages/` |
 
 `package_file` в указателе — путь **относительно** `{tasks_dir}/`.
 
@@ -49,7 +50,7 @@ story_groups:
 |------|--------|
 | `schema_version` | `1` |
 | `package_sequence` | Монотонный номер пакета |
-| `created_at` | ISO-8601 |
+| `created_at` | ISO-8601 UTC; **date-part = scaffold session**; время из `builder_resolve_queue.py --print-utc-now`; см. [`guides/builder-artifact-dates.md`](../guides/builder-artifact-dates.md) |
 | `label` | Короткое имя волны |
 | `input_kind` | §4 |
 | `tasks_root` | Префикс зоны тасков от корня workspace (см. `pkg_path_prefix` в `profiles.yaml`) |
@@ -57,6 +58,10 @@ story_groups:
 Опционально: `gim_keys` (GPT), `decision_ref`, `epic_file`.
 
 Пути — **от корня workspace** (каталог с `docs/methodology/Zeya888-builder-queue/`).
+
+**Имя файла pkg:** `pkg-<package_sequence>-<YYYYMMDD>-<slug>.yaml` — сегмент `YYYYMMDD` **обязан** совпадать с date-part поля `created_at`.
+
+**Проверка дат:** `--verify --check-dates` (см. guide + [`date-gate-grandfather.txt`](./date-gate-grandfather.txt)).
 
 ---
 

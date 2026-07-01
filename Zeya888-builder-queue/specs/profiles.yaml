@@ -56,6 +56,7 @@ projects:
     pkg_path_prefix: spa-app/docs/tasks/
     plan_file: .cursor/plans/Spa_builder.plan.md
     pipeline_doc: spa-app/docs/tasks/spa-story-execution-pipeline.md
+    ui_visual_pipeline_doc: docs/methodology/Zeya888-builder-queue/guides/spa-ui-visual-pipeline.md
     default_input_kind: task_list_linear
     input_package_yaml_key: spa_input_package
     artifact_kind: spa_cursor_build_window
@@ -104,3 +105,24 @@ projects:
     stack_label: Python
     execution_skill_primary: python-pro
     execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/python-pro/SKILL.md
+
+  scripts:
+    enabled: true
+    focus_folder: scripts
+    tasks_dir: scripts/docs/tasks
+    active_packages_dir: scripts-active-packages
+    current_pointer: scripts-active-package.current.yaml
+    build_windows_subdir: run-reports/scripts-build-windows
+    build_window_prefix: scripts-cursor-build-window
+    next_readme_dotfile: .scripts-next-readme
+    pkg_path_prefix: scripts/docs/tasks/
+    plan_file: .cursor/plans/Scripts_builder.plan.md
+    pipeline_doc: scripts/docs/tasks/scripts-story-execution-pipeline.md
+    default_input_kind: epic_story_tree
+    input_package_yaml_key: scripts_input_package
+    artifact_kind: scripts_cursor_build_window
+    build_window_title: Scripts Cursor build window
+    test_command: npm run test:unit
+    stack_label: Node.js / Hardhat / Web3
+    execution_skill_primary: javascript-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/javascript-pro/SKILL.md

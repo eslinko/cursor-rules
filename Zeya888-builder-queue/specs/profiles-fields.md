@@ -15,6 +15,7 @@
 | `pkg_path_prefix` | Префикс путей в pkg YAML |
 | `plan_file` | Operative builder plan (обычно `.cursor/plans/`) |
 | `pipeline_doc` | Epic/story execution pipeline |
+| `ui_visual_pipeline_doc` | Опционально (spa): полный SSOT UI Visual Pipeline (UI-0..UI-3, классификация, P1.3 fields) |
 | `default_input_kind` | `epic_story_tree` \| `task_list_linear` |
 | `input_package_yaml_key` | Ключ metadata в pkg |
 | `artifact_kind` | Тип build window artifact |

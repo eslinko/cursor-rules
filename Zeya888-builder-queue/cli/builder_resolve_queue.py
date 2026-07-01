@@ -5,6 +5,7 @@
 Запускать из корня workspace (каталог с docs/methodology/Zeya888-builder-queue/specs/profiles.yaml).
 
   python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gateway --verify
+  python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --verify
   python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gpt --list
   python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gateway --write-build-window --story-key STORY-M2-14-01
   python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project gpt --write-build-window --window-flat-start 1 --window-flat-end 3
@@ -20,12 +21,16 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.request import pathname2url
 
 BUILD_WINDOW_POINTER_NAME = "latest-cursor-build-window.md"
+DATE_GATE_INTRODUCED = date(2026, 6, 20)
+_PKG_FILENAME_DATE_RE = re.compile(r"^pkg-(\d{6})-(\d{8})-")
+_DATE_FIELD_RE = re.compile(r"^\s*-\s*\*\*Date:\*\*\s*(\d{4}-\d{2}-\d{2})", re.MULTILINE)
+_DEP_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
 def _repo_root() -> Path:
@@ -454,6 +459,162 @@ def _script_rel_to_repo(root: Path) -> str:
     return Path(__file__).resolve().relative_to(root).as_posix()
 
 
+_UI_SCOPE_RE = re.compile(r"ui_scope:\s*(visual|mixed|none)", re.IGNORECASE)
+_UI_ANCHOR_RE = re.compile(r"ui_anchor:\s*true", re.IGNORECASE)
+_EXTENDS_MOCKUP_RE = re.compile(r"extends mockup:\s*(.+)", re.IGNORECASE)
+_PUPPETEER_GATE_RE = re.compile(r"puppeteer_gate:\s*(\S+)", re.IGNORECASE)
+_VISUAL_HEURISTIC_RE = re.compile(
+    r"BoardPage|components/|mockup-|drawer|чипы|FilterPanel|SearchInput",
+    re.IGNORECASE,
+)
+
+
+def _spa_parse_task_readme_ui(content: str) -> dict[str, Any]:
+    scope_m = _UI_SCOPE_RE.search(content)
+    ui_scope = scope_m.group(1).lower() if scope_m else None
+    ui_anchor = bool(_UI_ANCHOR_RE.search(content))
+    gate_m = _PUPPETEER_GATE_RE.search(content)
+    puppeteer_gate = gate_m.group(1).strip() if gate_m else None
+    mockups: list[str] = []
+    mock_m = _EXTENDS_MOCKUP_RE.search(content)
+    if mock_m:
+        raw = mock_m.group(1).strip()
+        for part in re.split(r"[,;]", raw):
+            name = part.strip().strip("`")
+            if name:
+                mockups.append(name)
+    return {
+        "ui_scope": ui_scope,
+        "ui_anchor": ui_anchor,
+        "puppeteer_gate": puppeteer_gate,
+        "extends_mockups": mockups,
+    }
+
+
+def _spa_mockup_to_repo_path(name: str) -> str:
+    name = name.strip().strip("`")
+    if name.startswith("spa-app/"):
+        return name
+    if "/" in name:
+        return f"spa-app/docs/UX/{name}"
+    return f"spa-app/docs/UX/mockups/{name}"
+
+
+def _spa_task_needs_ui_pipeline(content: str) -> bool:
+    meta = _spa_parse_task_readme_ui(content)
+    if meta["ui_scope"] in ("visual", "mixed"):
+        return True
+    if meta["ui_anchor"]:
+        return True
+    if meta["ui_scope"] == "none":
+        return False
+    return bool(_VISUAL_HEURISTIC_RE.search(content))
+
+
+def _spa_resolve_ui_context(root: Path, paths: list[str]) -> dict[str, Any] | None:
+    """Anchor task + mockups + puppeteer gate for spa UI appendix in build window."""
+    entries: list[tuple[str, dict[str, Any], str]] = []
+    for rel in paths:
+        p = root / rel
+        if not p.is_file():
+            continue
+        text = p.read_text(encoding="utf-8")
+        if not _spa_task_needs_ui_pipeline(text):
+            continue
+        meta = _spa_parse_task_readme_ui(text)
+        entries.append((rel, meta, text))
+
+    if not entries:
+        return None
+
+    anchor_rel = None
+    for rel, meta, _ in entries:
+        if meta["ui_anchor"]:
+            anchor_rel = rel
+            break
+    if anchor_rel is None:
+        for rel, meta, _ in entries:
+            if meta["ui_scope"] in ("visual", "mixed"):
+                anchor_rel = rel
+                break
+    if anchor_rel is None:
+        anchor_rel = entries[0][0]
+
+    anchor_meta = next(m for r, m, _ in entries if r == anchor_rel)
+    mockup_paths: list[str] = []
+    for name in anchor_meta["extends_mockups"]:
+        mockup_paths.append(_spa_mockup_to_repo_path(name))
+
+    puppeteer_gate = anchor_meta.get("puppeteer_gate")
+    if not puppeteer_gate:
+        if "filter" in anchor_rel.lower() or any("filter" in m for m in mockup_paths):
+            puppeteer_gate = "test:ui:filters"
+        else:
+            puppeteer_gate = "test:ui:board-shell"
+
+    return {
+        "anchor_task": anchor_rel,
+        "mockup_paths": mockup_paths,
+        "puppeteer_gate": puppeteer_gate,
+    }
+
+
+def _spa_ui_appendix_block(root: Path, paths: list[str], *, ui_appendix_mode: str) -> str:
+    if ui_appendix_mode == "off":
+        return ""
+    ctx = _spa_resolve_ui_context(root, paths)
+    if ctx is None:
+        if ui_appendix_mode == "force":
+            ctx = {
+                "anchor_task": paths[0] if paths else "(no anchor)",
+                "mockup_paths": ["spa-app/docs/UX/mockups/mockup-01-dashboard-main-spec.md"],
+                "puppeteer_gate": "test:ui:board-shell",
+            }
+        else:
+            return ""
+
+    mockup_lines = "\n".join(f"@mockup: {p}" for p in ctx["mockup_paths"])
+    if not mockup_lines:
+        mockup_lines = "@mockup: spa-app/docs/UX/mockups/mockup-01-dashboard-main-spec.md"
+
+    gate = ctx["puppeteer_gate"]
+    anchor = ctx["anchor_task"]
+
+    return f"""
+## P3 Execute — spa UI appendix (auto-injected)
+
+См. также [workflow.md §P3 spa UI appendix](../../../../../docs/methodology/Zeya888-builder-queue/core/workflow.md).
+
+```text
+@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+
+P3 Execute. builder_project: spa. @.cursor/plans/Spa_builder.plan.md + @<this-build-window-file>
+По skill/rule: шаг 0 — python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project spa --verify; при FAIL — стоп.
+Шаг 0b (после verify):
+  cd spa-app && npx puppeteer browsers install chrome   # если Could not find Chrome
+  cd spa-app && npm run {gate}
+Стоп при FAIL 0b — до UI-2. Chrome: spa-app/docs/runtime-docs/frontend-run-and-environment.md §8.
+
+--- UI Visual Pipeline (spa; story-anchor) ---
+ui_gate: auto
+{mockup_lines}
+
+Anchor task: @{anchor}
+Story-anchor: anchor несёт UI-0..UI-1; dependent visual tasks — extends ui-mockup от anchor; story gate — §UI + post-implement PNG.
+
+UI-0 (anchor, MCP primary): npm run dev → MCP user-puppeteer → ui-baseline/ (1536x1024) ДО кода
+UI-1: ui-mockup-spec.md + human gate (принято) ДО UI-2
+UI-2: run-task + react-expert
+UI-3: npm test + npm run {gate} + acceptance §UI
+
+STOP: Story Done без story-gate acceptance §UI запрещён.
+SSOT: docs/methodology/Zeya888-builder-queue/guides/spa-ui-visual-pipeline.md; spa-story-execution-pipeline.md §UI task hard gates
+```
+"""
+
+
 def _render_build_window_md(
     *,
     profile: ProjectProfile,
@@ -464,6 +625,8 @@ def _render_build_window_md(
     regen_cmd: str,
     schema_version: str | None,
     pipeline_md_link: str,
+    root: Path | None = None,
+    ui_appendix_mode: str = "auto",
 ) -> str:
     gen = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     pkg_key = profile.input_package_yaml_key
@@ -509,6 +672,11 @@ def _render_build_window_md(
                 "",
             ]
         )
+    if profile.key == "spa" and root is not None:
+        appendix = _spa_ui_appendix_block(root, paths, ui_appendix_mode=ui_appendix_mode)
+        if appendix:
+            lines.append(appendix.strip())
+            lines.append("")
     lines.extend([f"## {section_title}", ""])
     body = "\n".join(lines)
     for i, p in enumerate(paths, start=1):
@@ -517,13 +685,216 @@ def _render_build_window_md(
     return body
 
 
+def _emit_print_utc_now() -> None:
+    now = datetime.now(timezone.utc)
+    utc_now = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    utc_date = now.strftime("%Y-%m-%d")
+    pkg_filename_date = now.strftime("%Y%m%d")
+    run_summary_prefix = now.strftime("run-summary-%Y%m%d-%H%M")
+    print(f"utc_now: {utc_now}")
+    print(f"utc_date: {utc_date}")
+    print(f"pkg_filename_date: {pkg_filename_date}")
+    print(f"run_summary_prefix: {run_summary_prefix}")
+
+
+def _load_grandfather_allowlist(root: Path) -> set[str]:
+    path = root / "docs/methodology/Zeya888-builder-queue/specs/date-gate-grandfather.txt"
+    if not path.is_file():
+        return set()
+    entries: set[str] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        pkg_id = s.split("|", 1)[0].strip()
+        if pkg_id.isdigit():
+            entries.add(pkg_id.zfill(6))
+    return entries
+
+
+def _parse_iso_date(value: str | None) -> date | None:
+    if not value:
+        return None
+    value = value.strip().strip("'\"")
+    try:
+        if "T" in value:
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).date()
+        return date.fromisoformat(value[:10])
+    except ValueError:
+        return None
+
+
+def _parse_pkg_filename_date(pkg_path: Path) -> str | None:
+    m = _PKG_FILENAME_DATE_RE.match(pkg_path.name)
+    return m.group(2) if m else None
+
+
+def _parse_pkg_sequence(pkg_path: Path) -> str | None:
+    m = _PKG_FILENAME_DATE_RE.match(pkg_path.name)
+    return m.group(1) if m else None
+
+
+def _parse_md_date(text: str) -> date | None:
+    m = _DATE_FIELD_RE.search(text)
+    return _parse_iso_date(m.group(1)) if m else None
+
+
+def _story_dir_from_task_paths(root: Path, paths: list[str]) -> Path | None:
+    if not paths:
+        return None
+    first = root / paths[0]
+    if first.name != "README.md":
+        return None
+    return first.parent.parent
+
+
+def _find_pipeline_story(story_dir: Path) -> Path | None:
+    if not story_dir.is_dir():
+        return None
+    candidates = sorted(story_dir.glob("STORY-*.md"))
+    return candidates[0] if candidates else None
+
+
+def _parse_story_dependency_paths(story_path: Path) -> list[Path]:
+    text = story_path.read_text(encoding="utf-8")
+    deps: list[Path] = []
+    in_dep = False
+    for line in text.splitlines():
+        if re.search(r"Зависит от:", line, re.IGNORECASE):
+            in_dep = True
+        elif in_dep and line.strip().startswith("- **") and "Зависит" not in line:
+            break
+        if not in_dep:
+            continue
+        for _label, href in _DEP_LINK_RE.findall(line):
+            if href.startswith("http"):
+                continue
+            dep = (story_path.parent / href).resolve()
+            if dep.is_file():
+                deps.append(dep)
+    return deps
+
+
+def _find_story_gate_file(root: Path, task_paths: list[str]) -> Path | None:
+    for rel in task_paths:
+        task_dir = (root / rel).parent
+        for gate in sorted(task_dir.glob("story-acceptance-gate*.md")):
+            return gate
+        for gate in sorted(task_dir.rglob("story-acceptance-gate*.md")):
+            return gate
+    story_dir = _story_dir_from_task_paths(root, task_paths)
+    if story_dir:
+        for gate in sorted(story_dir.rglob("story-acceptance-gate*.md")):
+            return gate
+    return None
+
+
+def _dependency_gate_dates(root: Path, dep_story_paths: list[Path]) -> list[tuple[str, date]]:
+    out: list[tuple[str, date]] = []
+    for dep in dep_story_paths:
+        for gate in sorted(dep.parent.rglob("story-acceptance-gate*.md")):
+            d = _parse_md_date(gate.read_text(encoding="utf-8"))
+            if d:
+                out.append((str(gate.relative_to(root)), d))
+            break
+    return out
+
+
+def _check_pkg_dates(
+    root: Path,
+    pkg_path: Path,
+    pkg_text: str,
+    groups: list[tuple[str, list[str]]],
+    *,
+    strict: bool,
+    allowlist: set[str],
+) -> tuple[list[str], list[str]]:
+    fails: list[str] = []
+    warns: list[str] = []
+
+    pkg_seq = _parse_pkg_sequence(pkg_path) or str(
+        _parse_pkg_scalar(pkg_text, "package_sequence") or ""
+    ).zfill(6)
+    created_at = _parse_iso_date(_parse_pkg_scalar(pkg_text, "created_at"))
+    filename_date = _parse_pkg_filename_date(pkg_path)
+
+    grandfathered = pkg_seq in allowlist
+    if grandfathered and not strict:
+        level = "WARN"
+    else:
+        level = "FAIL"
+
+    def add(msg: str) -> None:
+        full = f"pkg-{pkg_seq}: {msg}"
+        if level == "FAIL":
+            fails.append(full)
+        else:
+            warns.append(full)
+
+    if created_at is None:
+        add("created_at missing or invalid ISO-8601")
+        return fails, warns
+
+    if filename_date is None:
+        add("pkg filename missing YYYYMMDD segment (pkg-NNNNNN-YYYYMMDD-slug.yaml)")
+    elif created_at.strftime("%Y%m%d") != filename_date:
+        add(
+            f"filename date {filename_date} != created_at date {created_at.strftime('%Y%m%d')}"
+        )
+
+    if created_at >= DATE_GATE_INTRODUCED and grandfathered and not strict:
+        fails.append(
+            f"pkg-{pkg_seq}: new pkg must not be on grandfather allowlist "
+            f"(created_at {created_at})"
+        )
+
+    for story_key, paths in groups:
+        if story_key == "linear":
+            continue
+        story_dir = _story_dir_from_task_paths(root, paths)
+        pipeline = _find_pipeline_story(story_dir) if story_dir else None
+        dep_dates: list[tuple[str, date]] = []
+        if pipeline:
+            dep_dates = _dependency_gate_dates(
+                root, _parse_story_dependency_paths(pipeline)
+            )
+            for dep_path, dep_date in dep_dates:
+                if created_at < dep_date:
+                    add(
+                        f"{story_key}: created_at {created_at} before dependency gate "
+                        f"{dep_date} ({dep_path})"
+                    )
+
+        gate_file = _find_story_gate_file(root, paths)
+        if gate_file is None:
+            continue
+        gate_date = _parse_md_date(gate_file.read_text(encoding="utf-8"))
+        if gate_date is None:
+            add(f"{story_key}: gate missing Date: ({gate_file.relative_to(root)})")
+            continue
+        if gate_date < created_at:
+            add(
+                f"{story_key}: gate Date {gate_date} before pkg created_at {created_at} "
+                f"({gate_file.relative_to(root)})"
+            )
+        if dep_dates:
+            max_dep = max(d for _, d in dep_dates)
+            if gate_date < max_dep:
+                add(
+                    f"{story_key}: gate Date {gate_date} before dependency gate "
+                    f"{max_dep}"
+                )
+
+    return fails, warns
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Builder Queue YAML → очередь README.md")
     ap.add_argument(
         "--project",
-        required=True,
+        required=False,
         metavar="KEY",
-        help="Ключ профиля из profiles.yaml (gateway, gpt, spa, …)",
+        help="Ключ профиля из profiles.yaml (gateway, gpt, spa, …); не нужен с --print-utc-now",
     )
     ap.add_argument("--verify", action="store_true", help="Проверить exists для каждого README")
     ap.add_argument("--list", action="store_true", help="Нумерованный список путей")
@@ -546,15 +917,55 @@ def main() -> None:
         metavar="GIM-102,GIM-103",
         help="Срез по плоской очереди (gpt): N ключей = первые N README",
     )
+    ap.add_argument(
+        "--ui-appendix",
+        choices=("auto", "force", "off"),
+        default="auto",
+        help="spa: вставка UI Visual Pipeline block в build window (auto=visual tasks in window)",
+    )
+    ap.add_argument(
+        "--print-utc-now",
+        action="store_true",
+        help="UTC timestamps for pkg/gate/run-summary scaffold (no --project required)",
+    )
+    ap.add_argument(
+        "--check-dates",
+        action="store_true",
+        help="With --verify: temporal consistency of pkg created_at, filename, story gates",
+    )
+    ap.add_argument(
+        "--strict-dates",
+        action="store_true",
+        help="With --check-dates: ignore grandfather allowlist (remediation mode)",
+    )
     args = ap.parse_args()
-    if not (
+
+    if args.print_utc_now:
+        _emit_print_utc_now()
+        if not (
+            args.verify
+            or args.list
+            or args.export_active_task_path
+            or args.print_next
+            or args.write_next_pointer
+            or args.write_build_window
+        ):
+            return
+
+    if args.strict_dates and not args.check_dates:
+        raise SystemExit("--strict-dates requires --check-dates")
+
+    needs_project = (
         args.verify
         or args.list
         or args.export_active_task_path
         or args.print_next
         or args.write_next_pointer
         or args.write_build_window
-    ):
+    )
+    if needs_project and not args.project:
+        ap.error("--project KEY is required for queue operations")
+    if not needs_project and not args.print_utc_now:
         ap.print_help()
         sys.exit(2)
 
@@ -588,6 +999,32 @@ def main() -> None:
                 print(" ", p, file=sys.stderr)
             sys.exit(1)
         print(f"ok {len(flat)} paths (project={profile.key}, pkg {pkg_path.relative_to(root)})")
+        if args.check_dates:
+            allowlist = _load_grandfather_allowlist(root)
+            print(f"grandfather_allowlist: {len(allowlist)} entries")
+            fails, warns = _check_pkg_dates(
+                root,
+                pkg_path,
+                text,
+                groups,
+                strict=args.strict_dates,
+                allowlist=allowlist,
+            )
+            for w in warns:
+                print(f"WARN date-check: {w}", file=sys.stderr)
+            for f in fails:
+                print(f"FAIL date-check: {f}", file=sys.stderr)
+            if fails:
+                print(
+                    f"FAIL date-check: {len(fails)} violation(s); "
+                    f"see guides/builder-artifact-dates.md",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            if warns:
+                print(f"ok date-check ({len(warns)} warning(s), grandfather allowlist)")
+            else:
+                print("ok date-check")
 
     if args.list:
         for n, p in enumerate(flat, start=1):
@@ -707,6 +1144,8 @@ def main() -> None:
             regen_cmd=regen,
             schema_version=sv,
             pipeline_md_link=pipeline_md_link,
+            root=root,
+            ui_appendix_mode=args.ui_appendix,
         )
         out_path.write_text(body, encoding="utf-8")
         _emit_artifact_stdout(

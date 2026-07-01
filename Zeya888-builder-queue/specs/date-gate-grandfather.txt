@@ -1,0 +1,7 @@
+# Grandfather allowlist for --verify --check-dates
+# Format: package_sequence | reason | added | target_remediation
+# Allowlist must only shrink; empty is the goal.
+# New pkg (created_at >= DATE_GATE_INTRODUCED) must NOT be listed — those FAIL hard.
+#
+000031 | RC-02 scaffold date drift; gate 2026-06-19 vs pkg 2026-05-29 | 2026-06-20 | gate remediation like L10N-02; see date-gate-remediation-checklist.md
+000032 | RC-03 scaffold + gate 2026-05-29 before RC-01/RC-02 | 2026-06-20 | gate remediation like L10N-02; see date-gate-remediation-checklist.md
