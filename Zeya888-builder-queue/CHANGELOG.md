@@ -1,5 +1,27 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.11 — 2026-07-24
+
+- Per-scope backlog dashboard канон: [`workflow/backlog-dashboard-template.md`](./workflow/backlog-dashboard-template.md), [`workflow/backlog-dashboard-maintenance.md`](./workflow/backlog-dashboard-maintenance.md)
+- Focus prompt `$scope`: [`workflow/build-scope-dashboard-prompt.md`](./workflow/build-scope-dashboard-prompt.md) · Cursor `/build-scope-dashboard`
+- Aggregate Layer-2 automation: [`analysis/backlog-dashboard-status-automation.md`](./analysis/backlog-dashboard-status-automation.md) · [`tools/backlog-dashboard.html`](./tools/backlog-dashboard.html)
+- workflow variables `$scope` / `$scopeId` / `$dashboardFile`; gateway/gpt operator contracts §sync → `*-mvp-dashboard.md`
+
+## 1.4.10 — 2026-07-02
+
+- [`workflow-console.html`](./tools/workflow-console.html) v1.2.6 — профиль **`capybara`** в `BUILDER_PROJECTS` / `PROJECT_PROFILES`
+- [`guides/add-builder-profile.md`](./guides/add-builder-profile.md) — шаг workflow-console propagation; правило `profile_key` = имя директории
+- [add_builder_profile.plan.md](../../../.cursor/plans/add_builder_profile.plan.md) — полная параметризация `{profile_key}` + §workflow-console
+
+## 1.4.9 — 2026-07-02
+
+- Профиль **`capybara`** (Vue 3 + Node.js UI+API monolith + CLI) в [`profiles.yaml`](./specs/profiles.yaml)
+- Split от `scripts`: tasks SSOT → `capybara/docs/tasks/`; scripts сужен до `EPIC-SCR-02-tooling`
+- [`guides/add-builder-profile.md`](./guides/add-builder-profile.md) — SSOT bootstrap + Gateway structural clone + operative prompt
+- [`capybara-operator-contract.md`](./contracts/capybara-operator-contract.md), [`capybara-story-execution-pipeline.md`](../../../capybara/docs/tasks/capybara-story-execution-pipeline.md)
+- [Capybara_builder.plan.md](../../../.cursor/plans/Capybara_builder.plan.md); propagation workflow, session-starter, queue-manual §5c, builder-session, operator-habits
+- Reusable plan: [add_builder_profile.plan.md](../../../.cursor/plans/add_builder_profile.plan.md)
+
 ## 1.4.8 — 2026-06-04
 
 - [`guides/fixed-builder-plan-execution.md`](./guides/fixed-builder-plan-execution.md) — fixed `*_builder.plan.md`: @attach + workflow P3/P6; запрет Build / Execute plan (Cursor local registry)

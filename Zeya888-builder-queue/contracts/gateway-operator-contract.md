@@ -56,7 +56,10 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 После закрытия **каждого** task, story gate или acceptance:
 
 1. Обновить [`bullrun-launch-index.md`](../../../doge-complaints-gateway/docs/tasks/bullrun-launch-index.md) в **той же** итерации (task row + §«Актуальная точка» при смене волны).
-2. Не откладывать на конец сессии.
+2. Обновить package [`backlog-stories/*/INDEX.md`](../../../doge-complaints-gateway/docs/tasks/backlog-stories/) и root [`backlog-stories/INDEX.md`](../../../doge-complaints-gateway/docs/tasks/backlog-stories/INDEX.md).
+3. Пересчитать [`gateway-mvp-dashboard.md`](../../../doge-complaints-gateway/docs/tasks/gateway-mvp-dashboard.md) (derived snapshot; см. [backlog-dashboard-maintenance.md](../workflow/backlog-dashboard-maintenance.md) · [backlog-dashboard-template.md](../workflow/backlog-dashboard-template.md)).
+4. `npm run dashboard:aggregate`
+5. Не откладывать на конец сессии.
 
 ---
 

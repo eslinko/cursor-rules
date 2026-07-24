@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backlog Dashboard</title>
+  <style>
+    :root {
+      --bg-primary: #0a1420;
+      --bg-panel: #181715;
+      --bg-panel-hover: #1f1d1a;
+      --doge-gold: #eca125;
+      --doge-light-gold: #fce3ae;
+      --text-primary: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #2d3748;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --status-done: #22c55e;
+      --status-progress: #3b82f6;
+      --status-todo: #9ca3af;
+      --font-ui: "Inter", system-ui, -apple-system, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+      --max-width: 1320px;
+      --outer-pad: 48px;
+      --accordion-gap: 20px;
+      --transition-accordion: 150ms ease;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--outer-pad);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .header__brand { display: flex; align-items: center; gap: 12px; }
+    .header__logo { font-size: 28px; line-height: 1; }
+    .header__title { font-size: 24px; font-weight: 600; }
+    .header__subtitle {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header__pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      color: var(--doge-light-gold);
+    }
+    .pill--stale { color: var(--warning); border-color: var(--warning); }
+
+    .global-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+    .stat-card__label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stat-card__value {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--doge-gold);
+      margin-top: 4px;
+    }
+
+    .refresh-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    .refresh-panel__title {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .cli-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .cli-row code {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #60a5fa;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--doge-gold);
+      cursor: pointer;
+      padding: 6px 10px;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { background: var(--bg-panel-hover); }
+    .copy-btn.is-copied { color: var(--success); border-color: var(--success); }
+
+    .project-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--accordion-gap);
+    }
+
+    .project-block {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .project-block__header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .project-block__header:hover { background: var(--bg-panel-hover); }
+
+    .project-block__title {
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .project-block__pct {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--doge-gold);
+    }
+
+    .progress-bar {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .project-block__body {
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .project-block.is-collapsed .project-block__body { display: none; }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 16px 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .meta-row a { color: #60a5fa; }
+    table.data-table a { color: #60a5fa; text-decoration: none; }
+    table.data-table a:hover { text-decoration: underline; }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin: 16px 0 8px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table.data-table th,
+    table.data-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    table.data-table th {
+      background: #0d1117;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .epic-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .epic-chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #0d1117;
+    }
+    .epic-chip[data-status="Done"] { border-color: var(--status-done); color: var(--status-done); }
+    .epic-chip[data-status="In Progress"] { border-color: var(--status-progress); color: var(--status-progress); }
+    .epic-chip[data-status="Todo"] { border-color: var(--status-todo); color: var(--status-todo); }
+
+    .waves-list {
+      list-style: decimal;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    .waves-list li { margin-bottom: 6px; }
+
+    .chevron {
+      transition: transform var(--transition-accordion);
+      color: var(--text-muted);
+    }
+    .project-block.is-collapsed .chevron { transform: rotate(-90deg); }
+
+    @media (max-width: 768px) {
+      .page { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header__brand">
+        <span class="header__logo" aria-hidden="true">🐕</span>
+        <div>
+          <div class="header__title">DOGEstonia · Backlog Dashboard</div>
+          <div class="header__subtitle" id="header-subtitle">aggregated snapshot view</div>
+        </div>
+      </div>
+      <div class="header__pills" id="header-pills">
+        <span class="pill">Theme: Dark + DOGE</span>
+        <span class="pill">v1.0.0</span>
+      </div>
+    </header>
+
+    <div class="global-stats" id="global-stats"></div>
+
+    <section class="refresh-panel">
+      <div class="refresh-panel__title">Refresh data</div>
+      <div class="cli-row">
+        <code id="refresh-cmd">npm run dashboard:aggregate</code>
+        <button type="button" class="copy-btn" id="copy-refresh" aria-label="Copy refresh command">⧉</button>
+      </div>
+    </section>
+
+    <div class="project-list" id="project-list"></div>
+  </div>
+
+  <script>
+    /* DASHBOARD_DATA_START */
+    const DASHBOARD_DATA = {
+  "generated_at": "2026-07-24T11:52:18.995Z",
+  "projects": [
+    {
+      "key": "gateway",
+      "label": "Gateway",
+      "updated": "2026-07-24",
+      "summary": {
+        "packages": 7,
+        "stories": 30,
+        "done": 30,
+        "todo": 0,
+        "deferred": 2,
+        "accumulating": null,
+        "progress_pct": 100,
+        "progress_bar": "████████████"
+      },
+      "packages": [
+        {
+          "name": "story-draft-handoff",
+          "link": "backlog-stories/story-draft-handoff/INDEX.md",
+          "stories": 6,
+          "done": 6,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "issues-read-contract",
+          "link": "backlog-stories/issues-read-contract/INDEX.md",
+          "stories": 8,
+          "done": 8,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "demo-data-seeding",
+          "link": "backlog-stories/demo-data-seeding/INDEX.md",
+          "stories": 4,
+          "done": 4,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "localization-l10n",
+          "link": "backlog-stories/localization-l10n/INDEX.md",
+          "stories": 4,
+          "done": 3,
+          "todo": 0,
+          "deferred": 1,
+          "accum": null,
+          "progress_pct": 75,
+          "progress_bar": "█████████░░░",
+          "raw_progress": "75% `█████████░░░`"
+        },
+        {
+          "name": "gpt-submit-authz",
+          "link": "backlog-stories/gpt-submit-authz/INDEX.md",
+          "stories": 2,
+          "done": 2,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "cabinet-api",
+          "link": "backlog-stories/cabinet-api/INDEX.md",
+          "stories": 3,
+          "done": 2,
+          "todo": 0,
+          "deferred": 1,
+          "accum": null,
+          "progress_pct": 67,
+          "progress_bar": "████████░░░░",
+          "raw_progress": "67% `████████░░░░`"
+        },
+        {
+          "name": "taxonomy-fidelity",
+          "link": "backlog-stories/taxonomy-fidelity/INDEX.md",
+          "stories": 2,
+          "done": 2,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        }
+      ],
+      "epics": [
+        {
+          "name": "[EPIC-M2-21](epics/)",
+          "status": "In Progress",
+          "notes": "GW-DRAFT-06 Done pkg-000050; package story-draft-handoff closed"
+        },
+        {
+          "name": "EPIC-M2-06",
+          "status": "In Progress",
+          "notes": "PUBLIC-01 Done; issues-read-contract closed"
+        },
+        {
+          "name": "EPIC-M2-19",
+          "status": "Done (Awaiting Commits)",
+          "notes": "SEED-01..04 Done; hosted board 9 cards"
+        },
+        {
+          "name": "EPIC-M2-20",
+          "status": "Done",
+          "notes": "GAUTH historical; superseded user path"
+        },
+        {
+          "name": "EPIC-M2-22",
+          "status": "In Progress",
+          "notes": "CAB-01/02 Done; **GW-CAB-03 Deferred** post-MVP"
+        },
+        {
+          "name": "EPIC-M2-23",
+          "status": "In Progress",
+          "notes": "TAX-01/02 Done pkg-000054/000055; GPT-TAX-01 **Done** (GPT UI pkg-000027)"
+        }
+      ],
+      "next_waves": [],
+      "snapshot_path": "doge-complaints-gateway/docs/tasks/gateway-mvp-dashboard.md"
+    },
+    {
+      "key": "gpt",
+      "label": "GPT",
+      "updated": "2026-07-24",
+      "summary": {
+        "packages": 2,
+        "stories": 28,
+        "done": 27,
+        "todo": 1,
+        "deferred": 1,
+        "accumulating": null,
+        "progress_pct": 96,
+        "progress_bar": "████████████"
+      },
+      "packages": [
+        {
+          "name": "story-submit-handoff",
+          "link": "backlog-stories/story-submit-handoff/INDEX.md",
+          "stories": 2,
+          "done": 2,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "taxonomy-contract",
+          "link": "backlog-stories/taxonomy-contract/INDEX.md",
+          "stories": 1,
+          "done": 1,
+          "todo": 0,
+          "deferred": 0,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        }
+      ],
+      "epics": [
+        {
+          "name": "[EPIC-M1-01](../analysis/tasks/epics/EPIC-M1-01-issue-domain-instruction-foundation/EPIC-M1-01-issue-domain-instruction-foundation.md)",
+          "status": "Done",
+          "notes": "6 stories — instruction foundation"
+        },
+        {
+          "name": "[EPIC-M1-02](../analysis/tasks/epics/EPIC-M1-02-interview-dialogue-experience/EPIC-M1-02-interview-dialogue-experience.md)",
+          "status": "Done",
+          "notes": "11 stories — interview / REQ-29/43"
+        },
+        {
+          "name": "[EPIC-M1-03](../analysis/tasks/epics/EPIC-M1-03-FR-M1-traceability-and-ingest-core/EPIC-M1-03-FR-M1-traceability-and-ingest-core.md)",
+          "status": "Done",
+          "notes": "6 stories — FR-M1 / ingest"
+        },
+        {
+          "name": "[EPIC-M1-04](../analysis/tasks/epics/EPIC-M1-04-policy-gate-operator-rulebook/EPIC-M1-04-policy-gate-operator-rulebook.md)",
+          "status": "Done",
+          "notes": "4 stories — policy gate"
+        },
+        {
+          "name": "[EPIC-M1-05](../analysis/tasks/epics/EPIC-M1-05-issue-normalizer-strict-artifacts/EPIC-M1-05-issue-normalizer-strict-artifacts.md)",
+          "status": "Done",
+          "notes": "13 stories — normalizer / REQ-34/35/39"
+        },
+        {
+          "name": "[EPIC-M1-06](../analysis/tasks/epics/EPIC-M1-06-orchestrator-openapi-web2/EPIC-M1-06-orchestrator-openapi-web2.md)",
+          "status": "Done",
+          "notes": "26 stories — orchestrator / SUBMIT"
+        },
+        {
+          "name": "[EPIC-M1-07](../analysis/tasks/epics/EPIC-M1-07-acceptance-SPA-SoT/EPIC-M1-07-acceptance-SPA-SoT.md)",
+          "status": "Done",
+          "notes": "3 stories — acceptance / SoT"
+        },
+        {
+          "name": "[EPIC-M1-08](../analysis/tasks/epics/EPIC-M1-08-label-extraction-axes-controlled-vocabulary/EPIC-M1-08-label-extraction-axes-controlled-vocabulary.md)",
+          "status": "Done",
+          "notes": "19 stories — taxonomy / GPT-TAX-01"
+        },
+        {
+          "name": "[EPIC-M1-09](../analysis/tasks/epics/EPIC-M1-09-req22-wire-contract-v2-alignment/EPIC-M1-09-req22-wire-contract-v2-alignment.md)",
+          "status": "Done",
+          "notes": "17 stories — wire v2 / REQ-22…26"
+        },
+        {
+          "name": "[EPIC-M1-10](../analysis/tasks/epics/EPIC-M1-10-req23-behavioral-extensions/EPIC-M1-10-req23-behavioral-extensions.md)",
+          "status": "Done",
+          "notes": "12 stories — REQ-23/27/28"
+        },
+        {
+          "name": "Key",
+          "status": "Evidence",
+          "notes": ""
+        },
+        {
+          "name": "-----",
+          "status": "----------",
+          "notes": ""
+        },
+        {
+          "name": "[GPT-SUBMIT-01](backlog-stories/story-submit-handoff/STORY-GPT-SUBMIT-01-redirect-handoff.md)",
+          "status": "Done · pkg-000024+025 · M1-06-25",
+          "notes": ""
+        },
+        {
+          "name": "[GPT-SUBMIT-02](backlog-stories/story-submit-handoff/STORY-GPT-SUBMIT-02-legacy-intake-submitter-cleanup.md)",
+          "status": "Done · pkg-000026 · M1-06-26",
+          "notes": ""
+        },
+        {
+          "name": "[GPT-TAX-01](backlog-stories/taxonomy-contract/STORY-GPT-TAX-01-per-axis-taxonomy-contract.md)",
+          "status": "Done · pkg-000027 · GM8-19 · OpenAPI 0.7.0",
+          "notes": ""
+        }
+      ],
+      "next_waves": [],
+      "snapshot_path": "GPT UI/docs/tasks/gpt-mvp-dashboard.md"
+    },
+    {
+      "key": "identity",
+      "label": "Identity",
+      "updated": "2026-07-12",
+      "summary": {
+        "packages": 10,
+        "stories": 34,
+        "done": 30,
+        "todo": 3,
+        "deferred": 9,
+        "accumulating": 1,
+        "progress_pct": 88,
+        "progress_bar": "██████████░░"
+      },
+      "packages": [
+        {
+          "name": "auth-core",
+          "link": "backlog-stories/auth-core/INDEX.md",
+          "stories": 2,
+          "done": 1,
+          "todo": 1,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": 50,
+          "progress_bar": "██████░░░░░░",
+          "raw_progress": "50% `██████░░░░░░`"
+        },
+        {
+          "name": "oauth",
+          "link": "backlog-stories/oauth/INDEX.md",
+          "stories": 4,
+          "done": 4,
+          "todo": 0,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "eid",
+          "link": "backlog-stories/eid/INDEX.md",
+          "stories": 7,
+          "done": 7,
+          "todo": 0,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "phone-verification",
+          "link": "backlog-stories/phone-verification/INDEX.md",
+          "stories": 9,
+          "done": 9,
+          "todo": 0,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "cleanup",
+          "link": "backlog-stories/cleanup/INDEX.md",
+          "stories": 4,
+          "done": 3,
+          "todo": 1,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": 75,
+          "progress_bar": "█████████░░░",
+          "raw_progress": "75% `█████████░░░`"
+        },
+        {
+          "name": "security-hardening",
+          "link": "backlog-stories/security-hardening/INDEX.md",
+          "stories": 7,
+          "done": 6,
+          "todo": 0,
+          "deferred": null,
+          "accum": 1,
+          "progress_pct": 86,
+          "progress_bar": "██████████░░",
+          "raw_progress": "86% `██████████░░`"
+        },
+        {
+          "name": "identity-onboarding",
+          "link": "backlog-stories/identity-onboarding/INDEX.md",
+          "stories": 1,
+          "done": 0,
+          "todo": 1,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "eid-deferred",
+          "link": "backlog-stories/eid-deferred/INDEX.md",
+          "stories": 6,
+          "done": null,
+          "todo": null,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": null,
+          "progress_bar": null,
+          "raw_progress": "POST-MVP"
+        },
+        {
+          "name": "auth-bff",
+          "link": "backlog-stories/auth-bff/INDEX.md",
+          "stories": 3,
+          "done": null,
+          "todo": null,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": null,
+          "progress_bar": null,
+          "raw_progress": "POST-MVP"
+        },
+        {
+          "name": "story-draft-handoff",
+          "link": "backlog-stories/story-draft-handoff/INDEX.md",
+          "stories": 1,
+          "done": 1,
+          "todo": 0,
+          "deferred": null,
+          "accum": 0,
+          "progress_pct": null,
+          "progress_bar": null,
+          "raw_progress": "— excluded"
+        }
+      ],
+      "epics": [
+        {
+          "name": "EPIC-IDS-01…06",
+          "status": "Done",
+          "notes": "scaffold → testing"
+        },
+        {
+          "name": "EPIC-IDS-07",
+          "status": "In Progress",
+          "notes": "AUTHCORE-01 🟢; AUTHCORE-02 ⚪ (CAB-02 `/me` extend: created_at + account_status)"
+        },
+        {
+          "name": "EPIC-IDS-08",
+          "status": "In Progress",
+          "notes": "CLEANUP-04 open"
+        },
+        {
+          "name": "EPIC-IDS-09",
+          "status": "Done",
+          "notes": "platform; real eID deferred"
+        },
+        {
+          "name": "EPIC-IDS-10",
+          "status": "Done",
+          "notes": "PV-01…10; SPIKE-08 external"
+        },
+        {
+          "name": "EPIC-IDS-11",
+          "status": "Done",
+          "notes": "OAUTH-01…04"
+        },
+        {
+          "name": "EPIC-IDS-12",
+          "status": "In Progress",
+          "notes": "SEC-04 🟢 (pkg-000043); SEC-05 ADR only"
+        },
+        {
+          "name": "EPIC-IDS-13",
+          "status": "In Progress",
+          "notes": "ONB-01 open"
+        }
+      ],
+      "next_waves": [
+        "**CAB-02 identity contract** (extend `/me` для кабинета) — пара стори:"
+      ],
+      "snapshot_path": "doge-identity-service/docs/tasks/identity-backlog-dashboard.md"
+    },
+    {
+      "key": "spa",
+      "label": "SPA",
+      "updated": "2026-07-09",
+      "summary": {
+        "packages": 9,
+        "stories": 40,
+        "done": 30,
+        "todo": 9,
+        "deferred": 1,
+        "accumulating": 1,
+        "progress_pct": 75,
+        "progress_bar": "███████████░░░░"
+      },
+      "packages": [
+        {
+          "name": "search-and-filters",
+          "link": "backlog-stories/search-and-filters/INDEX.md",
+          "stories": 7,
+          "done": 7,
+          "todo": 0,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "localization",
+          "link": "backlog-stories/localization/INDEX.md",
+          "stories": 4,
+          "done": 4,
+          "todo": 0,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "identity-auth",
+          "link": "backlog-stories/identity-auth/INDEX.md",
+          "stories": 13,
+          "done": 12,
+          "todo": 1,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 92,
+          "progress_bar": "███████████░",
+          "raw_progress": "92% `███████████░`"
+        },
+        {
+          "name": "railway-deploy",
+          "link": "backlog-stories/railway-deploy/INDEX.md",
+          "stories": 2,
+          "done": 2,
+          "todo": 0,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "security-hardening",
+          "link": "backlog-stories/security-hardening/INDEX.md",
+          "stories": 3,
+          "done": 2,
+          "todo": 0,
+          "deferred": 1,
+          "accum": 0,
+          "progress_pct": 67,
+          "progress_bar": "████████░░░░",
+          "raw_progress": "67% `████████░░░░`"
+        },
+        {
+          "name": "design-foundation",
+          "link": "backlog-stories/design-foundation/INDEX.md",
+          "stories": 4,
+          "done": 1,
+          "todo": 3,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 25,
+          "progress_bar": "███░░░░░░░░░",
+          "raw_progress": "25% `███░░░░░░░░░`"
+        },
+        {
+          "name": "cabinet",
+          "link": "backlog-stories/cabinet/INDEX.md",
+          "stories": 7,
+          "done": 0,
+          "todo": 7,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "housekeeping",
+          "link": "backlog-stories/housekeeping/INDEX.md",
+          "stories": 1,
+          "done": 0,
+          "todo": 0,
+          "deferred": 0,
+          "accum": 1,
+          "progress_pct": null,
+          "progress_bar": null,
+          "raw_progress": "— registry"
+        },
+        {
+          "name": "Legacy DASH (parallel)",
+          "link": null,
+          "stories": 3,
+          "done": 1,
+          "todo": 2,
+          "deferred": 0,
+          "accum": 0,
+          "progress_pct": 33,
+          "progress_bar": "████░░░░░░░░",
+          "raw_progress": "33% `████░░░░░░░░`"
+        }
+      ],
+      "epics": [
+        {
+          "name": "EPIC-SPA-01",
+          "status": "Done",
+          "notes": "G2"
+        },
+        {
+          "name": "EPIC-SPA-02",
+          "status": "Done",
+          "notes": "L10N track"
+        },
+        {
+          "name": "EPIC-SPA-03",
+          "status": "Done",
+          "notes": "SEARCH track"
+        },
+        {
+          "name": "EPIC-SPA-04",
+          "status": "Done",
+          "notes": "ID-13 gate backlog"
+        },
+        {
+          "name": "EPIC-SPA-05",
+          "status": "Done",
+          "notes": "SEC-02 deferred"
+        },
+        {
+          "name": "EPIC-SPA-06",
+          "status": "Done",
+          "notes": "DEPLOY-01/02"
+        },
+        {
+          "name": "EPIC-SPA-07",
+          "status": "Todo",
+          "notes": "CAB-01…07"
+        },
+        {
+          "name": "EPIC-DASH-01",
+          "status": "In Progress",
+          "notes": "DASH-P1-01"
+        }
+      ],
+      "next_waves": [
+        "EPIC-SPA-07 — CAB-01 shell (primary per bullrun)",
+        "design-foundation — G4 tokens (operator alt)",
+        "identity — ID-13 public route regression gate"
+      ],
+      "snapshot_path": "spa-app/docs/tasks/spa-backlog-dashboard.md"
+    },
+    {
+      "key": "scripts",
+      "label": "Scripts",
+      "updated": "2026-07-09",
+      "summary": {
+        "packages": 1,
+        "stories": 1,
+        "done": 1,
+        "todo": 0,
+        "deferred": 0,
+        "accumulating": 0,
+        "progress_pct": 100,
+        "progress_bar": "████████████"
+      },
+      "packages": [
+        {
+          "name": "builder-console",
+          "link": "backlog-stories/builder-console/INDEX.md",
+          "stories": 1,
+          "done": 1,
+          "todo": 0,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        }
+      ],
+      "epics": [
+        {
+          "name": "EPIC-SCR-02-tooling",
+          "status": "In Progress",
+          "notes": "WFCONSOLE Done; DASH aggregator + HTML next"
+        }
+      ],
+      "next_waves": [
+        "STORY-SCR-DASH-01 — snapshot aggregator + `scripts-backlog-dashboard.md` bootstrap",
+        "STORY-SCR-DASH-02 — `backlog-dashboard.html` UI"
+      ],
+      "snapshot_path": "scripts/docs/tasks/scripts-backlog-dashboard.md"
+    },
+    {
+      "key": "capybara",
+      "label": "Capybara",
+      "updated": "2026-07-10",
+      "summary": {
+        "packages": 7,
+        "stories": 42,
+        "done": 6,
+        "todo": 36,
+        "deferred": 0,
+        "accumulating": 0,
+        "progress_pct": 14,
+        "progress_bar": "██░░░░░░░░░░"
+      },
+      "packages": [
+        {
+          "name": "capybara (CLI legacy)",
+          "link": "backlog-stories/capybara/",
+          "stories": 6,
+          "done": 6,
+          "todo": 0,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 100,
+          "progress_bar": "████████████",
+          "raw_progress": "100% `████████████`"
+        },
+        {
+          "name": "capybara-mig",
+          "link": "backlog-stories/capybara-mig/",
+          "stories": 6,
+          "done": 0,
+          "todo": 6,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "capybara-doc",
+          "link": "backlog-stories/capybara-doc/",
+          "stories": 5,
+          "done": 0,
+          "todo": 5,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "capybara-core",
+          "link": "backlog-stories/capybara-core/",
+          "stories": 8,
+          "done": 0,
+          "todo": 8,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "capybara-server",
+          "link": "backlog-stories/capybara-server/",
+          "stories": 5,
+          "done": 0,
+          "todo": 5,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "capybara-ui",
+          "link": "backlog-stories/capybara-ui/",
+          "stories": 6,
+          "done": 0,
+          "todo": 6,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        },
+        {
+          "name": "capybara-data",
+          "link": "backlog-stories/capybara-data/",
+          "stories": 6,
+          "done": 0,
+          "todo": 6,
+          "deferred": null,
+          "accum": null,
+          "progress_pct": 0,
+          "progress_bar": "░░░░░░░░░░░░",
+          "raw_progress": "0% `░░░░░░░░░░░░`"
+        }
+      ],
+      "epics": [
+        {
+          "name": "EPIC-SCR-CAPYBARA",
+          "status": "Done",
+          "notes": "CAPY-00…05 CLI closed"
+        },
+        {
+          "name": "EPIC-SCR-CAPY-MIG",
+          "status": "Todo",
+          "notes": "Phase A migration MIG-01…06"
+        },
+        {
+          "name": "EPIC-SCR-CAPY-DOC",
+          "status": "Todo",
+          "notes": "DOC-01…05 hygiene"
+        },
+        {
+          "name": "EPIC-SCR-CAPY-CORE",
+          "status": "Todo",
+          "notes": "Product backend CAPY-06…13"
+        },
+        {
+          "name": "EPIC-SCR-CAPY-SRV",
+          "status": "Todo",
+          "notes": "HTTP API SRV-01…05"
+        },
+        {
+          "name": "EPIC-SCR-CAPYUI",
+          "status": "Todo",
+          "notes": "Family Wallet UI CAPYUI-00…04"
+        },
+        {
+          "name": "EPIC-SCR-CAPY-DATA",
+          "status": "Todo",
+          "notes": "Mongo journal MDB-01…06"
+        }
+      ],
+      "next_waves": [
+        "DOC-01 — sync CAPY-04/05 + close CAPYBARA epic docs (ROADMAP active story)",
+        "MIG-01 — monorepo scaffold (critical path after DOC-01)",
+        "P3 backlog — pick next story per [bullrun-launch-index.md](bullrun-launch-index.md) §Актуальная точка"
+      ],
+      "snapshot_path": "capybara/docs/tasks/capybara-backlog-dashboard.md"
+    }
+  ],
+  "global": {
+    "project_count": 6,
+    "total_stories": 175,
+    "total_done": 124,
+    "total_todo": 49,
+    "overall_pct": 71
+  }
+};
+    /* DASHBOARD_DATA_END */
+
+    const STALE_DAYS = 14;
+    const REFRESH_CMD = 'npm run dashboard:aggregate';
+
+    function daysSince(dateStr) {
+      if (!dateStr) return Infinity;
+      const d = new Date(dateStr + 'T12:00:00Z');
+      const now = new Date();
+      return Math.floor((now - d) / (86400000));
+    }
+
+    function epicStatusKey(status) {
+      const s = (status || '').toLowerCase();
+      if (s.includes('done')) return 'Done';
+      if (s.includes('progress')) return 'In Progress';
+      return 'Todo';
+    }
+
+    function sortProjects(projects) {
+      return [...projects].sort((a, b) => {
+        const pa = a.summary?.progress_pct ?? 999;
+        const pb = b.summary?.progress_pct ?? 999;
+        return pa - pb;
+      });
+    }
+
+    function renderGlobal(global, generatedAt) {
+      const el = document.getElementById('global-stats');
+      const cards = [
+        { label: 'Projects', value: global.project_count },
+        { label: 'Total stories', value: global.total_stories },
+        { label: 'Done', value: global.total_done },
+        { label: 'Overall', value: global.overall_pct + '%' },
+      ];
+      el.innerHTML = cards
+        .map(
+          (c) =>
+            `<div class="stat-card"><div class="stat-card__label">${c.label}</div><div class="stat-card__value">${c.value}</div></div>`,
+        )
+        .join('');
+
+      const pills = document.getElementById('header-pills');
+      const genDate = generatedAt ? generatedAt.slice(0, 10) : '—';
+      pills.innerHTML = `
+        <span class="pill">Theme: Dark + DOGE</span>
+        <span class="pill">v1.0.0</span>
+        <span class="pill">Generated: ${genDate}</span>
+      `;
+    }
+
+    function resolvePackageHref(snapshotPath, packageLink) {
+      if (!snapshotPath || !packageLink) return null;
+      const baseDir = snapshotPath.replace(/\/[^/]+$/, '');
+      const rel = packageLink.replace(/^\.\//, '');
+      return `../../../../${baseDir}/${rel}`;
+    }
+
+    function renderPackageNameCell(pkg, snapshotPath) {
+      const href = resolvePackageHref(snapshotPath, pkg.link);
+      const name = escapeHtml(pkg.name);
+      if (!href) return name;
+      return `<a href="${escapeHtml(href)}" title="${escapeHtml(pkg.link)}">${name}</a>`;
+    }
+
+    function renderPackageTable(packages, snapshotPath) {
+      if (!packages || packages.length === 0) return '<p class="meta-row">No packages</p>';
+      const rows = packages
+        .map((p) => {
+          const prog =
+            p.progress_bar ||
+            (p.progress_pct != null ? `${p.progress_pct}%` : p.raw_progress || '—');
+          return `<tr>
+            <td>${renderPackageNameCell(p, snapshotPath)}</td>
+            <td>${p.stories ?? '—'}</td>
+            <td>${p.done ?? '—'}</td>
+            <td>${p.todo ?? '—'}</td>
+            <td class="progress-bar">${escapeHtml(prog)}</td>
+          </tr>`;
+        })
+        .join('');
+      return `<table class="data-table"><thead><tr>
+        <th>Package</th><th>Stories</th><th>Done</th><th>Todo</th><th>Progress</th>
+      </tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    function renderEpics(epics) {
+      if (!epics || epics.length === 0) return '';
+      const chips = epics
+        .map((e) => {
+          const sk = epicStatusKey(e.status);
+          return `<span class="epic-chip" data-status="${sk}" title="${escapeHtml(e.notes || '')}">${escapeHtml(e.name)} · ${escapeHtml(e.status)}</span>`;
+        })
+        .join('');
+      return `<div class="section-title">Epic rollup</div><div class="epic-chips">${chips}</div>`;
+    }
+
+    function renderWaves(waves) {
+      if (!waves || waves.length === 0) return '';
+      const items = waves.map((w) => `<li>${escapeHtml(w)}</li>`).join('');
+      return `<div class="section-title">Next recommended waves</div><ol class="waves-list">${items}</ol>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderProjects(projects) {
+      const list = document.getElementById('project-list');
+      const sorted = sortProjects(projects);
+      list.innerHTML = sorted
+        .map((p, idx) => {
+          const s = p.summary || {};
+          const pct = s.progress_pct ?? '—';
+          const bar = s.progress_bar || '';
+          const stale = daysSince(p.updated) > STALE_DAYS;
+          const collapsed = idx > 0 ? ' is-collapsed' : '';
+          const stalePill = stale ? '<span class="pill pill--stale">stale</span>' : '';
+          const snapLink = p.snapshot_path
+            ? `<a href="../../../../${p.snapshot_path}">${escapeHtml(p.snapshot_path)}</a>`
+            : '—';
+
+          return `<article class="project-block${collapsed}" data-project="${escapeHtml(p.key)}">
+            <div class="project-block__header" role="button" tabindex="0" aria-expanded="${idx === 0}">
+              <span class="chevron">▼</span>
+              <span class="project-block__title">${escapeHtml(p.label)}</span>
+              ${stalePill}
+              <span class="project-block__pct">${pct}%</span>
+              <span class="progress-bar">${escapeHtml(bar)}</span>
+            </div>
+            <div class="project-block__body">
+              <div class="meta-row">
+                <span>Updated: ${p.updated || '—'}</span>
+                <span>Stories: ${s.done ?? 0}/${s.stories ?? 0} done</span>
+                <span>Snapshot: ${snapLink}</span>
+              </div>
+              <div class="section-title">By package</div>
+              ${renderPackageTable(p.packages, p.snapshot_path)}
+              ${renderEpics(p.epics)}
+              ${renderWaves(p.next_waves)}
+            </div>
+          </article>`;
+        })
+        .join('');
+
+      list.querySelectorAll('.project-block__header').forEach((header) => {
+        const toggle = () => {
+          const block = header.closest('.project-block');
+          const collapsed = block.classList.toggle('is-collapsed');
+          header.setAttribute('aria-expanded', String(!collapsed));
+        };
+        header.addEventListener('click', toggle);
+        header.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        });
+      });
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (_) { /* fallback */ }
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    function init() {
+      const data = typeof DASHBOARD_DATA !== 'undefined' ? DASHBOARD_DATA : { projects: [], global: {} };
+      const subtitleEl = document.getElementById('header-subtitle');
+      if (subtitleEl && data.projects && data.projects.length) {
+        const keys = data.projects.map((p) => p.key).join(' · ');
+        subtitleEl.textContent = `aggregated snapshot view — ${keys}`;
+      }
+      renderGlobal(data.global || {}, data.generated_at);
+      renderProjects(data.projects || []);
+
+      const copyBtn = document.getElementById('copy-refresh');
+      copyBtn.addEventListener('click', async () => {
+        await copyText(REFRESH_CMD);
+        copyBtn.classList.add('is-copied');
+        setTimeout(() => copyBtn.classList.remove('is-copied'), 1300);
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

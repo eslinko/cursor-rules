@@ -49,7 +49,8 @@
 
 1. Обновить статус строки в [`bullrun-launch-index.md`](../../../GPT UI/docs/analysis/tasks/bullrun-launch-index.md) (task table, gap queue, §«Актуальная точка»).
 2. При дубле GIM — [`gpt-interview-module1-tasks-index.md`](../../../GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md).
-3. Не откладывать синхронизацию на «конец сессии».
+3. Пересчитать [`gpt-mvp-dashboard.md`](../../../GPT%20UI/docs/tasks/gpt-mvp-dashboard.md) + `npm run dashboard:aggregate` (см. [backlog-dashboard-template.md](../workflow/backlog-dashboard-template.md)).
+4. Не откладывать синхронизацию на «конец сессии».
 
 Артефакты таска (`acceptance-verification-*.md`, `run-summary`) **не** заменяют индекс.
 
