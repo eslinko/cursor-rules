@@ -44,8 +44,10 @@
 После **каждого** закрытого task или story gate:
 
 1. Обновить `bullrun-launch-index.md` и [`backlog-stories/INDEX.md`](../../../spa-app/docs/tasks/backlog-stories/INDEX.md) при doc-gap story.
-2. Обновить §«Актуальная точка».
-3. Не откладывать sync на конец сессии.
+2. Обновить package `INDEX.md` (если есть) для затронутого пакета.
+3. Обновить [`spa-backlog-dashboard.md`](../../../spa-app/docs/tasks/spa-backlog-dashboard.md) — см. [backlog-dashboard-maintenance.md](../workflow/backlog-dashboard-maintenance.md).
+4. Обновить §«Актуальная точка».
+5. Не откладывать sync на конец сессии.
 
 ---
 

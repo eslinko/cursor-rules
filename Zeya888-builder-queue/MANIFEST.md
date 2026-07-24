@@ -59,7 +59,9 @@ flowchart TB
 | [`curriculum/00-guide-for-humans.md`](./curriculum/00-guide-for-humans.md) | Wrapping: метод для человека, роль архитектора |
 | [`curriculum/06-architect-studio-and-p1-intakes.md`](./curriculum/06-architect-studio-and-p1-intakes.md) | Studio = PA chat; gap; три P1 intakes |
 | [`curriculum/learning-path.md`](./curriculum/learning-path.md) | Маршрут модулей 0–6 (Human + Operative) |
-| [`contracts/scripts-operator-contract.md`](./contracts/scripts-operator-contract.md) | Operator contract для `builder_project: scripts` (Web3 / Node.js) |
+| [`contracts/scripts-operator-contract.md`](./contracts/scripts-operator-contract.md) | Operator contract для `builder_project: scripts` (tooling) |
+| [`contracts/capybara-operator-contract.md`](./contracts/capybara-operator-contract.md) | Operator contract для `builder_project: capybara` (Vue+Node + CLI) |
+| [`guides/add-builder-profile.md`](./guides/add-builder-profile.md) | SSOT bootstrap нового профиля + Gateway clone |
 
 ## Исторические пути
 

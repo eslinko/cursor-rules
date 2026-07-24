@@ -151,36 +151,42 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 
 ---
 
-## 5b. Профиль `scripts` (Web3 / Node.js)
+## 5b. Профиль `scripts` (operator tooling)
 
-`--project scripts` — активен. До первого **P1.3** `pkg-bootstrap-pending.yaml` даёт пустую очередь; `--verify` → **FAIL** (`Очередь README пуста` — ожидаемо). После P1 — story-key или flat window. Контракт: [scripts-operator-contract.md](../contracts/scripts-operator-contract.md). Runtime plan: `.cursor/plans/Scripts_builder.plan.md`.
-
-### Verify / list (bootstrap)
+`--project scripts` — активен (scope: `EPIC-SCR-02-tooling`). Active pkg: `pkg-000005-wfconsole` → **ok 6 paths**. Capybara work — профиль `capybara`. Контракт: [scripts-operator-contract.md](../contracts/scripts-operator-contract.md). Runtime plan: `.cursor/plans/Scripts_builder.plan.md`.
 
 ```bash
 python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --verify
 python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --list
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts \
+  --write-build-window --story-key STORY-SCR-WFCONSOLE-01-workflow-prompt-console
 ```
 
-До первого P1 **verify и list ожидаемо FAIL** — норма (empty `linear_paths`).
+Pipeline — [scripts-story-execution-pipeline.md](../../../scripts/docs/tasks/scripts-story-execution-pipeline.md).
+
+---
+
+## 5c. Профиль `capybara` (Vue 3 + Node monolith + CLI)
+
+`--project capybara` — активен. Active pkg: `pkg-000007-capy-05-charge` → **ok 9 paths**. Контракт: [capybara-operator-contract.md](../contracts/capybara-operator-contract.md). Runtime plan: `.cursor/plans/Capybara_builder.plan.md`. **Fixed plan:** @attach + workflow §P3/P6 — не Build на файле.
+
+### Verify / list
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project capybara --verify
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project capybara --list
+```
 
 ### Build window
 
-**Одна Story:**
-
 ```bash
-python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts \
-  --write-build-window --story-key STORY-SCR-01-01
-```
-
-**Flat slice:**
-
-```bash
-python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts \
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project capybara \
+  --write-build-window --story-key STORY-SCR-CAPY-05-charge-child-to-pool-with-split
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project capybara \
   --write-build-window --window-flat-start 1 --window-flat-end K
 ```
 
-`K` — из `--list`. Tests: `npm run test:unit` (корень workspace). Pipeline — [scripts-story-execution-pipeline.md](../../../scripts/docs/tasks/scripts-story-execution-pipeline.md).
+`K` — из `--list`. Tests: `npx mocha scripts/tests/unit/capybara/**/*.test.js --config scripts/tests/.mocharc.json`. Pipeline — [capybara-story-execution-pipeline.md](../../../capybara/docs/tasks/capybara-story-execution-pipeline.md). New profile SSOT: [add-builder-profile.md](../guides/add-builder-profile.md).
 
 ---
 

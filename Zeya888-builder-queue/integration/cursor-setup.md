@@ -12,7 +12,7 @@ docs/methodology/Zeya888-builder-queue/
 
 Файл: [`.cursor/skills/builder-session/SKILL.md`](../../../.cursor/skills/builder-session/SKILL.md)
 
-Триггеры: `builder_project`, `pkg-`, build window, `Gateway_builder`, `GPT_builder`, `ID_builder`.
+Триггеры: `builder_project`, `pkg-`, build window, `Gateway_builder`, `GPT_builder`, `ID_builder`, `Capybara_builder`.
 
 ## 3. Rule
 
@@ -23,6 +23,8 @@ docs/methodology/Zeya888-builder-queue/
 Создайте `.cursor/plans/YourProject_builder.plan.md` по шаблону [`../templates/builder-plan-template.md`](../templates/builder-plan-template.md).
 
 ## 5. profiles.yaml
+
+**SSOT:** [`../guides/add-builder-profile.md`](../guides/add-builder-profile.md) — Intake Form, Checklist, Gateway clone для `*_builder.plan.md`, operative prompt.
 
 Добавьте профиль в [`../specs/profiles.yaml`](../specs/profiles.yaml) или создайте отдельный файл для своего репо (скопируйте [`../examples/sample-profiles/minimal.yaml`](../examples/sample-profiles/minimal.yaml)).
 

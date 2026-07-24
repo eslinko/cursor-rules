@@ -3,7 +3,7 @@
 > **Plan (read-only unless operator asks):** [`.cursor/plans/Scripts_builder.plan.md`](../../../.cursor/plans/Scripts_builder.plan.md)  
 > **Propagation:** [builder-session/SKILL.md](../../../.cursor/skills/builder-session/SKILL.md) · [builder-operator-habits.mdc](../../../.cursor/rules/builder-operator-habits.mdc) · [session-starter.md](../core/session-starter.md)
 
-Process-reminder правила для `builder_project: scripts` (Web3 / Node.js в `scripts/`). P1/PA промпты — только [workflow.md](../core/workflow.md); не дублировать в plan.
+Process-reminder правила для `builder_project: scripts` (operator tooling в `scripts/docs/tasks/`). **Capybara work** — только `builder_project: capybara`. P1/PA промпты — только [workflow.md](../core/workflow.md); не дублировать в plan.
 
 ---
 
@@ -23,19 +23,20 @@ Process-reminder правила для `builder_project: scripts` (Web3 / Node.j
 **Запрещено:**
 
 - Брать порядок из памяти или из `docs/runtime-infrastructure/` без materialized pkg.
-- Создавать эпики вне префикса `EPIC-SCR-*` без P1.
+- Создавать эпики вне `EPIC-SCR-02-tooling` в scripts tree без P1.
+- Вести `STORY-SCR-CAPY*` / `STORY-SCR-CAPYUI*` через `builder_project: capybara` ([capybara-operator-contract.md](./capybara-operator-contract.md)).
 
 ---
 
 ## 2. `treat-missing-epic-as-not-decomposed` — эпик без индекса = не декомпозирован
 
-Если `EPIC-SCR-*.md` существует в `scripts/docs/tasks/epics/`, но в bullrun **нет** task queue:
+Если `EPIC-SCR-02-tooling.md` или tooling story существует в `scripts/docs/tasks/`, но в bullrun **нет** task queue:
 
 - Считать эпик **не декомпозированным**.
 - **Не** начинать P3 Execute.
 - Запустить **P1** + [`bullrun-epic-decompose.md`](../../../.cursor/commands/bullrun-epic-decompose.md) или **P1.3** для backlog story.
 
-**Backlog story (типично scripts):** story в `docs/tasks/backlog-stories/STORY-SCR-*.md`, epic ещё не в pipeline → **P1.3** (`input_mode=backlog_story`): materialize `EPIC-SCR-*` + pipeline story + tasks + pkg ([workflow.md](../core/workflow.md) §P1.3).
+**Backlog story (типично scripts):** story в `scripts/docs/tasks/backlog-stories/builder-console/STORY-SCR-WFCONSOLE*.md` → **P1.3**.
 
 ---
 
@@ -128,21 +129,12 @@ Build plan **не** содержит таблицу P4 — только эта �
 
 | Параметр | Значение |
 |----------|----------|
-| Epic prefix | `EPIC-SCR-*` |
-| Story prefix | `STORY-SCR-*` |
-| Materialize path | `scripts/docs/tasks/epics/` |
-| Pipeline story | `epics/<EPIC>/stories/<STORY-KEY>/STORY-*.md` |
-| Task naming | `task-scr-<epic-slug>-tNN-<slug>/README.md` |
-| Active pointer | `scripts-active-package.current.yaml` |
+| Epic prefix | `EPIC-SCR-02-tooling` |
+| Story prefix | `STORY-SCR-WFCONSOLE*` |
+| Materialize path | `scripts/docs/tasks/epics/EPIC-SCR-02-tooling/` |
 | Execution skill | `javascript-pro` |
-| Code facts anchor | `scripts/lib/`, `scripts/tests/`, `hardhat.config.js`, root `package.json` |
+| Code facts anchor | `docs/methodology/Zeya888-builder-queue/tools/workflow-console.html` |
 
-**Epic materialize (из backlog Meta.Epic):**
+**Capybara (`STORY-SCR-CAPY*`, `STORY-SCR-CAPYUI*`):** профиль `capybara` — [capybara-operator-contract.md](./capybara-operator-contract.md) §7.
 
-- EPIC уже в `epics/` → использовать.
-- EPIC только в backlog → materialize `EPIC-SCR-NN-<slug>.md` (следующий свободный номер) + bullrun.
-- Не создавать `EPIC-M2-*`, `EPIC-SPA-*`, `EPIC-IDS-*` в scripts tree.
-
-**Backlog INDEX:** обновить `backlog-stories/INDEX.md` при закрытии story.
-
-**Intake shaping:** [`runtime-infrastructure/README.md`](../../../scripts/docs/runtime-infrastructure/README.md) (01–08) — источник для PA.3 / backlog stories, не substitute для pkg queue.
+**Intake shaping:** Capybara intake — `scripts/docs/runtime-infrastructure/` via profile `capybara` only.

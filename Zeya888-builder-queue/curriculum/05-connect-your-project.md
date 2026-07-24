@@ -63,11 +63,9 @@ Profile — **карта репозитория** для CLI и Phase 0. Арх�
 
 ### Checklist нового профиля
 
-- [ ] `{project}-active-packages/` создан  
-- [ ] `{project}-active-package.current.yaml`  
-- [ ] `.cursor/plans/YourProject_builder.plan.md` по [`builder-plan-template.md`](../templates/builder-plan-template.md)  
-- [ ] `bullrun-launch-index.md` (или аналог) в `tasks_dir`  
-- [ ] `--verify` (ожидаемо FAIL до первого P1 — норма)
+**SSOT:** [`../guides/add-builder-profile.md`](../guides/add-builder-profile.md) §0 Intake + §1 Checklist + §3 Operative prompt.
+
+Учебный пример без production: [`../examples/sample-profiles/minimal.yaml`](../examples/sample-profiles/minimal.yaml).
 
 ---
 

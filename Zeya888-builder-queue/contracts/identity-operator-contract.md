@@ -46,8 +46,10 @@
 После **каждого** закрытого task (🟢 Done / acceptance) или story gate:
 
 1. Обновить статус строки в `bullrun-launch-index.md` (task table или gap queue).
-2. При необходимости — §«Актуальная точка» (следующая story, override, epic gate).
-3. Не откладывать синхронизацию на «конец сессии».
+2. Обновить package [`backlog-stories/*/INDEX.md`](../../../doge-identity-service/docs/tasks/backlog-stories/) и root [`backlog-stories/INDEX.md`](../../../doge-identity-service/docs/tasks/backlog-stories/INDEX.md).
+3. Пересчитать [`identity-backlog-dashboard.md`](../../../doge-identity-service/docs/tasks/identity-backlog-dashboard.md) (derived snapshot; см. [backlog-dashboard-maintenance.md](../workflow/backlog-dashboard-maintenance.md)).
+4. При необходимости — §«Актуальная точка» (следующая story, override, epic gate).
+5. Не откладывать синхронизацию на «конец сессии».
 
 Артефакты таска (`acceptance-verification-*.md`, `run-summary`) **не** заменяют индекс.
 
@@ -89,9 +91,10 @@ Override-волна (`run_mode=epic_ids_*_audit_*` / `*_reaudit_*`) — отде
 
 1. `run_mode` override list (если оператор явно указал)  
 2. Active `identity-active-packages/pkg-*.yaml` + `--verify`  
-3. `bullrun-launch-index.md`  
-4. **Epic mode:** `EPIC-IDS-*.md` · **Requirement mode:** `docs/requirements/` → эпик по ссылкам/индексу · **Backlog mode:** `backlog-stories/` → после P1.3 pipeline story в `epics/`  
-5. Task `README.md` + acceptance-verification
+3. `bullrun-launch-index.md` + `backlog-stories/INDEX.md` + package `INDEX.md`  
+4. `identity-backlog-dashboard.md` (derived)  
+5. **Epic mode:** `EPIC-IDS-*.md` · **Requirement mode:** `docs/requirements/` → эпик по ссылкам/индексу · **Backlog mode:** `backlog-stories/` → после P1.3 pipeline story в `epics/`  
+6. Task `README.md` + acceptance-verification
 
 ---
 

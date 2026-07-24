@@ -34,7 +34,10 @@
 | `$executionSkillPrimary`  | `execution_skill_primary` в profiles (напр. `python-pro`, `react-expert`)                                                                                                                                         |
 | `$executionSkillPath`     | `execution_skill_path` в profiles — путь к execution SKILL.md                                                                                                                                                     |
 | `$executionSkillDeclared` | строка для task README: `Skill declared: $executionSkillPrimary` (или fallback из profile / README таска)                                                                                                         |
-| `$p13Appendix`            | operator contract §6/§7 P1.3 (`spa` / `identity` / `scripts`) — epic naming, materialize rules                                                                                                                    |
+| `$p13Appendix`            | operator contract §6/§7 P1.3 (`spa` / `identity` / `scripts` / `capybara`) — epic naming, materialize rules                                                                                                       |
+| `$scope`                  | display-label scope of work для dashboard (напр. `MVP`); вход оператора в [`build-scope-dashboard-prompt.md`](../workflow/build-scope-dashboard-prompt.md)                                                       |
+| `$scopeId`                | lowercase slug от `$scope` (`MVP` → `mvp`) — имя файла snapshot                                                                                                                                                   |
+| `$dashboardFile`          | `{focus_folder}/docs/tasks/{project}-{scopeId}-dashboard.md` (всегда `docs/tasks/`, не `analysis/tasks`)                                                                                                          |
 
 
 
@@ -77,16 +80,28 @@
 
 
 
-|                 | `scripts` (Web3 / Node.js infrastructure)                                                               |
+|                 | `scripts` (operator tooling — `EPIC-SCR-02-tooling`)                                                    |
 | --------------- | ------------------------------------------------------------------------------------------------------- |
 | `$planFile`     | `.cursor/plans/Scripts_builder.plan.md`                                                                 |
 | `$tasksRoot`    | `scripts/docs/tasks`                                                                                    |
-| `$storyFile`    | напр. `scripts/docs/tasks/backlog-stories/STORY-SCR-01-web3-connection.md` (`input_mode=backlog_story`) |
+| `$storyFile`    | напр. `scripts/docs/tasks/backlog-stories/builder-console/STORY-SCR-WFCONSOLE-01-….md`                   |
 | `$backlogIndex` | `scripts/docs/tasks/backlog-stories/INDEX.md`                                                           |
-| Окно по story   | `--write-build-window --story-key STORY-SCR-01-01`                                                      |
-| Окно flat       | `--write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                      |
+| Окно по story   | `--write-build-window --story-key STORY-SCR-WFCONSOLE-01-workflow-prompt-console`                       |
 | Pipeline        | `scripts/docs/tasks/scripts-story-execution-pipeline.md`                                                |
-| Intake docs     | `scripts/docs/runtime-infrastructure/README.md` (shaping only, не очередь)                              |
+
+
+
+|                 | `capybara` (Vue 3 + Node monolith + CLI)                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
+| `$planFile`     | `.cursor/plans/Capybara_builder.plan.md`                                                                |
+| `$tasksRoot`    | `capybara/docs/tasks`                                                                                   |
+| `$storyFile`    | напр. `capybara/docs/tasks/backlog-stories/capybara-ui/STORY-SCR-CAPYUI-00-….md` (`input_mode=backlog_story`) |
+| `$backlogIndex` | `capybara/docs/tasks/backlog-stories/INDEX.md`                                                          |
+| Окно по story   | `--write-build-window --story-key STORY-SCR-CAPY-05-charge-child-to-pool-with-split`                    |
+| Окно flat       | `--write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                      |
+| Pipeline        | `capybara/docs/tasks/capybara-story-execution-pipeline.md`                                              |
+| Intake docs     | `scripts/docs/runtime-infrastructure/README.md` (shaping only)                                          |
+| Code CLI        | `scripts/lib/capybara/`; UI: `capybara-ui/` (planned)                                                   |
 
 
 ---
@@ -126,7 +141,7 @@
 | Analysis | `.cursor/rules/analysis.mdc`                |
 
 
-Rule подмешивается при работе в `doge-complaints-gateway/`**,** `GPT UI/`, `doge-identity-service/`**,** `spa-app/`, `scripts/`**.
+Rule подмешивается при работе в `doge-complaints-gateway/`**,** `GPT UI/`, `doge-identity-service/`**,** `spa-app/`, `scripts/`, `capybara/`**.
 
 ### Wave checkpoint
 
@@ -288,6 +303,7 @@ Artifact dates: см. §P1 appendix (artifact dates) — $printUtcNowCmd пер�
 @.cursor/rules/builder-operator-habits.mdc
 @.cursor/rules/analysis.mdc
 @$storyFile=
+@$backlogIndex=
 
 P1 Plan mode. builder_project: $builderProject (типично identity или spa).
 input_mode=backlog_story. @$storyFile
@@ -402,6 +418,9 @@ P2 Build window only. builder_project: $builderProject.
 ```text
 @.cursor/skills/builder-session/SKILL.md
 @.cursor/rules/builder-operator-habits.mdc
+@$planFile=
+@$buildWindowFile=
+@$storyFile=
 
 P3 Execute. builder_project: $builderProject. @$planFile + @$buildWindowFile
 Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epicFile / @$storyFile; input_mode=backlog_story -> @$storyFile
@@ -420,6 +439,11 @@ P3 appendix (dates): gate/run-summary `Date:` — только post live-run; `$
 @.cursor/skills/builder-session/SKILL.md
 @.cursor/rules/builder-operator-habits.mdc
 @.cursor/rules/analysis.mdc
+@$planFile=
+@$buildWindowFile=
+@$storyFile=
+@$mockupSpec=
+@$mockupImg=
 
 P3 Execute. builder_project: spa. @$planFile + @$buildWindowFile
 Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epicFile / @$storyFile; input_mode=backlog_story -> @$storyFile
@@ -432,9 +456,8 @@ Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epic
 
 --- UI Visual Pipeline (spa; story-anchor model) ---
 ui_gate: auto
-@mockup: spa-app/docs/UX/mockups/mockup-01-dashboard-main-spec.md
-@mockup: spa-app/docs/UX/mockups/mockup-10-dashboard-filter-status-spec.md
-@mockup: spa-app/docs/UX/mockups/mockup-13-dashboard-filter-reset-spec.md
+@mockup: $mockupSpec
+@mockup: $mockupImg
 
 Правила ui_gate:
 - auto (default) — pipeline по ui_scope/ui_complexity в task README, ui_anchor, или эвристике Scope
@@ -490,16 +513,18 @@ STOP story Done если post-implement PNG для anchor state A отсутст
 Оператор вставляет в **Claude.ai / Claude Code** (не второй Cursor-чат):
 
 ```text
-проведи жесткий аудит по фактическому коду отностельно исполнения $стори или req
-
-и актуализируй каждый таск и стори в отчете
-
-выбрать из:
+$bullrun=
 doge-complaints-gateway/docs/tasks/bullrun-launch-index.md
 doge-identity-service/docs/tasks/bullrun-launch-index.md
 spa-app/docs/tasks/bullrun-launch-index.md
 GPT UI/docs/analysis/tasks/bullrun-launch-index.md
 scripts/docs/tasks/bullrun-launch-index.md
+
+$story=
+
+проведи жесткий аудит по фактическому коду отностельно исполнения $story
+
+и актуализируй каждый таск и стори в отчете $bullrun
 
 мышление @.cursor/rules/analysis.mdc  
 
@@ -527,6 +552,7 @@ scripts/docs/tasks/bullrun-launch-index.md
 @.cursor/rules/builder-operator-habits.mdc
 @.cursor/rules/analysis.mdc
 $planFile=
+$auditReport=
 
 P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport (гапы временной рабочей документации (не runtime, perssistent) игнорируй)
 По skill/rule: не выполняй код и pytest; не закрывай gap implementation. Gap → task-папки (@docs/methodology/task-standard.md), @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
@@ -560,6 +586,7 @@ P5 appendix (dates): новые gap-task gates — те же правила да
 @.cursor/skills/builder-session/SKILL.md
 @.cursor/rules/builder-operator-habits.mdc
 @.cursor/rules/analysis.mdc
+$planFile=
 
 run_mode=<wave_name>
 builder_project: $builderProject
@@ -584,15 +611,14 @@ P6 appendix (dates): gate/run-summary `Date:` — только post live-run; $v
 | `<first-readme-from-plan-safe-override-list>` | **Первый** path из нумерованного списка §safe-override (порядок P6 — как в плане, напр. t08 → t09 → t07) |
 | Следующие таски | Новое сообщение с `@<next-readme>` или чекпоинт «следующий в очереди: …/README.md» |
 
-**Пример (scripts, CAPY-01 audit):**
+**Пример (capybara, P1.3 backlog):**
 
 ```text
-run_mode=capy01_audit_followup
-builder_project: scripts
-@.cursor/plans/Scripts_builder.plan.md
-@scripts/docs/tasks/epics/EPIC-SCR-01-capybara/stories/STORY-SCR-CAPY-01-sweep-balance-to-parent/task-scr-capybara-t08-audit-l2-zero-amount-distinction/README.md
+builder_project: capybara
+@.cursor/plans/Capybara_builder.plan.md
+@capybara/docs/tasks/backlog-stories/capybara-ui/STORY-SCR-CAPYUI-00-app-skeleton-and-design-system.md
 
-P6 Execute — gap closure only; pkg-000002 unchanged
+P1.3 backlog intake — materialize EPIC-SCR-CAPYUI + pkg
 ```
 
 #### P6 — Execute (без `run_mode`, YAML default)
@@ -614,12 +640,15 @@ P6 Execute — gap closure only; pkg-000002 unchanged
 
 ### P8 — Commits
 
+После закрытия story wave: обновить [`spa-backlog-dashboard.md`](../../../spa-app/docs/tasks/spa-backlog-dashboard.md) если не сделано в P6 — [backlog-dashboard-maintenance.md](../workflow/backlog-dashboard-maintenance.md).
+
 ```text
 @.cursor/skills/builder-session/SKILL.md
 @.cursor/rules/builder-operator-habits.mdc
 @docs/methodology/git-commit.md
+$anchor=
 
-Commits для scope anchor (`REQ-XX`, `EPIC/STORY` или `STORY-IDS-*` из backlog intake — по input_mode).
+Commits для scope anchor ($anchor).
 feat → test → docs; не коммить: docs/tasks/**, BULLRUN, acceptance-verification, run-summary без явной команды; push не делать.
 
 ```

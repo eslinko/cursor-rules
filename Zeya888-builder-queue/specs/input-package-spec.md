@@ -28,6 +28,7 @@
 | `spa` | `spa-app/docs/tasks` | `spa-active-package.current.yaml` (будущее) | `spa-active-packages/` |
 | `identity` | `doge-identity-service/docs/tasks` | `identity-active-package.current.yaml` | `identity-active-packages/` |
 | `scripts` | `scripts/docs/tasks` | `scripts-active-package.current.yaml` | `scripts-active-packages/` |
+| `capybara` | `capybara/docs/tasks` | `capybara-active-package.current.yaml` | `capybara-active-packages/` |
 
 `package_file` в указателе — путь **относительно** `{tasks_dir}/`.
 

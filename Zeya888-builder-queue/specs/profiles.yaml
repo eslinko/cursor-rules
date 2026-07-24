@@ -126,3 +126,25 @@ projects:
     stack_label: Node.js / Hardhat / Web3
     execution_skill_primary: javascript-pro
     execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/javascript-pro/SKILL.md
+
+  capybara:
+    enabled: true
+    focus_folder: capybara
+    tasks_dir: capybara/docs/tasks
+    active_packages_dir: capybara-active-packages
+    current_pointer: capybara-active-package.current.yaml
+    build_windows_subdir: run-reports/capybara-build-windows
+    build_window_prefix: capybara-cursor-build-window
+    next_readme_dotfile: .capybara-next-readme
+    pkg_path_prefix: capybara/docs/tasks/
+    plan_file: .cursor/plans/Capybara_builder.plan.md
+    pipeline_doc: capybara/docs/tasks/capybara-story-execution-pipeline.md
+    default_input_kind: epic_story_tree
+    input_package_yaml_key: capybara_input_package
+    artifact_kind: capybara_cursor_build_window
+    build_window_title: Capybara Cursor build window
+    test_command: 'npx mocha scripts/tests/unit/capybara/**/*.test.js --config scripts/tests/.mocharc.json'
+    stack_label: Vue 3 + Node.js (UI + API monolith)
+    execution_skill_primary: vue-expert
+    execution_skill_fallback: javascript-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/vue-expert/SKILL.md

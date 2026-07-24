@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workflow</title>
+  <style>
+    :root {
+      --bg-primary: #0a1420;
+      --bg-panel: #181715;
+      --bg-panel-hover: #1f1d1a;
+      --doge-gold: #eca125;
+      --doge-light-gold: #fce3ae;
+      --text-primary: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #2d3748;
+      --phase-wave: #eca125;
+      --phase-p1: #3b82f6;
+      --phase-p2: #10b981;
+      --phase-p3: #3b82f6;
+      --phase-p4: #f59e0b;
+      --phase-p5: #8b5cf6;
+      --phase-p6: #059669;
+      --phase-p7: #d97706;
+      --phase-p8: #f97316;
+      --error: #ef4444;
+      --success: #22c55e;
+      --token-var: #eca125;
+      --token-project: #10b981;
+      --token-cli: #60a5fa;
+      --font-ui: "Inter", system-ui, -apple-system, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+      --max-width: 1320px;
+      --outer-pad: 48px;
+      --header-h: 72px;
+      --accordion-gap: 20px;
+      --input-h: 36px;
+      --cli-h: 40px;
+      --transition-fast: 100ms ease;
+      --transition-accordion: 150ms ease;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--outer-pad);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--header-h);
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .header__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header__logo {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .header__title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header__subtitle {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header__pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      color: var(--doge-light-gold);
+    }
+
+    .prompt-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: var(--accordion-gap);
+    }
+
+    .prompt-block {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .prompt-block__header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-fast);
+    }
+
+    .prompt-block__header:hover {
+      background: var(--bg-panel-hover);
+    }
+
+    .prompt-block__header:focus-visible {
+      outline: 2px solid var(--phase-p1);
+      outline-offset: -2px;
+    }
+
+    .phase-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .prompt-block__title {
+      flex: 1;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .chevron {
+      color: var(--text-muted);
+      transition: transform var(--transition-accordion);
+      font-size: 12px;
+    }
+
+    .prompt-block.is-collapsed .chevron {
+      transform: rotate(-90deg);
+    }
+
+    .prompt-block.is-collapsed .prompt-block__body {
+      display: none;
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 4px;
+      border: none;
+      background: transparent;
+      color: var(--doge-gold);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .copy-btn:hover {
+      background: rgba(236, 161, 37, 0.15);
+    }
+
+    .copy-btn:focus-visible {
+      outline: 2px solid var(--doge-gold);
+    }
+
+    .copy-btn.is-copied {
+      color: var(--success);
+    }
+
+    .copy-btn__label {
+      font-size: 11px;
+      margin-left: 4px;
+      display: none;
+    }
+
+    .copy-btn.is-copied .copy-btn__label {
+      display: inline;
+    }
+
+    .prompt-block__body {
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .page-operator-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      padding: 20px 0 24px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-operator-fields .field-section-title {
+      grid-column: 1 / -1;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--doge-light-gold);
+      margin-bottom: 4px;
+    }
+
+    .field--path {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: var(--input-h);
+      padding: 0 10px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      transition: border-color var(--transition-fast);
+    }
+
+    .field-input-wrap {
+      position: relative;
+    }
+
+    .field-input-wrap input {
+      padding-right: 32px;
+    }
+
+    .field-clear {
+      display: none;
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .field-clear.is-visible {
+      display: flex;
+    }
+
+    .field-clear:hover {
+      background: var(--text-muted);
+      color: var(--bg-primary);
+    }
+
+    .field-clear:focus-visible {
+      outline: 2px solid var(--phase-p1);
+      outline-offset: 1px;
+    }
+
+    .field input:hover,
+    .field select:hover {
+      border-color: var(--text-muted);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--phase-p1);
+    }
+
+    .field.field-empty input,
+    .field.field-empty select {
+      border-color: var(--error);
+    }
+
+    .prompt-pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      color: var(--text-primary);
+    }
+
+    .cli-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .cli-section__title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--doge-light-gold);
+    }
+
+    .cli-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: var(--cli-h);
+      margin-bottom: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 8px 0 12px;
+    }
+
+    .cli-row code {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-primary);
+    }
+
+    .tok-var { color: var(--token-var); }
+    .tok-project { color: var(--token-project); }
+    .tok-cli { color: var(--token-cli); }
+    .tok-path { color: var(--text-primary); }
+    .tok-comment { color: var(--text-muted); }
+
+    .cli-section--only {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .prompt-step-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      padding: 12px 0 8px;
+      border-bottom: 1px dashed var(--border);
+      margin-bottom: 12px;
+    }
+
+    .prompt-step-fields--mockups {
+      grid-template-columns: 1fr;
+    }
+
+    .mockup-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mockup-field-group__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mockup-field-group__label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .field-add-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--doge-gold);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .field-add-btn:hover {
+      background: rgba(236, 161, 37, 0.15);
+      border-color: var(--doge-gold);
+    }
+
+    .field-add-btn:focus-visible {
+      outline: 2px solid var(--phase-p1);
+    }
+
+    .mockup-field-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mockup-field-row .field-input-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .field-remove-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    .field-remove-btn:hover {
+      background: rgba(220, 80, 80, 0.15);
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    .field-remove-btn:focus-visible {
+      outline: 2px solid var(--phase-p1);
+    }
+
+    .mockup-field-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mockup-field-list .field {
+      margin: 0;
+    }
+
+    .prompt-hint {
+      margin-top: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(236, 161, 37, 0.08);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header" data-testid="wfconsole-header">
+      <div class="header__brand">
+        <span class="header__logo" aria-hidden="true">🐕</span>
+        <div>
+          <div class="header__title">DOGEstonia · Builder Queue</div>
+          <div class="header__subtitle">operator prompt console — workflow.md core happy-path</div>
+        </div>
+      </div>
+      <div class="header__pills">
+        <span class="pill">Theme: Dark + DOGE</span>
+        <span class="pill">v1.2.8</span>
+        <span class="pill">2026-07-02</span>
+      </div>
+    </header>
+
+    <section class="page-operator-fields" id="page-operator-fields" data-testid="page-operator-fields">
+      <div class="field-section-title">Session parameters (wave context)</div>
+    </section>
+
+    <div class="prompt-blocks" id="prompt-blocks"></div>
+  </div>
+
+  <script>
+    const BUILDER_PROJECTS = ['gateway', 'gpt', 'identity', 'spa', 'scripts', 'capybara'];
+
+    const PROJECT_PROFILES = {
+      gateway: {
+        project: 'gateway',
+        tasks_dir: 'doge-complaints-gateway/docs/tasks',
+        current_pointer: 'gateway-active-package.current.yaml',
+        plan_file: '.cursor/plans/Gateway_builder.plan.md',
+        execution_skill_primary: 'python-pro',
+        execution_skill_path: '.cursor/skills/sources/jeffallan-claude-skills/skills/python-pro/SKILL.md',
+        hasUxPipeline: false,
+        backlog_index: null,
+      },
+      gpt: {
+        project: 'gpt',
+        tasks_dir: 'GPT UI/docs/analysis/tasks',
+        current_pointer: 'gpt-active-package.current.yaml',
+        plan_file: '.cursor/plans/GPT_builder.plan.md',
+        execution_skill_primary: 'openai-custom-gpt-builder',
+        execution_skill_path: '.cursor/skills/openai-custom-gpt-builder/SKILL.md',
+        hasUxPipeline: false,
+        backlog_index: null,
+      },
+      identity: {
+        project: 'identity',
+        tasks_dir: 'doge-identity-service/docs/tasks',
+        current_pointer: 'identity-active-package.current.yaml',
+        plan_file: '.cursor/plans/ID_builder.plan.md',
+        execution_skill_primary: 'python-pro',
+        execution_skill_path: '.cursor/skills/sources/jeffallan-claude-skills/skills/python-pro/SKILL.md',
+        hasUxPipeline: false,
+        backlog_index: 'doge-identity-service/docs/tasks/backlog-stories/INDEX.md',
+      },
+      spa: {
+        project: 'spa',
+        tasks_dir: 'spa-app/docs/tasks',
+        current_pointer: 'spa-active-package.current.yaml',
+        plan_file: '.cursor/plans/Spa_builder.plan.md',
+        pipeline_doc: 'spa-app/docs/tasks/spa-story-execution-pipeline.md',
+        ui_visual_pipeline_doc: 'docs/methodology/Zeya888-builder-queue/guides/spa-ui-visual-pipeline.md',
+        execution_skill_primary: 'react-expert',
+        execution_skill_path: '.cursor/skills/sources/jeffallan-claude-skills/skills/react-expert/SKILL.md',
+        hasUxPipeline: true,
+        backlog_index: 'spa-app/docs/tasks/backlog-stories/INDEX.md',
+      },
+      scripts: {
+        project: 'scripts',
+        tasks_dir: 'scripts/docs/tasks',
+        current_pointer: 'scripts-active-package.current.yaml',
+        plan_file: '.cursor/plans/Scripts_builder.plan.md',
+        execution_skill_primary: 'javascript-pro',
+        execution_skill_path: '.cursor/skills/sources/jeffallan-claude-skills/skills/javascript-pro/SKILL.md',
+        hasUxPipeline: false,
+        backlog_index: 'scripts/docs/tasks/backlog-stories/INDEX.md',
+      },
+      capybara: {
+        project: 'capybara',
+        tasks_dir: 'capybara/docs/tasks',
+        current_pointer: 'capybara-active-package.current.yaml',
+        plan_file: '.cursor/plans/Capybara_builder.plan.md',
+        pipeline_doc: 'capybara/docs/tasks/capybara-story-execution-pipeline.md',
+        execution_skill_primary: 'vue-expert',
+        execution_skill_path: '.cursor/skills/sources/jeffallan-claude-skills/skills/vue-expert/SKILL.md',
+        hasUxPipeline: false,
+        backlog_index: 'capybara/docs/tasks/backlog-stories/INDEX.md',
+      },
+    };
+
+    const TEXT_P13 = `@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+$storyFile=
+$backlogIndex=
+
+P1 Plan mode. builder_project: $builderProject (типично identity или spa).
+input_mode=backlog_story. @$storyFile
+Опционально для сверки зависимостей: @$backlogIndex
+Epic/task naming и materialize: $p13Appendix (operator contract §6 для spa или identity).
+
+1) Вход — только @$storyFile. AC, Scope, «Вне scope», «Точки в коде» брать из файла; не придумывать новые stories/AC и не менять формулировки.
+2) Epic из Meta.Epic story — по $p13Appendix (materialize в @$tasksRoot/epics/, строка в bullrun-launch-index).
+3) Materialize pipeline story: @$tasksRoot/epics/<EPIC>/stories/<STORY-KEY>/STORY-*.md — перенести AC/scope из backlog verbatim; decision_ref → @$storyFile + источники из Meta.
+4) Глубокая декомпозиция в task-папки (@docs/methodology/task-standard.md):
+   - каждый пункт Scope → 1+ atomic task (implement/fix/tests);
+   - каждый AC → traceability в task AC/DoD;
+   - финальный task — story acceptance-verification; story gate — \`[story-acceptance-gate-template.md](../templates/story-acceptance-gate-template.md)\`;
+   - naming task-папок — по $p13Appendix;
+   - каждый README: Purpose, Code Facts (verify exists), AC/DoD, Where to change, Verification commands;
+   - $executionSkillDeclared (по builder-session / profiles.yaml).
+   Ориентир глубины: мелкая story 3–4 tasks; средняя 4–6; крупная cleanup 5–7. Запрет: один task на всю story, если Scope содержит 3+ независимых изменений в коде.
+5) Immutable pkg (@docs/methodology/Zeya888-builder-queue/specs/input-package-spec.md):
+   - input_kind: epic_story_tree;
+   - epic_file → materialized epic;
+   - story_groups: одна группа = STORY-KEY из backlog, paths = все task README по порядку;
+   - обновить $currentPointer (из profiles).
+6) Синхронизировать @$tasksRoot/bullrun-launch-index.md (story row, task table, «Актуальная точка»).
+7) Backlog-файл @$storyFile не удалять; в pipeline-story указать source: backlog-stories/…
+
+Не смешивать в этой волне с input_mode=requirement|epic_story без явной команды оператора.
+Plan only — без execution. Claims с путями (analysis.mdc).
+В конце: mapping \`backlog_story -> epic -> story -> tasks -> pkg paths\` + список созданных/изменённых путей.
+
+Artifact dates: см. §P1 appendix (artifact dates) — $printUtcNowCmd перед pkg/gate; после scaffold $verifyDatesCmd.`;
+
+    const TEXT_UX_APPENDIX = `Если story затрагивает UI (Scope: BoardPage, components/, mockup, drawer, FilterPanel, SearchInput и т.п.) или ui_scope ∈ {visual, mixed}:
+
+После materialize pipeline story + task README + pkg создай один файл рядом с pipeline story:
+
+  @$tasksRoot/epics/<EPIC>/stories/<STORY-KEY>/STORY-UX-MOCKUP-BRIEF.md
+
+Содержимое — готовый промпт для отдельного UX-диалога (не для разработки). Пиши от второго лица («Ты UX-специалист…»), чтобы оператор мог скопировать файл целиком в новый чат.
+
+Структура файла (обязательно):
+
+1) **Роль и задача** — UX/UI spec writer для spa-app; цель: mockup *-spec.md для P3 @mockup:, без кода.
+2) **Контекст story** — verbatim из pipeline story: Meta, Зачем, Scope, Вне scope, UI-relevant AC (не перефразировать AC).
+3) **Code facts** — таблица «зона UI | файл | что сейчас»; только проверенные пути (analysis.mdc, read/grep).
+4) **Уже есть** — ссылки на существующие mockup-NN-*-spec.md, которые можно extends; viewport 1536×1024; UI routes (/#/board и т.д.).
+5) **Что нарисовать / описать** — таблица screen/state | описание | must/should; минимум default + 1 interactive state; mobile — если в Scope/AC.
+6) **Deliverables** — каталог \`spa-app/docs/UX/mockups/<epic-folder>/\`; имя \`mockup-NN-<slug>-spec.md\`; структура как mockup-01-dashboard-main-spec.md (layout, tokens, components, states, selectors/data-testid).
+7) **Handoff** — блок copy-paste для P3:
+   @mockup: spa-app/docs/UX/mockups/...
+8) **Checklist DoD** — каждый UI AC покрыт; selectors для puppeteer; нет противоречий «Вне scope»; operator gate «принято» до P3.
+
+Правила:
+- Plan only: в P1 не создавать сами mockup spec PNG/файлы — только STORY-UX-MOCKUP-BRIEF.md.
+- Если ui_scope: none / story без DOM — appendix skip, файл не создавать.
+- В конце P1 отчёта: путь к brief + «следующий шаг: отдельный UX-чат по STORY-UX-MOCKUP-BRIEF.md → затем P2/P3».`;
+
+    const TEXT_P3_UX = `@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+@$planFile=
+@$buildWindowFile=
+@$storyFile=
+@$mockupSpec=
+@$mockupImg=
+
+P3 Execute. builder_project: spa. @$planFile + @$buildWindowFile
+Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epicFile / @$storyFile; input_mode=backlog_story -> @$storyFile
+По skill/rule: шаг 0 — $verifyCmd из корня workspace; при FAIL — стоп.
+Шаг 0b (spa visual pkg, после verify):
+  cd spa-app && npx puppeteer browsers install chrome   # если test:ui: Could not find Chrome
+  cd spa-app && npm run <puppeteer_gate-from-anchor-task>   # напр. test:ui:filters
+Стоп при FAIL шага 0b — до UI-2 implement visual tasks. Chrome: spa-app/docs/runtime-docs/frontend-run-and-environment.md §8.
+Загрузить @$executionSkillPath перед code changes (task README \`Skill declared\` overrides profile). Очередь YAML default (immutable pkg не переписывать). Все README из окна по порядку; bullrun-start + run-task; полные артефакты тасков. Claims из кода, не из памяти чата.
+
+--- UI Visual Pipeline (spa; story-anchor model) ---
+ui_gate: auto
+@mockup: $mockupSpec
+@mockup: $mockupImg
+
+Правила ui_gate:
+- auto (default) — pipeline по ui_scope/ui_complexity в task README, ui_anchor, или эвристике Scope
+- off — skip UI pipeline (doc-only / ui_scope: none)
+
+Story-anchor (один на story wave):
+- Anchor task (ui_anchor: true или первый ui_scope: visual) — полный UI-0..UI-1 в task-folder
+- Dependent visual tasks — extends ui-mockup: <anchor>/ui-mockup-spec.md; UI-0 skip; UI-3 partial при смене DOM
+- Story gate — acceptance-verification §UI + anchor ui-baseline/post-implement/*.png
+
+Anchor task (до UI-2 implement):
+UI-0 Baseline (MCP primary): npm run dev (spa-app :4173) → MCP user-puppeteer navigate + screenshot → ui-baseline/ (1536x1024); ui-baseline/README.md
+UI-1 Target mockup: @mockup → ui-mockup-spec.md; иначе AskQuestion → ui-mockup-spec.md от baseline → STOP human gate (принято/исправить)
+UI-2 Implement: run-task + react-expert (после gate)
+UI-3 Verify: npm test + npm run <puppeteer_gate> (обязательно) + post-implement PNG; acceptance-verification §UI
+
+STOP (hard):
+- Story Done запрещён без story-gate acceptance §UI + post-implement PNG (anchor)
+- UI-2 запрещён без human gate на ui-mockup-spec.md (Path B) или @mockup refs (Path A)
+- Retroactive exception — только retroactive_closure в ui-baseline/README.md + operator sign-off / run_mode=spa_*_ui_audit_*; не default path
+
+SSOT: @$uiVisualPipelineDoc; @$uiPipelineDoc
+
+--- UI screenshots delivery (mandatory) ---
+ui_screenshot_root: <anchor-task-folder>/ui-baseline/
+ui_screenshot_states: all M123 states A|B|C|D (или перечислить из ui-mockup-spec)
+viewport: 1536x1024
+
+Правила capture:
+1. UI-0 (ДО UI-2): ui-baseline/pre-implement/<state>-<slug>-1536x1024.png + ui-baseline/README.md (route, selectors, utc)
+2. UI-3 (ПОСЛЕ implement): ui-baseline/post-implement/<state>-<slug>-1536x1024.png для КАЖДОГО state
+3. Сохранять ТОЛЬКО в папку anchor task story (не /tmp, не tests/output)
+4. Имена: kebab-case, префикс state (not-supported, form, joined, error)
+5. Способ: node script в spa-app/tests/puppeteer/ ИЛИ MCP user-puppeteer — но output path = ui_screenshot_root
+
+Hard deliverable в конце P3 (обязательный блок ответа):
+
+## UI Screenshots
+| State | Phase | File |
+|-------|-------|------|
+| A | post-implement | @spa-app/docs/tasks/.../ui-baseline/post-implement/not-supported-....png |
+| B | post-implement | @spa-app/docs/tasks/.../ui-baseline/post-implement/form-....png |
+| ... | ... | ... |
+
++ ссылка на ui-mockup-spec.md и acceptance §UI
+STOP story Done если post-implement PNG для anchor state A отсутствует на диске (ls verify).`;
+
+    const P3_UX_MOCKUP_BLOCK = `@mockup: $mockupSpec
+@mockup: $mockupImg`;
+
+    const BLOCK_PAGE_FIELDS = {
+      wave: [],
+      p13: ['storyFile'],
+      p13Ux: ['storyFile'],
+      p2: [],
+      p3: ['planFile', 'buildWindowFile', 'storyFile'],
+      p3Ux: ['planFile', 'buildWindowFile', 'storyFile'],
+      p4: ['storyFile'],
+      p5: [],
+      p6: [],
+      p7: [],
+      p8: ['storyKey'],
+    };
+
+    const BLOCK_PROMPT_FIELDS = {
+      p13: ['backlogIndex'],
+      p13Ux: ['backlogIndex'],
+      p2: ['windowFlatEnd'],
+      p5: ['auditReport'],
+      p4: ['bullrun'],
+    };
+
+    const PROMPTS = [
+      {
+        id: 'wave',
+        label: 'Session starter',
+        phase: 'Wave',
+        phaseColor: 'var(--phase-wave)',
+        text: `@docs/methodology/Zeya888-builder-queue/core/session-starter.md
+
+builder_project: gateway
+workspace_root: /Users/eslinko/Development/DOGEstonia
+pipeline_profile: builder_full
+
+Выполни Phase 0 (onboarding) по AGENT CONTRACT ниже. Не меняй код.
+После Onboarding summary — жди фазу (PA | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8).`,
+      },
+      {
+        id: 'p13',
+        label: 'P1.3',
+        phase: 'P1.3',
+        phaseColor: 'var(--phase-p1)',
+        uxStandard: true,
+        text: TEXT_P13,
+      },
+      {
+        id: 'p13Ux',
+        label: 'P1.3 (spa UX)',
+        phase: 'P1.3',
+        phaseColor: 'var(--phase-p1)',
+        uxVariant: true,
+        text: TEXT_P13 + '\n\n' + TEXT_UX_APPENDIX,
+      },
+      {
+        id: 'p2',
+        label: 'P2',
+        phase: 'P2',
+        phaseColor: 'var(--phase-p2)',
+        cliOnly: true,
+      },
+      {
+        id: 'p3',
+        label: 'P3',
+        phase: 'P3',
+        phaseColor: 'var(--phase-p3)',
+        uxStandard: true,
+        text: `@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@$planFile=
+@$buildWindowFile=
+@$storyFile=
+
+P3 Execute. builder_project: $builderProject. @$planFile + @$buildWindowFile
+Ref: input_mode=requirement -> @$requirementDoc; input_mode=epic_story -> @$epicFile / @$storyFile; input_mode=backlog_story -> @$storyFile
+По skill/rule: шаг 0 — $verifyCmd из корня workspace; при FAIL — стоп. Загрузить @$executionSkillPath перед code changes (task README \`Skill declared\` overrides profile). Очередь YAML default (immutable pkg не переписывать). Все README из окна по порядку; bullrun-start + run-task; полные артефакты тасков. Claims из кода, не из памяти чата.
+
+P3 appendix (dates): gate/run-summary \`Date:\` — только post live-run; $verifyDatesCmd перед story Done.`,
+      },
+      {
+        id: 'p3Ux',
+        label: 'P3 (spa UX)',
+        phase: 'P3',
+        phaseColor: 'var(--phase-p3)',
+        uxVariant: true,
+        text: TEXT_P3_UX,
+      },
+      {
+        id: 'p4',
+        label: 'P4',
+        phase: 'P4',
+        phaseColor: 'var(--phase-p4)',
+        text: `$bullrun=
+$story=
+
+проведи жесткий аудит по фактическому коду отностительно исполнения $story
+
+и актуализируй каждый таск и стори в отчете $bullrun
+
+мышление @.cursor/rules/analysis.mdc  
+
+Правила: только проверяемые claims с путями; регрессии; gaps с severity + как закрыть.
+Не предлагай реализацию — только findings.
+
+по итогу отчет в анализ зоне текущего проекта (*/docs/analysis)`,
+      },
+      {
+        id: 'p5',
+        label: 'P5',
+        phase: 'P5',
+        phaseColor: 'var(--phase-p5)',
+        text: `@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+$planFile=
+$auditReport=
+
+P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport (гапы временной рабочей документации (не runtime, perssistent) игнорируй)
+По skill/rule: не выполняй код и pytest; не закрывай gap implementation. Gap → task-папки (@docs/methodology/task-standard.md), @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
+
+Порог P5 (override в \`$planFile\` vs новый pkg):
+- safe-override в plan: gaps ≤ 3, README paths ≤ 5, 0 новых story folders, тот же эпик (post-audit).
+- иначе: scaffold task-папок + черновик pkg + \`activation: none\`; отдельная P1 для обновления current.yaml.
+
+Если порог override: добавь/обнови в \`$planFile\` подраздел \`Явно прописанный safe-override (<wave>)\` с:
+1) \`run_mode=<wave_name>\`,
+2) нумерованным списком \`README.md\` (каждый path — exists на диске),
+3) правилом: при \`run_mode\` исполняется **только** этот список, без смены active pkg.
+P5 checklist: уникальный run_mode; нет мёртвых run_mode без секции; gap-таблица; \`activation: run_mode=…\` или \`activation: none\`.
+P5 appendix (dates): новые gap-task gates — те же правила дат (§P1 appendix artifact dates); $printUtcNowCmd после live verify.
+В конце: таблица \`gap -> task -> файлы -> status\`. Claims с путями к файлам.`,
+      },
+      {
+        id: 'p6',
+        label: 'P6',
+        phase: 'P6',
+        phaseColor: 'var(--phase-p6)',
+        hint: 'Без run_mode → повтори P2 + P3 (см. workflow §P6 YAML default)',
+        text: `@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@.cursor/rules/analysis.mdc
+$planFile=
+
+builder_project: $builderProject
+@$planFile
+@<first-readme-from-plan-safe-override-list>
+
+P6 Execute — gap closure only; immutable active pkg unchanged (см. §safe-override в @$planFile).
+По skill/rule: шаг 0 — $verifyCmd из корня workspace (контроль default pkg, не смена current); при FAIL — стоп.
+Загрузить @$executionSkillPath перед code changes (task README \`Skill declared\` overrides profile).
+Исполнять **только** numbered list из §safe-override @$planFile — **строго по порядку** в плане (не по frontmatter todos).
+После **каждого** закрытого gap-task: sync @$tasksRoot/bullrun-launch-index.md + backlog INDEX при наличии; bullrun-start + run-task; acceptance-verification-*.md.
+Claims из кода, не из памяти чата. Не редактировать @$planFile без явной команды оператора.
+
+P6 appendix (dates): gate/run-summary \`Date:\` — только post live-run; $verifyDatesCmd перед закрытием story/gap wave.`,
+      },
+      {
+        id: 'p7',
+        label: 'P7',
+        phase: 'P7',
+        phaseColor: 'var(--phase-p7)',
+        text: `правки по gap-листу выполнены
+проведи подробный re-audit по закрытию каждого gap по фактическому коду
+@.cursor/rules/analysis.mdc`,
+      },
+      {
+        id: 'p8',
+        label: 'P8',
+        phase: 'P8',
+        phaseColor: 'var(--phase-p8)',
+        text: `@.cursor/skills/builder-session/SKILL.md
+@.cursor/rules/builder-operator-habits.mdc
+@docs/methodology/git-commit.md
+$anchor=
+
+Commits для scope anchor ($anchor).
+feat → test → docs; не коммить: docs/tasks/**, BULLRUN, acceptance-verification, run-summary без явной команды; push не делать.`,
+      },
+    ];
+
+    const PAGE_FIELD_KEYS = [
+      'builder_project',
+      'storyFile',
+      'storyKey',
+      'buildWindowFile',
+      'planFile',
+    ];
+
+    const PAGE_FIELD_META = {
+      builder_project: { label: 'builder_project', token: 'builderProject', type: 'select' },
+      storyFile: { label: '@$storyFile=', token: 'storyFile', type: 'text', wide: true, aliasTokens: ['story'] },
+      storyKey: { label: '$anchor=', token: 'storyKey', type: 'text', aliasTokens: ['anchor'] },
+      buildWindowFile: { label: '@$buildWindowFile=', token: 'buildWindowFile', type: 'text', wide: true },
+      planFile: { label: '@$planFile=', token: 'planFile', type: 'text', wide: true },
+    };
+
+    const PROMPT_FIELD_META = {
+      backlogIndex: { label: '@$backlogIndex=', token: 'backlogIndex', type: 'text', optional: true, wide: true },
+      bullrun: { label: '$bullrun=', token: 'bullrun', type: 'text', wide: true },
+      windowFlatEnd: { label: '—window-flat-end', token: null, type: 'number', optional: true },
+      auditReport: { label: '@$auditReport=', token: 'auditReport', type: 'text', wide: true },
+    };
+
+    const COPY_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2h8a2 2 0 0 1 2 2v8h-2V4H4V2zm-2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v8h8V6H2z"/></svg>`;
+
+    const PHASE_COLORS = {
+      'var(--phase-wave)': '#eca125',
+      'var(--phase-p1)': '#3b82f6',
+      'var(--phase-p2)': '#10b981',
+      'var(--phase-p3)': '#3b82f6',
+      'var(--phase-p4)': '#f59e0b',
+      'var(--phase-p5)': '#8b5cf6',
+      'var(--phase-p6)': '#059669',
+      'var(--phase-p7)': '#d97706',
+      'var(--phase-p8)': '#f97316',
+    };
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function highlightTokens(html) {
+      return html
+        .replace(/(@\$[a-zA-Z][\w]*=?)/g, '<span class="tok-var">$1</span>')
+        .replace(/(\$[a-zA-Zа-яА-ЯёЁ][\wа-яА-ЯёЁ]*)/g, '<span class="tok-var">$1</span>')
+        .replace(/(builder_project:\s*[^\n<]+)/g, '<span class="tok-project">$1</span>')
+        .replace(/(--[a-z-]+)/g, '<span class="tok-cli">$1</span>');
+    }
+
+    function substituteToken(text, varName, value) {
+      const v = value == null ? '' : String(value).trim();
+      const hasValue = v.length > 0;
+      let out = text;
+      const atEq = new RegExp(`@\\$${varName}=`, 'g');
+      const atPlain = new RegExp(`@\\$${varName}(?![\\w=])`, 'g');
+      const eqForm = new RegExp(`(?<![@])\\$${varName}=`, 'g');
+      const standalone = new RegExp(`\\$${varName}(?![\\w=])`, 'g');
+
+      if (hasValue) {
+        out = out.replace(atEq, `@$${varName}=${v}`);
+        out = out.replace(atPlain, `@${v}`);
+        out = out.replace(eqForm, `$${varName}=${v}`);
+        out = out.replace(standalone, v);
+      }
+      return out;
+    }
+
+    function substituteDerived(text, profile) {
+      const p = profile.project;
+      const base = 'python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py';
+      return text
+        .replace(/\$builderProject/g, p)
+        .replace(/\$tasksRoot/g, profile.tasks_dir)
+        .replace(/\$verifyCmd/g, `${base} --project ${p} --verify`)
+        .replace(/\$verifyDatesCmd/g, `${base} --project ${p} --verify --check-dates`)
+        .replace(/\$printUtcNowCmd/g, `${base} --print-utc-now`)
+        .replace(/\$executionSkillPath/g, profile.execution_skill_path)
+        .replace(
+          /\$executionSkillDeclared/g,
+          `Skill declared: ${profile.execution_skill_primary}`,
+        )
+        .replace(/\$currentPointer/g, `${profile.tasks_dir}/${profile.current_pointer}`)
+        .replace(/\$uiVisualPipelineDoc/g, profile.ui_visual_pipeline_doc || '$uiVisualPipelineDoc')
+        .replace(/\$uiPipelineDoc/g, profile.pipeline_doc || '$uiPipelineDoc');
+    }
+
+    function postProcessP3Ux(text, values) {
+      const specs = values.mockupSpecs || [];
+      const imgs = values.mockupImgs || [];
+      const paths = [...specs, ...imgs];
+      const block = paths.length > 0
+        ? paths.map((p) => `@mockup: ${p}`).join('\n')
+        : P3_UX_MOCKUP_BLOCK;
+      let out = text.replace(P3_UX_MOCKUP_BLOCK, block);
+      if (specs[0]) out = substituteToken(out, 'mockupSpec', specs[0]);
+      if (imgs[0]) out = substituteToken(out, 'mockupImg', imgs[0]);
+      return out;
+    }
+
+    function postProcessP8(text, values) {
+      const key = (values.storyKey || '').trim();
+      if (!key) return text;
+      let out = substituteToken(text, 'anchor', key);
+      out = out.replace(/\(\$anchor\)/g, `(\`${key}\`)`);
+      return out;
+    }
+
+    function postProcessWave(text, values) {
+      const p = (values.builder_project || 'scripts').trim();
+      return text.replace(/builder_project:\s*\w+/g, `builder_project: ${p}`);
+    }
+
+    function getProfile(project) {
+      const p = (project || '').trim();
+      return PROJECT_PROFILES[p] || PROJECT_PROFILES.scripts;
+    }
+
+    function applyTokenAliases(out, meta, value) {
+      if (!meta?.token || !value?.trim()) return out;
+      let result = substituteToken(out, meta.token, value);
+      for (const alias of meta.aliasTokens || []) {
+        result = substituteToken(result, alias, value);
+      }
+      return result;
+    }
+
+    function substituteAllTokens(text, values) {
+      let out = text;
+      for (const key of PAGE_FIELD_KEYS) {
+        const meta = PAGE_FIELD_META[key];
+        if (meta?.token) {
+          out = applyTokenAliases(out, meta, values[key]);
+        }
+      }
+      for (const key of Object.keys(PROMPT_FIELD_META)) {
+        const meta = PROMPT_FIELD_META[key];
+        if (meta?.token) {
+          out = applyTokenAliases(out, meta, values[key]);
+        }
+      }
+      return out;
+    }
+
+    function buildPromptText(blockId, template, values) {
+      const profile = getProfile(values.builder_project);
+      let text = substituteAllTokens(template, values);
+      text = substituteDerived(text, profile);
+      if (blockId === 'wave') text = postProcessWave(text, values);
+      if (blockId === 'p3Ux') text = postProcessP3Ux(text, values);
+      if (blockId === 'p8') text = postProcessP8(text, values);
+      return text;
+    }
+
+    function getPageValues() {
+      const values = {};
+      const panel = document.getElementById('page-operator-fields');
+      panel.querySelectorAll('[data-page-field]').forEach((input) => {
+        values[input.dataset.pageField] = input.value;
+      });
+      return values;
+    }
+
+    function getPromptValues(blockEl) {
+      const values = {};
+      if (!blockEl) return values;
+      blockEl.querySelectorAll('[data-prompt-field]').forEach((input) => {
+        values[input.dataset.promptField] = input.value;
+      });
+      return values;
+    }
+
+    function getMockupValues(blockEl) {
+      const specs = [];
+      const imgs = [];
+      if (!blockEl) return { mockupSpecs: specs, mockupImgs: imgs };
+      blockEl.querySelectorAll('input[data-mockup-kind="spec"]').forEach((inp) => {
+        const v = inp.value.trim();
+        if (v) specs.push(v);
+      });
+      blockEl.querySelectorAll('input[data-mockup-kind="img"]').forEach((inp) => {
+        const v = inp.value.trim();
+        if (v) imgs.push(v);
+      });
+      return { mockupSpecs: specs, mockupImgs: imgs };
+    }
+
+    function getValuesForBlock(blockId, blockEl) {
+      const values = { ...getPageValues(), ...getPromptValues(blockEl) };
+      if (blockId === 'p3Ux' && blockEl) {
+        const mockup = getMockupValues(blockEl);
+        values.mockupSpecs = mockup.mockupSpecs;
+        values.mockupImgs = mockup.mockupImgs;
+      }
+      return values;
+    }
+
+    function highlightPageEmptyFields(fieldKeys) {
+      const panel = document.getElementById('page-operator-fields');
+      panel.querySelectorAll('.field').forEach((f) => f.classList.remove('field-empty'));
+      for (const key of fieldKeys) {
+        const meta = PAGE_FIELD_META[key];
+        if (!meta?.token) continue;
+        const input = panel.querySelector(`[data-page-field="${key}"]`);
+        if (!input || input.value.trim()) continue;
+        input.closest('.field')?.classList.add('field-empty');
+      }
+    }
+
+    function highlightPromptEmptyFields(blockEl, fieldKeys) {
+      if (!blockEl) return;
+      blockEl.querySelectorAll('.prompt-step-fields .field').forEach((f) => {
+        f.classList.remove('field-empty');
+      });
+      for (const key of fieldKeys) {
+        const meta = PROMPT_FIELD_META[key];
+        if (!meta || meta.optional) continue;
+        const input = blockEl.querySelector(`[data-prompt-field="${key}"]`);
+        if (!input || input.value.trim()) continue;
+        input.closest('.field')?.classList.add('field-empty');
+      }
+    }
+
+    const blockRegistry = [];
+
+    function refreshBlockPreview(blockEl, block) {
+      if (!block.text) return;
+      const pre = blockEl.querySelector('.prompt-pre');
+      if (!pre) return;
+      const values = getValuesForBlock(block.id, blockEl);
+      const text = buildPromptText(block.id, block.text, values);
+      pre.innerHTML = highlightTokens(escapeHtml(text));
+    }
+
+    function refreshAllPreviews() {
+      for (const { el, block } of blockRegistry) {
+        refreshBlockPreview(el, block);
+      }
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (_) {
+        /* fallback below */
+      }
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    function showCopiedFeedback(btn) {
+      btn.classList.add('is-copied');
+      const prev = btn.getAttribute('aria-label');
+      btn.setAttribute('aria-label', 'Copied');
+      setTimeout(() => {
+        btn.classList.remove('is-copied');
+        btn.setAttribute('aria-label', prev || 'Copy');
+      }, 1300);
+    }
+
+    function buildCliCommands(project, windowFlatEnd) {
+      const base = 'python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py';
+      const p = (project && project.trim()) || 'scripts';
+      const end = (windowFlatEnd && String(windowFlatEnd).trim()) || 'X';
+      return [
+        { slug: 'verify', cmd: `${base} --project ${p} --verify` },
+        { slug: 'verify-dates', cmd: `${base} --project ${p} --verify --check-dates` },
+        { slug: 'print-utc', cmd: `${base} --print-utc-now` },
+        { slug: 'list', cmd: `${base} --project ${p} --list` },
+        {
+          slug: 'build-window',
+          cmd: `${base} --project ${p} --write-build-window --window-flat-start 1 --window-flat-end ${end}`,
+        },
+      ];
+    }
+
+    function renderCliSection(cliOnly, blockEl) {
+      const section = document.createElement('div');
+      section.className = cliOnly ? 'cli-section cli-section--only' : 'cli-section';
+      section.innerHTML = '<div class="cli-section__title">CLI commands</div>';
+      const pageValues = getPageValues();
+      const promptValues = getPromptValues(blockEl);
+      const commands = buildCliCommands(
+        pageValues.builder_project,
+        promptValues.windowFlatEnd,
+      );
+      for (const { slug, cmd } of commands) {
+        const row = document.createElement('div');
+        row.className = 'cli-row';
+        row.dataset.testid = `cli-row-${slug}`;
+        const code = document.createElement('code');
+        code.textContent = cmd;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.setAttribute('aria-label', 'Copy CLI command');
+        btn.innerHTML = COPY_ICON + '<span class="copy-btn__label">Copied</span>';
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await copyText(cmd);
+          showCopiedFeedback(btn);
+        });
+        row.appendChild(code);
+        row.appendChild(btn);
+        section.appendChild(row);
+      }
+      return section;
+    }
+
+    function wrapTextInputWithClear(input) {
+      const wrap = document.createElement('div');
+      wrap.className = 'field-input-wrap';
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'field-clear';
+      clearBtn.setAttribute('aria-label', 'Clear field');
+      clearBtn.textContent = '×';
+
+      function syncClearVisibility() {
+        clearBtn.classList.toggle('is-visible', input.value.length > 0);
+      }
+
+      clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        input.value = '';
+        syncClearVisibility();
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+
+      input.addEventListener('input', syncClearVisibility);
+      syncClearVisibility();
+
+      wrap.appendChild(input);
+      wrap.appendChild(clearBtn);
+      return wrap;
+    }
+
+    function renderPromptField(blockId, key) {
+      const meta = PROMPT_FIELD_META[key];
+      const field = document.createElement('div');
+      field.className = 'field';
+      if (meta.wide) field.classList.add('field--path');
+      field.dataset.testid = `prompt-field-${blockId}-${key}`;
+      const label = document.createElement('label');
+      label.textContent = meta.label;
+      label.setAttribute('for', `prompt-field-input-${blockId}-${key}`);
+      let input;
+      if (meta.type === 'number') {
+        input = document.createElement('input');
+        input.type = 'number';
+        input.min = '1';
+      } else {
+        input = document.createElement('input');
+        input.type = 'text';
+      }
+      input.id = `prompt-field-input-${blockId}-${key}`;
+      input.dataset.promptField = key;
+      input.autocomplete = 'off';
+      field.appendChild(label);
+      if (meta.type === 'number') {
+        field.appendChild(input);
+      } else {
+        field.appendChild(wrapTextInputWithClear(input));
+      }
+      return field;
+    }
+
+    function renderPromptStepFields(blockId, blockEl) {
+      const keys = BLOCK_PROMPT_FIELDS[blockId];
+      if (!keys || keys.length === 0) return null;
+      const wrap = document.createElement('div');
+      wrap.className = 'prompt-step-fields';
+      for (const key of keys) {
+        wrap.appendChild(renderPromptField(blockId, key));
+      }
+      wrap.querySelectorAll('input').forEach((inp) => {
+        inp.addEventListener('input', () => {
+          const block = blockRegistry.find((b) => b.el === blockEl)?.block;
+          if (block?.cliOnly) {
+            refreshP2Cli();
+          } else {
+            refreshBlockPreview(blockEl, block);
+          }
+        });
+        inp.addEventListener('change', () => {
+          const block = blockRegistry.find((b) => b.el === blockEl)?.block;
+          if (block?.cliOnly) {
+            refreshP2Cli();
+          } else {
+            refreshBlockPreview(blockEl, block);
+          }
+        });
+      });
+      return wrap;
+    }
+
+    function wireMockupInput(input, blockEl) {
+      input.addEventListener('input', () => {
+        const block = blockRegistry.find((b) => b.el === blockEl)?.block;
+        refreshBlockPreview(blockEl, block);
+      });
+      input.addEventListener('change', () => {
+        const block = blockRegistry.find((b) => b.el === blockEl)?.block;
+        refreshBlockPreview(blockEl, block);
+      });
+    }
+
+    function appendMockupRow(listEl, kind, blockEl) {
+      const isFirst = listEl.querySelectorAll('.mockup-field-row').length === 0;
+      const field = document.createElement('div');
+      field.className = 'field field--path mockup-field-row';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.dataset.mockupKind = kind;
+      input.autocomplete = 'off';
+      field.appendChild(wrapTextInputWithClear(input));
+      if (!isFirst) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'field-remove-btn';
+        removeBtn.dataset.testid = kind === 'spec' ? 'mockup-remove-spec' : 'mockup-remove-img';
+        removeBtn.setAttribute('aria-label', `Remove ${kind} mockup field`);
+        removeBtn.textContent = '−';
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          field.remove();
+          const block = blockRegistry.find((b) => b.el === blockEl)?.block;
+          refreshBlockPreview(blockEl, block);
+        });
+        field.appendChild(removeBtn);
+      }
+      listEl.appendChild(field);
+      wireMockupInput(input, blockEl);
+      return input;
+    }
+
+    function renderMockupGroup(kind, label, testId, blockEl) {
+      const group = document.createElement('div');
+      group.className = 'mockup-field-group';
+      const header = document.createElement('div');
+      header.className = 'mockup-field-group__header';
+      const labelEl = document.createElement('span');
+      labelEl.className = 'mockup-field-group__label';
+      labelEl.textContent = label;
+      const list = document.createElement('div');
+      list.className = 'mockup-field-list';
+      list.dataset.mockupKind = kind;
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'field-add-btn';
+      addBtn.dataset.testid = testId;
+      addBtn.setAttribute('aria-label', `Add ${kind} mockup field`);
+      addBtn.textContent = '+';
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        appendMockupRow(list, kind, blockEl);
+      });
+      header.appendChild(labelEl);
+      header.appendChild(addBtn);
+      group.appendChild(header);
+      group.appendChild(list);
+      appendMockupRow(list, kind, blockEl);
+      return group;
+    }
+
+    function renderP3UxMockupFields(blockEl) {
+      const wrap = document.createElement('div');
+      wrap.className = 'prompt-step-fields prompt-step-fields--mockups';
+      wrap.appendChild(renderMockupGroup('spec', '@$mockupSpec=', 'mockup-add-spec', blockEl));
+      wrap.appendChild(renderMockupGroup('img', '@$mockupImg=', 'mockup-add-img', blockEl));
+      return wrap;
+    }
+
+    function renderPageField(key) {
+      const meta = PAGE_FIELD_META[key];
+      const field = document.createElement('div');
+      field.className = 'field';
+      if (meta.wide) field.classList.add('field--path');
+      field.dataset.testid = key === 'builder_project' ? 'page-builder-project' : `page-field-${key}`;
+      const label = document.createElement('label');
+      label.textContent = meta.label;
+      label.setAttribute('for', `page-field-input-${key}`);
+      let input;
+      if (meta.type === 'select') {
+        input = document.createElement('select');
+        input.id = `page-field-input-${key}`;
+        input.dataset.pageField = key;
+        for (const opt of BUILDER_PROJECTS) {
+          const o = document.createElement('option');
+          o.value = opt;
+          o.textContent = opt;
+          input.appendChild(o);
+        }
+        input.value = 'scripts';
+        field.appendChild(label);
+        field.appendChild(input);
+      } else {
+        input = document.createElement('input');
+        input.type = 'text';
+        input.id = `page-field-input-${key}`;
+        input.dataset.pageField = key;
+        input.autocomplete = 'off';
+        field.appendChild(label);
+        field.appendChild(wrapTextInputWithClear(input));
+      }
+      return field;
+    }
+
+    function renderPageFields() {
+      const panel = document.getElementById('page-operator-fields');
+      for (const key of PAGE_FIELD_KEYS) {
+        panel.appendChild(renderPageField(key));
+      }
+      const projectSelect = panel.querySelector('[data-page-field="builder_project"]');
+      projectSelect.addEventListener('change', () => {
+        applyProjectProfile(projectSelect.value);
+        refreshP2Cli();
+        refreshAllPreviews();
+      });
+      panel.querySelectorAll('[data-page-field]').forEach((inp) => {
+        if (inp.dataset.pageField === 'builder_project') return;
+        inp.addEventListener('input', refreshAllPreviews);
+        inp.addEventListener('change', refreshAllPreviews);
+      });
+    }
+
+    function applyProjectProfile(project) {
+      const profile = getProfile(project);
+      const planInput = document.querySelector('[data-page-field="planFile"]');
+      if (planInput && profile.plan_file) {
+        planInput.value = profile.plan_file;
+        planInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (profile.backlog_index) {
+        for (const id of ['p13', 'p13Ux']) {
+          const el = document.querySelector(`[data-testid="prompt-block-${id}"]`);
+          const inp = el?.querySelector('[data-prompt-field="backlogIndex"]');
+          if (inp) {
+            inp.value = profile.backlog_index;
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+      }
+      const p4Inp = document.querySelector('[data-testid="prompt-block-p4"] [data-prompt-field="bullrun"]');
+      if (p4Inp) {
+        p4Inp.value = `${profile.tasks_dir}/bullrun-launch-index.md`;
+        p4Inp.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+
+    function setBlockCollapsed(blockId, collapsed) {
+      const el = document.querySelector(`[data-testid="prompt-block-${blockId}"]`);
+      if (!el) return;
+      const header = el.querySelector('.prompt-block__header');
+      if (collapsed) {
+        el.classList.add('is-collapsed');
+        header?.setAttribute('aria-expanded', 'false');
+      } else {
+        el.classList.remove('is-collapsed');
+        header?.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    let p2BlockEl = null;
+    let p2BodyEl = null;
+
+    function refreshP2Cli() {
+      if (!p2BlockEl || !p2BodyEl) return;
+      const old = p2BodyEl.querySelector('.cli-section');
+      if (old) old.remove();
+      p2BodyEl.appendChild(renderCliSection(true, p2BlockEl));
+    }
+
+    function renderBlocks() {
+      const root = document.getElementById('prompt-blocks');
+      for (const block of PROMPTS) {
+        const el = document.createElement('article');
+        el.className = 'prompt-block is-collapsed';
+        el.dataset.testid = `prompt-block-${block.id}`;
+
+        const header = document.createElement('div');
+        header.className = 'prompt-block__header';
+        header.tabIndex = 0;
+        header.setAttribute('role', 'button');
+        header.setAttribute('aria-expanded', 'false');
+
+        const badge = document.createElement('span');
+        badge.className = 'phase-badge';
+        badge.textContent = block.phase;
+        badge.style.background = PHASE_COLORS[block.phaseColor] || '#eca125';
+
+        const title = document.createElement('span');
+        title.className = 'prompt-block__title';
+        title.textContent = block.label;
+
+        const chevron = document.createElement('span');
+        chevron.className = 'chevron';
+        chevron.textContent = '▼';
+        chevron.setAttribute('aria-hidden', 'true');
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'copy-btn';
+        copyBtn.dataset.testid = `copy-prompt-${block.id}`;
+        copyBtn.setAttribute('aria-label', 'Copy prompt');
+        copyBtn.innerHTML = COPY_ICON + '<span class="copy-btn__label">Copied</span>';
+        if (block.cliOnly) copyBtn.hidden = true;
+
+        header.appendChild(badge);
+        header.appendChild(title);
+        header.appendChild(chevron);
+        header.appendChild(copyBtn);
+
+        const body = document.createElement('div');
+        body.className = 'prompt-block__body';
+
+        const promptFields = renderPromptStepFields(block.id, el);
+        if (promptFields) body.appendChild(promptFields);
+        if (block.id === 'p3Ux') {
+          body.appendChild(renderP3UxMockupFields(el));
+        }
+
+        if (block.cliOnly) {
+          p2BlockEl = el;
+          p2BodyEl = body;
+          body.appendChild(renderCliSection(true, el));
+        } else {
+          const pre = document.createElement('pre');
+          pre.className = 'prompt-pre';
+          body.appendChild(pre);
+        }
+
+        if (block.hint) {
+          const hint = document.createElement('div');
+          hint.className = 'prompt-hint';
+          hint.textContent = block.hint;
+          body.appendChild(hint);
+        }
+
+        el.appendChild(header);
+        el.appendChild(body);
+        root.appendChild(el);
+        blockRegistry.push({ el, block });
+
+        const toggle = () => {
+          const collapsed = el.classList.toggle('is-collapsed');
+          header.setAttribute('aria-expanded', String(!collapsed));
+        };
+
+        header.addEventListener('click', (e) => {
+          if (e.target.closest('.copy-btn')) return;
+          toggle();
+        });
+        header.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (!e.target.closest('.copy-btn')) toggle();
+          }
+        });
+
+        copyBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (block.cliOnly) return;
+          highlightPageEmptyFields(BLOCK_PAGE_FIELDS[block.id] || []);
+          highlightPromptEmptyFields(el, BLOCK_PROMPT_FIELDS[block.id] || []);
+          const values = getValuesForBlock(block.id, el);
+          const text = buildPromptText(block.id, block.text, values);
+          await copyText(text);
+          showCopiedFeedback(copyBtn);
+        });
+      }
+    }
+
+    function init() {
+      renderPageFields();
+      renderBlocks();
+      const project = getPageValues().builder_project || 'scripts';
+      applyProjectProfile(project);
+      refreshAllPreviews();
+    }
+
+    init();
+  </script>
+</body>
+</html>

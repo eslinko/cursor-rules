@@ -1,6 +1,6 @@
 # Builder plan template (унифицированный скелет)
 
-SSOT структуры для [Gateway_builder.plan.md](../../../.cursor/plans/Gateway_builder.plan.md), [GPT_builder.plan.md](../../../.cursor/plans/GPT_builder.plan.md), [ID_builder.plan.md](../../../.cursor/plans/ID_builder.plan.md), [Scripts_builder.plan.md](../../../.cursor/plans/Scripts_builder.plan.md).
+SSOT структуры для [Gateway_builder.plan.md](../../../.cursor/plans/Gateway_builder.plan.md), [GPT_builder.plan.md](../../../.cursor/plans/GPT_builder.plan.md), [ID_builder.plan.md](../../../.cursor/plans/ID_builder.plan.md), [Scripts_builder.plan.md](../../../.cursor/plans/Scripts_builder.plan.md), [Capybara_builder.plan.md](../../../.cursor/plans/Capybara_builder.plan.md).
 
 **Эталон §INPUT SOURCE и ниже:** нормализованный Gateway plan (2026-06-04).  
 **Анализ зеркала:** [builder-plans-unification-analysis.md](./builder-plans-unification-analysis.md)  

@@ -32,10 +32,6 @@
 
 ## Добавление нового проекта
 
-1. Скопировать блок существующего профиля
-2. Заполнить `stack_label`, `execution_skill_primary`, `execution_skill_path`
-3. Создать `{project}-active-packages/` и `{project}-active-package.current.yaml`
-4. Создать `.cursor/plans/{Project}_builder.plan.md`
-5. `python3 …/cli/builder_resolve_queue.py --project {key} --verify`
+**SSOT:** [`../guides/add-builder-profile.md`](../guides/add-builder-profile.md) — Intake Form, Checklist, Gateway clone, operative prompt.
 
-Пример минимального профиля: [`../examples/sample-profiles/minimal.yaml`](../examples/sample-profiles/minimal.yaml)
+Кратко: скопировать блок в `profiles.yaml` → bootstrap `{tasks_dir}` → operator contract → Gateway-clone plan → `--verify`.
