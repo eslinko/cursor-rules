@@ -75,7 +75,7 @@ task-spa-<story>-tNN-<slug>/
 
 | Path  | Условие                                   | Действие                                                                            |
 | ----- | ----------------------------------------- | ----------------------------------------------------------------------------------- |
-| **A** | Оператор подал `@mockup:` в P3            | Ссылки в `ui-mockup-spec.md`; interview skip при полном покрытии                    |
+| **A** | Оператор подал `@mockup:` в P3 **или** P1.3 ready-mockups уже прописал `@mockup:` в task README (артборд в story) | Ссылки в `ui-mockup-spec.md`; interview skip при полном покрытии                    |
 | **B** | Нет мокапов, `ui_complexity` ≥ `standard` | AskQuestion (1–2 раунда) → `ui-mockup-spec.md` от baseline → **human gate** до кода |
 | **C** | `trivial` + `mockup-NN`                   | Baseline + ссылка на глобальный spec; короткий checkpoint «delta понятна»           |
 

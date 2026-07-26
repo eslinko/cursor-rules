@@ -1,5 +1,17 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.13 — 2026-07-26
+
+- P4 **spa UX** (code + screenshots vs artboard): dual audit, match matrix, `icon-asset: placeholder-ok` — [`core/workflow.md`](./core/workflow.md)
+- [`tools/workflow-console.html`](./tools/workflow-console.html) v1.2.12 — блок **P4 (spa UX)**
+- Sync: spa-operator-contract §5
+
+## 1.4.12 — 2026-07-25
+
+- P1.3 UX decision tree + appendix **UX ready mockups** (артборд уже в story → `@mockup:` в tasks, без `STORY-UX-MOCKUP-BRIEF`) — [`core/workflow.md`](./core/workflow.md)
+- [`tools/workflow-console.html`](./tools/workflow-console.html) v1.2.9 — блок **P1.3 (spa UX ready)**
+- Sync: spa-operator-contract §6, spa-ui-visual-pipeline Path A
+
 ## 1.4.11 — 2026-07-24
 
 - Per-scope backlog dashboard канон: [`workflow/backlog-dashboard-template.md`](./workflow/backlog-dashboard-template.md), [`workflow/backlog-dashboard-maintenance.md`](./workflow/backlog-dashboard-maintenance.md)

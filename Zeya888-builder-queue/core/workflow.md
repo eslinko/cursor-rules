@@ -349,9 +349,44 @@ story-acceptance-gate Date: — только после live pytest + --verify �
 SSOT: guides/builder-artifact-dates.md
 ```
 
---- P1 appendix: UX mockup brief (spa visual/mixed story only) ---
+--- P1 UX appendices: выбор ветки (spa / frontend visual) ---
+
+После materialize P1.3 выбери **ровно один** UX-appendix (или skip):
+
+| Условие | Appendix |
+|---------|----------|
+| В `$storyFile` есть §«Артборд» / таблица мокапов **и** указанные `*-spec.md` (и при наличии `.png`) **существуют на диске** (read/glob) | **UX ready mockups** ниже |
+| UI visual/mixed (Scope: BoardPage, components/, mockup, drawer, … или `ui_scope` ∈ {visual, mixed}), но артборда нет / файлов нет | **UX mockup brief** ниже |
+| `ui_scope: none` / story без DOM | skip оба appendix |
+
+Не запускай brief, если сработал ready. Не invent mockup paths.
+
+--- P1 appendix: UX ready mockups (spa / frontend, artboard already in story) ---
 
 ```text
+Применять только если decision tree выбрал ready (verified artboard в @$storyFile).
+
+После materialize pipeline story + task README + pkg (plan only):
+
+1) Verify — каждый путь из §Артборд / таблицы мокапов: read или glob. Missing *-spec.md (или заявленный .png) → HARD STOP, спросить оператора. Не писать STORY-UX-MOCKUP-BRIEF «дорисовать», пока оператор не решит.
+2) Pipeline story — перенести §Артборд verbatim (+ UI-relevant FR/AC) из backlog; в Meta/заметке: ui_scope: visual|mixed; mockup paths = SSOT дизайна.
+3) Tasks — visual/shell README: явные строки для P3 Path A:
+     @mockup: <path-to-*-spec.md>
+     @mockup: <path-to.png>    # если файл есть
+   + ui_scope: visual|mixed; на shell task при необходимости ui_anchor: true; dependent — extends ui-mockup / extends mockup.
+4) Pkg — не создавать новые mockup-файлы. В отчёте P1 перечислить все @mockup: paths для handoff P2/P3.
+5) Запрет — не создавать STORY-UX-MOCKUP-BRIEF.md; не открывать UX-чат на генерацию мокапов.
+6) Handoff — «Ready mockups → P2 → P3 (spa UI) Path A; brief skip».
+
+Эталон артборда: spa-app/docs/tasks/backlog-stories/cabinet/STORY-SPA-CAB-01-profile-cabinet-shell-assembly.md §Артборд.
+```
+
+--- P1 appendix: UX mockup brief (spa visual/mixed — только если нет verified artboard) ---
+
+```text
+Применять только если decision tree выбрал brief (UI нужен, verified artboard отсутствует).
+Если сработал appendix UX ready mockups — этот appendix SKIP целиком.
+
 Если story затрагивает UI (Scope: BoardPage, components/, mockup, drawer, FilterPanel, SearchInput и т.п.) или ui_scope ∈ {visual, mixed}:
 
 После materialize pipeline story + task README + pkg создай один файл рядом с pipeline story:
@@ -466,16 +501,16 @@ ui_gate: auto
 Story-anchor (один на story wave):
 - Anchor task (ui_anchor: true или первый ui_scope: visual) — полный UI-0..UI-1 в task-folder
 - Dependent visual tasks — extends ui-mockup: <anchor>/ui-mockup-spec.md; UI-0 skip; UI-3 partial при смене DOM
-- Story gate — acceptance-verification §UI + anchor ui-baseline/post-implement/*.png
+- Story gate — acceptance-verification §UI + story-root `screenshots/full-cycle/` (primary) + anchor ui-baseline as archive/history
 
 Anchor task (до UI-2 implement):
 UI-0 Baseline (MCP primary): npm run dev (spa-app :4173) → MCP user-puppeteer navigate + screenshot → ui-baseline/ (1536x1024); ui-baseline/README.md
 UI-1 Target mockup: @mockup → ui-mockup-spec.md; иначе AskQuestion → ui-mockup-spec.md от baseline → STOP human gate (принято/исправить)
 UI-2 Implement: run-task + react-expert (после gate)
-UI-3 Verify: npm test + npm run <puppeteer_gate> (обязательно) + post-implement PNG; acceptance-verification §UI
+UI-3 Verify: npm test + npm run <puppeteer_gate> (обязательно) + post-implement PNG; then story-root screenshots pack (below); acceptance-verification §UI
 
 STOP (hard):
-- Story Done запрещён без story-gate acceptance §UI + post-implement PNG (anchor)
+- Story Done запрещён без story-gate acceptance §UI + story-root screenshots/README.md + at least one live happy PNG under screenshots/full-cycle/ (ls verify)
 - UI-2 запрещён без human gate на ui-mockup-spec.md (Path B) или @mockup refs (Path A)
 - Retroactive exception — только retroactive_closure в ui-baseline/README.md + operator sign-off / run_mode=spa_*_ui_audit_*; не default path
 
@@ -493,6 +528,20 @@ viewport: 1536x1024
 4. Имена: kebab-case, префикс state (not-supported, form, joined, error)
 5. Способ: node script в spa-app/tests/puppeteer/ ИЛИ MCP user-puppeteer — но output path = ui_screenshot_root
 
+--- Story-root screenshots pack (mandatory after UI-3, same P3 iteration) ---
+After anchor UI-3 (`ui-baseline/post-implement/`), still in this P3 run:
+
+1. Create story-root `<pipeline-story-folder>/screenshots/` with `README.md` indexer:
+   - sections: **Happy flow** + **Edge cases**
+   - columns: ID | meaningful kebab filename | trigger/hooks
+2. Move historical UI-0/UI-3 baseline PNGs → `screenshots/archive/`
+3. Run full-cycle runner → `screenshots/full-cycle/`:
+   - live happy path: `USER_EMAIL` / `USER_PASSWORD` from `spa-app/.env` (never commit secrets)
+   - deterministic M-states: mock Vite + documented session/localStorage hooks
+4. Story-gate acceptance §UI must link story-root `full-cycle/` as canonical evidence (not only task `ui-baseline/`)
+
+Layout example: `…/STORY-SPA-CAB-03-civic-status-in-cabinet/screenshots/README.md`
+
 Hard deliverable в конце P3 (обязательный блок ответа):
 
 ## UI Screenshots
@@ -502,8 +551,16 @@ Hard deliverable в конце P3 (обязательный блок ответ�
 | B | post-implement | @spa-app/docs/tasks/.../ui-baseline/post-implement/form-....png |
 | ... | ... | ... |
 
-+ ссылка на ui-mockup-spec.md и acceptance §UI
-STOP story Done если post-implement PNG для anchor state A отсутствует на диске (ls verify).
+## Story-root screenshots
+| Kind | Path |
+|------|------|
+| Indexer | @…/screenshots/README.md |
+| Live happy | @…/screenshots/full-cycle/<nn>-happy-live-…-1536x1024.png |
+| Full-cycle pack | @…/screenshots/full-cycle/ |
+| Archive baselines | @…/screenshots/archive/ |
+
++ link to ui-mockup-spec.md and acceptance §UI
+STOP Story Done if story-root README indexer or live happy PNG is missing on disk (`ls` verify).
 ```
 
 Примечания (не в copy-paste): `@mockup:` — 0..N строк; без них — UI-1 Path B (interview). Doc-only pkg: `ui_gate: off`. Build window должен содержать этот блок (CLI auto-inject). Dry-run: SEARCH-03 P3.
@@ -534,6 +591,54 @@ $story=
 по итогу отчет в анализ зоне текущего проекта (*/docs/analysis)
 ```
 
+### P4 — spa UX (code + screenshots vs artboard)
+
+Для spa visual/mixed stories после P3 с story-root `screenshots/`. Оператор вставляет в **Claude.ai / Claude Code** (не второй Cursor-чат). Console: **P4 (spa UX)**.
+
+```text
+$bullrun=
+$story=
+
+мышление @.cursor/rules/analysis.mdc
+
+P4 spa UX — dual audit (code + screenshots vs artboard). Findings only — no implementation.
+
+Inputs (resolve from $story / pipeline story folder):
+- AC / Scope / acceptance §UI in @$story
+- Artboard SSOT: §Артборд and/or @mockup: / mockup-*-spec.md (+ PNG states on artboard)
+- Story-root screenshots: <story>/screenshots/README.md + screenshots/full-cycle/ (+ archive/ optional)
+
+--- Phase A — Code audit ---
+Hard audit of actual code vs execution of $story.
+Update each task and story status touchpoint in $bullrun report.
+Rules: verifiable claims with paths only; regressions; gaps with severity + how to close.
+Do not propose implementation — findings only.
+
+--- Phase B — Visual audit (mandatory for spa visual/mixed) ---
+1. Inventory artboard states from §Артборд / mockup specs (state set on artboard).
+2. Inventory screenshots/full-cycle/ via screenshots/README.md (Happy flow + Edge cases); `ls` verify each PNG exists.
+3. Build match matrix in the report:
+
+| Artboard state | Screenshot file | Match | Notes |
+|----------------|-----------------|-------|-------|
+| … | full-cycle/… | pass / partial / fail / missing | … |
+
+4. Compare layout, hierarchy, copy/CTA presence, routing vs artboard — not pixel-perfect unless AC requires it. Locale shots may differ by L10N keys.
+5. Icon assets rule (hard): empty / stub / blank-pixel icon files under public/icons/… (or equivalent) are NOT a visual-fail when:
+   - code wires the correct path / component slot, and
+   - positioning / size / slot matches artboard.
+   Mark those rows `icon-asset: placeholder-ok`. Gap only if icon omitted from markup or path/slot/position wrong.
+6. Missing screenshots/README.md or live happy PNG under full-cycle/ → severity High (aligns with P3 Story Done STOP).
+
+--- Report (*/docs/analysis) ---
+1. Code findings
+2. Visual findings (matrix + icon placeholder notes)
+3. Gaps → severity + how to close
+4. Bullrun / task / story status touchpoints (same as base P4)
+```
+
+Примечания (не в copy-paste): базовый §P4 — только code; для UI evidence после P3 story-root pack — этот блок. Pixel-diff tools не обязательны.
+
 Перед **P5**: если нужен двойной аудит — выполнить P4b до scaffold.
 
 Если gaps точечные и небольшие — оформить в project-specific builder plan подраздел
@@ -542,8 +647,6 @@ $story=
 - override включается только по явной метке `run_mode=...`;
 - default остаётся YAML SSOT;
 - список путей в override — нумерованный и проверяемый, без выдумывания.
-
-
 
 ### P5 — Plan: Gap scaffold only
 

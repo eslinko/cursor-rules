@@ -101,6 +101,8 @@
 | `epic_story` | Факт-код vs AC Stories в `$epicFile` | workflow §P4 |
 | `run_mode=…` | Findings audit report + AC тасков override | workflow §P7 |
 
+**spa visual/mixed** (после P3 story-root `screenshots/`): использовать **P4 (spa UX)** — Phase A code + Phase B screenshots vs артборд (matrix в отчёте). Пустые/stub icon assets → `icon-asset: placeholder-ok`, если path/slot и позиционирование верны (не visual-fail).
+
 Build plan **не** содержит таблицу P4 — только эта секция и workflow.
 
 ---
@@ -128,4 +130,14 @@ Build plan **не** содержит таблицу P4 — только эта �
 **Backlog INDEX:** обновить `backlog-stories/INDEX.md` при закрытии story.
 
 **Visual / mixed tasks:** UI-0..UI-3 — [`guides/spa-ui-visual-pipeline.md`](../guides/spa-ui-visual-pipeline.md); hard gates — [`spa-story-execution-pipeline.md`](../../../spa-app/docs/tasks/spa-story-execution-pipeline.md) §UI task hard gates.
+
+**P1.3 UX appendix (выбор одной ветки):**
+
+| Условие | Appendix в [workflow.md](../core/workflow.md) |
+|---------|-----------------------------------------------|
+| §Артборд в backlog story + `*-spec.md` на диске | **UX ready mockups** — wire `@mockup:` в task README; **не** создавать `STORY-UX-MOCKUP-BRIEF.md` |
+| UI visual/mixed, артборда нет | **UX mockup brief** — `STORY-UX-MOCKUP-BRIEF.md` → отдельный UX-чат |
+| `ui_scope: none` | skip |
+
+Console: `P1.3 (spa UX ready)` vs `P1.3 (spa UX)`.
 
