@@ -103,6 +103,8 @@
 
 **spa visual/mixed** (после P3 story-root `screenshots/`): использовать **P4 (spa UX)** — Phase A code + Phase B screenshots vs артборд (matrix в отчёте). Пустые/stub icon assets → `icon-asset: placeholder-ok`, если path/slot и позиционирование верны (не visual-fail).
 
+**Post-audit P7:** читать disposition table из P5 (`CLOSED` | `TASKED` | `WAIVED reason=…` + `follow_up`) — [workflow.md](../core/workflow.md) §P5 / §P7. `WAIVED` не требует правок; wave complete ≠ product Story Done; stop-rule `WAVE_STALLED_NO_DELTA` при no-delta reaudit — AskQuestion если `follow_up` неясен, иначе map из P5; `new_story→PA.3` → Architect Studio / PA.3.
+
 Build plan **не** содержит таблицу P4 — только эта секция и workflow.
 
 ---

@@ -107,14 +107,17 @@ P1 **только планирует**: EPIC/STORY/tasks, pkg, index. **Пред
 
 ## P5 — Gap scaffold only
 
-**Что происходит:** по audit report — **только** scaffold gap tasks, index, опционально safe-override в plan. **Без кода и pytest.**
+**Что происходит:** по audit report — triage disposition + scaffold только для **TASKED**. **Без кода и pytest.**
 
-**Порог (workflow §P5):**
-- мало gaps (≤3, ≤5 README paths, тот же эпик) → safe-override `run_mode=…` в plan;
-- иначе → scaffold + черновик pkg, `activation: none`, отдельная P1 для current.yaml.
+**Disposition (workflow §P5):** каждый gap → `CLOSED` | `TASKED` | `WAIVED reason=…`. Working-doc / Info-out-of-DoD → `WAIVED`, не silent ignore. У каждого WAIVED — `follow_up` (`none` | `TASKED-later` | `new_story→PA.3` | `doc-task` | `deferred-INDEX`). AskQuestion только при кандидате в новый скоуп (out-of-DoD / operator / кластер).
+
+**Порог (workflow §P5)** — только TASKED:
+- TASKED ≤3, ≤5 README paths, тот же эпик → safe-override `run_mode=…` в plan;
+- иначе → scaffold + черновик pkg, `activation: none`, отдельная P1 для current.yaml;
+- TASKED = 0 → `activation: none` + disposition table + bullrun note.
 
 **Архитектор:** проектирует gap closure wave, не пишет fix.  
-**Typical mistake:** «закрой gaps кодом» в P5.
+**Typical mistake:** «закрой gaps кодом» в P5; «игнорируй» без строки WAIVED; WAIVED без `follow_up`.
 
 **Operative:** workflow §P5.
 
@@ -133,9 +136,11 @@ P1 **только планирует**: EPIC/STORY/tasks, pkg, index. **Пред
 
 ## P7 — Re-audit
 
-**Что происходит:** external re-audit — каждый gap из P5 проверен по коду на закрытие.
+**Что происходит:** external re-audit по disposition table из P5. `WAIVED` не требует правок; wave complete = 0 OPEN и 0 incomplete TASKED. Stop-rule `WAVE_STALLED_NO_DELTA` при пустом delta vs pass N−1. На stalled: обязательный AskQuestion, если `follow_up` пустой/неясен; иначе принять map из P5 без повторного interview.
 
-**Архитектор:** gate перед P8; решает, нужна ли ещё волна.
+**Архитектор:** gate перед P8; не крутить P5→P7 на Low/Info WAIVED без delta.  
+**Typical mistake:** считать «правки не подтверждены» fail wave, когда actionable set был пуст / все WAIVED; уйти со stalled без follow_up.  
+Product Story Done ≠ empty OPEN gap-list.
 
 **Operative:** workflow §P7.
 

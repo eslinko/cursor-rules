@@ -657,21 +657,49 @@ Do not propose implementation — findings only.
 $planFile=
 $auditReport=
 
-P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport (гапы временной рабочей документации (не runtime, perssistent) игнорируй)
-По skill/rule: не выполняй код и pytest; не закрывай gap implementation. Gap → task-папки (@docs/methodology/task-standard.md), @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
+P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport
+По skill/rule: не выполняй код и pytest; не закрывай gap implementation.
 
-Порог P5 (override в `$planFile` vs новый pkg):
-- safe-override в plan: gaps ≤ 3, README paths ≤ 5, 0 новых story folders, тот же эпик (post-audit).
+Disposition (обязательно — каждый gap ID из @$auditReport ровно один статус):
+- CLOSED — уже закрыт фактом до/в этой волне (редко на входе P5)
+- TASKED — scaffold task-папки (@docs/methodology/task-standard.md); путь в override list или pkg draft
+- WAIVED reason=<working-doc|out-of-DoD|info-nonblocking|operator> — без task; не требует правок для wave
+
+Запрет: «игнорируй» / silent skip без строки disposition. Working-doc (временная рабочая документация, не runtime, не persistent SSOT) → WAIVED reason=working-doc, не молчаливый ignore.
+Info / out-of-DoD leftovers → WAIVED reason=info-nonblocking|out-of-DoD (или operator).
+
+follow_up (для каждого WAIVED; колонка в disposition table):
+none | TASKED-later | new_story→PA.3 | doc-task | deferred-INDEX
+
+WAIVED follow-up gate (AskQuestion, 1–2 раунда) — ТОЛЬКО если:
+- reason ∈ {out-of-DoD, operator}, OR
+- ≥2 related WAIVED forming one product leftover, OR
+- agent judges WAIVED cluster = new scope outside current DoD.
+Else set follow_up=none without interview (typical working-doc / single info-nonblocking).
+
+AskQuestion choices: accept forever (none) | TASKED now/later | new_story→PA.3 | doc-task | deferred-INDEX.
+If new_story→PA.3: do NOT scaffold story in P5 — handoff «open PA.3 / Architect Studio with bullet intake from WAIVED IDs».
+If operator picks TASKED now: reclassify those gaps to TASKED and continue scaffold threshold below.
+
+Scaffold только для TASKED. Sync @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
+
+Порог P5 (override в `$planFile` vs новый pkg) — считай только TASKED:
+- safe-override в plan: TASKED ≤ 3, README paths ≤ 5, 0 новых story folders, тот же эпик (post-audit).
 - иначе: scaffold task-папок + черновик pkg + `activation: none`; отдельная P1 для обновления current.yaml.
+- TASKED = 0 → `activation: none`; всё равно выдай disposition-таблицу + bullrun wave note (WAIVED list).
 
 Если порог override: добавь/обнови в `$planFile` подраздел `Явно прописанный safe-override (<wave>)` с:
 1) `run_mode=<wave_name>`,
 2) нумерованным списком `README.md` (каждый path — exists на диске),
-3) правилом: при `run_mode` исполняется **только** этот список, без смены active pkg.
-P5 checklist: уникальный run_mode; нет мёртвых run_mode без секции; gap-таблица; `activation: run_mode=…` или `activation: none`.
+3) правилом: при `run_mode` исполняется **только** этот список, без смены active pkg,
+4) disposition-таблицей (все gap ID) или ссылкой на неё в bullrun note.
+P5 checklist: уникальный run_mode; нет мёртвых run_mode без секции; disposition table полная (все ID из audit); нет «ignored» без WAIVED; каждый WAIVED имеет follow_up; AskQuestion выполнен или явно N/A по триггеру; `activation: run_mode=…` или `activation: none`.
 P5 appendix (dates): новые gap-task gates — те же правила дат (§P1 appendix artifact dates); $printUtcNowCmd после live verify.
-В конце: таблица `gap -> task -> файлы -> status`. Claims с путями к файлам.
+В конце: таблица `gap | severity | disposition | reason | follow_up | task path | files`. Claims с путями к файлам.
+Product Story Done (AC/DoD) ≠ empty OPEN gap-list — зафиксируй оба явно при handoff.
 ```
+
+Примечания (не в copy-paste): disposition + follow_up копируются в §safe-override / `$planFile` при override, иначе — bullrun story/wave note. P7 читает эту таблицу; WAIVED не reopen как OPEN только из‑за «нет патча».
 
 
 
@@ -734,10 +762,34 @@ P1.3 backlog intake — materialize EPIC-SCR-CAPYUI + pkg
 ### P7 — Claude: Re-audit
 
 ```text
-правки по gap-листу выполнены
-проведи подробный re-audit по закрытию каждого gap по фактическому коду
-@.cursor/rules/analysis.mdc
+@$auditReport=
+@$planFile=
+@$priorReaudit=
+
+P7 re-audit gap wave. @.cursor/rules/analysis.mdc
+Источник статусов: disposition table из P5 (@$planFile §safe-override / bullrun note), не только OPEN/CLOSED из прошлого reaudit.
+
+Per gap:
+- TASKED / claimed CLOSED → verify fact-code/docs; result CLOSED or OPEN
+- WAIVED → validate reason still applies; keep WAIVED (do not demand code edits; do not reopen as OPEN solely for «no patch»)
+- Missing disposition → treat as OPEN
+
+Wave complete iff: 0 OPEN and 0 incomplete TASKED.
+Do not claim «правки по gap-листу выполнены» when actionable set was empty (all WAIVED / activation none) — say «actionable gaps closed or none; WAIVED recorded».
+If TASKED were executed: claim «правки по actionable gap-листу выполнены» only after fact verify.
+
+Stop-rule: if @$priorReaudit set and per-gap status+evidence delta vs pass N-1 is empty AND no new Critical/Medium OPEN → verdict WAVE_STALLED_NO_DELTA; STOP further P5→P7 loops.
+
+WAIVED follow-up interview (mandatory on WAVE_STALLED_NO_DELTA):
+- If any WAIVED has missing/unclear follow_up OR follow_up=none but reason ∈ {out-of-DoD, operator} without prior P5 AskQuestion evidence → AskQuestion (same choices as P5).
+- Without operator answer: wave status stays WAVE_STALLED_NO_DELTA (not «permanently accepted»).
+- After answer: write follow_up into disposition/bullrun; if TASKED now → handoff P5 re-triage; if new_story→PA.3 → handoff Architect Studio / PA.3; if none → permanently accept WAIVED.
+- If all WAIVED already have explicit follow_up from P5 → do not re-interview; report follow_up map and stop.
+
+Product Story Done (AC/DoD) ≠ empty OPEN gap-list; report both explicitly.
 ```
+
+Примечания (не в copy-paste): `$priorReaudit` — path к pass N−1 (опционально; без него stop-rule не срабатывает). Wave complete с WAIVED — норма; OPEN блокирует audit wave, не обязательно product Done. Follow_up map из P5 снимает повторный interview на stalled.
 
 
 

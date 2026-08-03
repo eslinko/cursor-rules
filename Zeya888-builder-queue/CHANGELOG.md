@@ -1,5 +1,19 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.15 — 2026-08-03
+
+- P5 **WAIVED follow_up** + условный AskQuestion (новый скоуп) — [`core/workflow.md`](./core/workflow.md)
+- P7 **WAIVED follow-up interview** на `WAVE_STALLED_NO_DELTA`; handoff `new_story→PA.3`
+- [`tools/workflow-console.html`](./tools/workflow-console.html) v1.2.14 — sync P5/P7
+- Sync: curriculum/03, spa-operator-contract §5
+
+## 1.4.14 — 2026-08-03
+
+- P5 gap **disposition** (`CLOSED` | `TASKED` | `WAIVED reason=…`); запрет silent ignore working-doc — [`core/workflow.md`](./core/workflow.md)
+- P7 **wave complete** (0 OPEN / incomplete TASKED); WAIVED без обязательных правок; stop-rule `WAVE_STALLED_NO_DELTA`; Story Done ≠ empty OPEN gap-list
+- [`tools/workflow-console.html`](./tools/workflow-console.html) v1.2.13 — sync P5/P7; `$priorReaudit`
+- Sync: curriculum/03, spa-operator-contract §5
+
 ## 1.4.13 — 2026-07-26
 
 - P4 **spa UX** (code + screenshots vs artboard): dual audit, match matrix, `icon-asset: placeholder-ok` — [`core/workflow.md`](./core/workflow.md)
