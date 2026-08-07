@@ -58,7 +58,7 @@ Redirect stub со старого имени (5–10 строк → ссылка
 
 | Type | Key | Title | Package/Epic | Status | Priority | Essence |
 |------|-----|-------|--------------|--------|----------|---------|
-| story | KEY | … | pkg / EPIC | Todo | P1 | Одна фраза: что ещё нужно сделать |
+| story | [KEY](backlog-stories/…/STORY-….md) | … | [pkg](backlog-stories/pkg/INDEX.md) / [EPIC](epics/…/EPIC-….md) | Todo | P1 | Одна фраза: что ещё нужно сделать |
 
 ## Requirements Done
 
@@ -133,6 +133,8 @@ filled = round(12 * done / active_total)  # bar █/░, clamp 0…12
 **By package:** считает **только product stories** пакета (как раньше). Unified % — только в Summary `Active work items`.
 
 **Essence (Remaining):** одна фраза про суть работы. Ясно человеку; без канцелярита и без метафор.
+
+**Links (Remaining):** колонки **Key** и **Package/Epic** — markdown-ссылки на backlog story / package `INDEX.md` / epic md (не plain text keys).
 
 **Type values:** `story` · `doc-task` · `req` · `bug` (при необходимости).
 

@@ -148,3 +148,25 @@ projects:
     execution_skill_primary: vue-expert
     execution_skill_fallback: javascript-pro
     execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/vue-expert/SKILL.md
+
+  landing:
+    enabled: true
+    focus_folder: landing
+    tasks_dir: landing/docs/tasks
+    active_packages_dir: landing-active-packages
+    current_pointer: landing-active-package.current.yaml
+    build_windows_subdir: run-reports/landing-build-windows
+    build_window_prefix: landing-cursor-build-window
+    next_readme_dotfile: .landing-next-readme
+    pkg_path_prefix: landing/docs/tasks/
+    plan_file: .cursor/plans/Landing_builder.plan.md
+    pipeline_doc: landing/docs/tasks/landing-story-execution-pipeline.md
+    default_input_kind: epic_story_tree
+    input_package_yaml_key: landing_input_package
+    artifact_kind: landing_cursor_build_window
+    build_window_title: Landing Cursor build window
+    test_command: 'cd landing && npm run build'
+    stack_label: Astro + TypeScript + Tailwind
+    execution_skill_primary: typescript-pro
+    execution_skill_fallback: javascript-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/typescript-pro/SKILL.md

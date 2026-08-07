@@ -18,7 +18,7 @@ pipeline_profile: builder_full
 
 | Поле | Значение | Примечание |
 |------|----------|------------|
-| `builder_project` | `gateway` \| `gpt` \| `identity` \| `spa` \| `scripts` \| `capybara` | Ключ из `profiles.yaml` |
+| `builder_project` | `gateway` \| `gpt` \| `identity` \| `spa` \| `scripts` \| `capybara` \| `landing` | Ключ из `profiles.yaml` |
 | `workspace_root` | абсолютный путь к корню workspace | где лежит `docs/methodology/Zeya888-builder-queue/` |
 | `pipeline_profile` | `builder_full` \| `generic_repo` | `builder_full` — P1–P8; иначе только Phase 0 |
 
@@ -46,7 +46,7 @@ pipeline_profile: builder_full
 После Onboarding summary — жди фазу (PA | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8).
 ```
 
-Для GPT — `builder_project: gpt`, [workflow.md](./workflow.md) §P1–P8 и [gpt-operator-contract.md](../contracts/gpt-operator-contract.md) (resolve from index, `run_mode`, sync index). Для **doge-identity-service** — `builder_project: identity`, [identity-operator-contract.md](../contracts/identity-operator-contract.md). Для **spa-app** — `builder_project: spa`, [spa-operator-contract.md](../contracts/spa-operator-contract.md); типичный intake **P1.3** `backlog`. Для **scripts** (operator tooling) — `builder_project: scripts`, [scripts-operator-contract.md](../contracts/scripts-operator-contract.md). Для **capybara** (Vue+Node monolith + CLI) — `builder_project: capybara`, [capybara-operator-contract.md](../contracts/capybara-operator-contract.md); типичный intake **P1.3** backlog `STORY-SCR-CAPY*` / `STORY-SCR-CAPYUI*`. В первом сообщении оператор указывает **один** режим: `input_mode: epic_story` \| `requirement` \| `backlog_story` (identity/spa/scripts/capybara) или `run_mode=…` / default pkg (gpt).
+Для GPT — `builder_project: gpt`, [workflow.md](./workflow.md) §P1–P8 и [gpt-operator-contract.md](../contracts/gpt-operator-contract.md) (resolve from index, `run_mode`, sync index). Для **doge-identity-service** — `builder_project: identity`, [identity-operator-contract.md](../contracts/identity-operator-contract.md). Для **spa-app** — `builder_project: spa`, [spa-operator-contract.md](../contracts/spa-operator-contract.md); типичный intake **P1.3** `backlog`. Для **scripts** (operator tooling) — `builder_project: scripts`, [scripts-operator-contract.md](../contracts/scripts-operator-contract.md). Для **capybara** (Vue+Node monolith + CLI) — `builder_project: capybara`, [capybara-operator-contract.md](../contracts/capybara-operator-contract.md); типичный intake **P1.3** backlog `STORY-SCR-CAPY*` / `STORY-SCR-CAPYUI*`. Для **landing** (Astro+TS+Tailwind) — `builder_project: landing`, [landing-operator-contract.md](../contracts/landing-operator-contract.md); типичный intake **P1.1** epic (`epic-0N-*` / living `bullrun-landing-index.md`). В первом сообщении оператор указывает **один** режим: `input_mode: epic_story` \| `requirement` \| `backlog_story` (identity/spa/scripts/capybara/landing) или `run_mode=…` / default pkg (gpt).
 
 ---
 

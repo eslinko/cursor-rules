@@ -19,7 +19,8 @@ Per **scope of work** (не «весь проект навсегда»):
 |---------|----------|----------|
 | gateway | `mvp` | [`gateway-mvp-dashboard.md`](../../../../doge-complaints-gateway/docs/tasks/gateway-mvp-dashboard.md) |
 | gpt | `mvp` | [`gpt-mvp-dashboard.md`](../../../../GPT%20UI/docs/tasks/gpt-mvp-dashboard.md) |
-| spa (legacy) | — | [`spa-backlog-dashboard.md`](../../../../spa-app/docs/tasks/spa-backlog-dashboard.md) до rename |
+| landing | `mvp` | [`landing-mvp-dashboard.md`](../../../../landing/docs/tasks/landing-mvp-dashboard.md) |
+| spa (legacy) | — | [`spa-backlog-dashboard.md`](../../../../spa-app/docs/tasks/spa-backlog-dashboard.md) до rename · канон [`spa-mvp-dashboard.md`](../../../../spa-app/docs/tasks/spa-mvp-dashboard.md) |
 
 Related upstream (типично): `bullrun-launch-index.md`, `backlog-stories/INDEX.md`, package `INDEX.md`, при наличии — `requirements/` Status.
 

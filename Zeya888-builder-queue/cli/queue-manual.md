@@ -190,6 +190,28 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 
 ---
 
+## 5d. Профиль `landing` (Astro + TypeScript + Tailwind)
+
+`--project landing` — активен. Active pkg: `pkg-000000-bootstrap` → **ok 1 paths** (profile marker). Контракт: [landing-operator-contract.md](../contracts/landing-operator-contract.md). Runtime plan: `.cursor/plans/Landing_builder.plan.md`. **Fixed plan:** @attach + workflow §P3/P6 — не Build на файле. **Next:** P1.1 EPIC-01 INFRA from [bullrun-landing-index.md](../../../landing/docs/tasks/bullrun-landing-index.md).
+
+### Verify / list
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project landing --verify
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project landing --list
+```
+
+### Build window
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project landing \
+  --write-build-window --window-flat-start 1 --window-flat-end K
+```
+
+`K` — из `--list`. Tests: `cd landing && npm run build` (FAIL until INFRA-1). Pipeline — [landing-story-execution-pipeline.md](../../../landing/docs/tasks/landing-story-execution-pipeline.md).
+
+---
+
 ## 6. Профиль `taxonomy` (queueless meta-script)
 
 **Taxonomy Cycle Builder** — ручной цикл обновления меток (телеметрия → решения → патчи gateway + spa). **Не** pkg-очередь: нет `--list`, `--write-build-window`, `pkg-*.yaml`.

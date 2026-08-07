@@ -1,5 +1,19 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.17 — 2026-08-07
+
+- P5 **auto-decide** disposition/follow_up (без AskQuestion): quality-first / complex→`new_story` draft / docs only вне analysis — [`core/workflow.md`](./core/workflow.md)
+- P7: drop follow-up interview; `P5_DISPOSITION_INCOMPLETE` при неполном map; verify `new_story` path
+- [`tools/workflow-console.html`](./tools/workflow-console.html) v1.2.16 — sync P5/P7
+- Sync: curriculum/03, spa/landing operator contracts
+
+## 1.4.16 — 2026-08-03
+
+- Profile **`landing`** (Astro + TypeScript + Tailwind): [`specs/profiles.yaml`](./specs/profiles.yaml), [`contracts/landing-operator-contract.md`](./contracts/landing-operator-contract.md), [`.cursor/plans/Landing_builder.plan.md`](../../../.cursor/plans/Landing_builder.plan.md)
+- Tasks SSOT bootstrap: `landing/docs/tasks/` bullrun-launch-index + pipeline + pkg-000000 marker; living map `bullrun-landing-index.md` preserved
+- [`tools/workflow-console.html`](./tools/workflow-console.html) v1.2.15 — `BUILDER_PROJECTS` + `PROJECT_PROFILES.landing`
+- Propagation: workflow, session-starter, queue-manual §5d, MANIFEST, builder-session, operator-habits; dashboard registry + `landing-mvp-dashboard.md`
+
 ## 1.4.15 — 2026-08-03
 
 - P5 **WAIVED follow_up** + условный AskQuestion (новый скоуп) — [`core/workflow.md`](./core/workflow.md)

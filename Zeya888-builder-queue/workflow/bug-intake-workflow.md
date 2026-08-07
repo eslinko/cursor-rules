@@ -48,8 +48,9 @@ repro_steps: []
 ## 3. Story scaffold (P1.3 variant)
 
 - Key: `STORY-SPA-BUG-NN-<slug>`
-- Epic: reuse in-scope epic (e.g. EPIC-SPA-03 for filter bug) **or** `EPIC-SPA-BUG` if cross-cutting
-- Tasks: reproduce → fix → test → gate (minimum)
+- Epic: reuse in-scope epic (e.g. EPIC-SPA-03 for filter bug) **or** `EPIC-SPA-BUG` / wave epic if cross-cutting
+- **Structure SSOT (spa):** [`spa-app/docs/tasks/backlog-stories/bugs/BUG-STORY-SCHEMA.md`](../../../../spa-app/docs/tasks/backlog-stories/bugs/BUG-STORY-SCHEMA.md) · example [BUG-01](../../../../spa-app/docs/tasks/backlog-stories/bugs/STORY-SPA-BUG-01-story-submission-unavailable.md)
+- Tasks: reproduce → **pin layer** → fix → test → gate (minimum; P0 cross-service must not skip pin)
 
 ## 4. Execute
 

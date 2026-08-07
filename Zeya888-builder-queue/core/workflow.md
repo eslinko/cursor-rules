@@ -34,7 +34,7 @@
 | `$executionSkillPrimary`  | `execution_skill_primary` в profiles (напр. `python-pro`, `react-expert`)                                                                                                                                         |
 | `$executionSkillPath`     | `execution_skill_path` в profiles — путь к execution SKILL.md                                                                                                                                                     |
 | `$executionSkillDeclared` | строка для task README: `Skill declared: $executionSkillPrimary` (или fallback из profile / README таска)                                                                                                         |
-| `$p13Appendix`            | operator contract §6/§7 P1.3 (`spa` / `identity` / `scripts` / `capybara`) — epic naming, materialize rules                                                                                                       |
+| `$p13Appendix`            | operator contract §6/§7 P1.3 (`spa` / `identity` / `scripts` / `capybara` / `landing`) — epic naming, materialize rules                                                                                                       |
 | `$scope`                  | display-label scope of work для dashboard (напр. `MVP`); вход оператора в [`build-scope-dashboard-prompt.md`](../workflow/build-scope-dashboard-prompt.md)                                                       |
 | `$scopeId`                | lowercase slug от `$scope` (`MVP` → `mvp`) — имя файла snapshot                                                                                                                                                   |
 | `$dashboardFile`          | `{focus_folder}/docs/tasks/{project}-{scopeId}-dashboard.md` (всегда `docs/tasks/`, не `analysis/tasks`)                                                                                                          |
@@ -104,6 +104,20 @@
 | Code CLI        | `scripts/lib/capybara/`; UI: `capybara-ui/` (planned)                                                   |
 
 
+
+|                 | `landing` (Astro + TypeScript + Tailwind)                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
+| `$planFile`     | `.cursor/plans/Landing_builder.plan.md`                                                                 |
+| `$tasksRoot`    | `landing/docs/tasks`                                                                                    |
+| `$epicFile`     | напр. `landing/docs/tasks/epics/epic-01-infra/epic-01-infra.md` (`input_mode=epic_story`)               |
+| `$storyFile`    | напр. `landing/docs/tasks/backlog-stories/STORY-LAND-*.md` (`input_mode=backlog_story`, optional)      |
+| `$backlogIndex` | `landing/docs/tasks/backlog-stories/INDEX.md`                                                           |
+| Окно flat       | `--write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                      |
+| Pipeline        | `landing/docs/tasks/landing-story-execution-pipeline.md`                                                |
+| Living map      | `landing/docs/tasks/bullrun-landing-index.md`                                                           |
+| Architecture    | `landing/docs/architecture/`                                                                            |
+
+
 ---
 
 
@@ -141,7 +155,7 @@
 | Analysis | `.cursor/rules/analysis.mdc`                |
 
 
-Rule подмешивается при работе в `doge-complaints-gateway/`**,** `GPT UI/`, `doge-identity-service/`**,** `spa-app/`, `scripts/`, `capybara/`**.
+Rule подмешивается при работе в `doge-complaints-gateway/`**,** `GPT UI/`, `doge-identity-service/`**,** `spa-app/`, `scripts/`, `capybara/`, `landing/`**.
 
 ### Wave checkpoint
 
@@ -430,6 +444,7 @@ SSOT: guides/builder-artifact-dates.md
 | `identity`        | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project identity --window-flat-start 1 --window-flat-end K``--write-build-window --story-key STORY-IDS-01-02` **или** `--window-flat-start 1 --window-flat-end K` (в зависимости от active pkg и выбранного `input_mode`) |
 | `spa`             | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project spa --write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`; `task_list_linear` после P1.3)                                                                                                |
 | `scripts`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project scripts --write-build-window --window-flat-start 1 --window-flat-end K``--write-build-window --story-key $storyKey`                                                                                               |
+| `landing`         | `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project landing --write-build-window --window-flat-start 1 --window-flat-end K` (`K` из `--list`)                                                                                                                          |
 
 
 1. В stdout после `ok build-window`: `**build_window_abs:`** / `**vscode_file_uri:`** — открыть из терминала (Cmd+click); `**quick_open_basename:`** или `**quick_open_pointer:`** (`latest-cursor-build-window.md` в `*-active-packages/`) — для **Cmd+P**; `**cursor_attach:`** — для P3. Symlink обновляется при каждой генерации. **Не** вставлять путь в Go-to-File целиком — `GPT UI/…` обрезается до `UI/docs/…`.
@@ -661,45 +676,46 @@ P5 Plan mode — scaffold only. builder_project: $builderProject. @$auditReport
 По skill/rule: не выполняй код и pytest; не закрывай gap implementation.
 
 Disposition (обязательно — каждый gap ID из @$auditReport ровно один статус):
-- CLOSED — уже закрыт фактом до/в этой волне (редко на входе P5)
+- CLOSED — уже закрыт фактом до/в этой волне
 - TASKED — scaffold task-папки (@docs/methodology/task-standard.md); путь в override list или pkg draft
-- WAIVED reason=<working-doc|out-of-DoD|info-nonblocking|operator> — без task; не требует правок для wave
+- WAIVED reason=<working-doc|out-of-DoD|info-nonblocking|operator> — без task в текущей wave
 
-Запрет: «игнорируй» / silent skip без строки disposition. Working-doc (временная рабочая документация, не runtime, не persistent SSOT) → WAIVED reason=working-doc, не молчаливый ignore.
-Info / out-of-DoD leftovers → WAIVED reason=info-nonblocking|out-of-DoD (или operator).
+Запрет: «игнорируй» / silent skip без строки disposition.
 
-follow_up (для каждого WAIVED; колонка в disposition table):
-none | TASKED-later | new_story→PA.3 | doc-task | deferred-INDEX
+Auto-decide (inform operator; **no AskQuestion**). Apply in order to each gap:
+1. Already fixed on disk → CLOSED, follow_up=n/a.
+2. Documentation gap:
+   - temporary analysis / working-doc (`*/docs/analysis/**`, audit/reaudit/worklog) → WAIVED reason=working-doc, follow_up=none (do not fix).
+   - else persistent SSOT (backlog story, architecture, design-system, pipeline, product contracts, task README AC) → TASKED (doc fix this wave) — quality first.
+3. Complex product gap (needs own DoD / new surface / outside current story AC / will not fit a pointed task within override) → WAIVED reason=out-of-DoD, follow_up=new_story; **in P5 create** backlog draft `backlog-stories/…/STORY-*-….md` + INDEX row + bullrun note (do not wait for PA.3 interview). Handoff: draft ready → optional PA.3 refine.
+4. Else (fixable in current epic/story) → TASKED now. Do **not** default to follow_up=TASKED-later or deferred-INDEX (quality first).
 
-WAIVED follow-up gate (AskQuestion, 1–2 раунда) — ТОЛЬКО если:
-- reason ∈ {out-of-DoD, operator}, OR
-- ≥2 related WAIVED forming one product leftover, OR
-- agent judges WAIVED cluster = new scope outside current DoD.
-Else set follow_up=none without interview (typical working-doc / single info-nonblocking).
+follow_up values: none | new_story | n/a (CLOSED). TASKED-later / deferred-INDEX — only if operator explicitly ordered in chat.
+Principles: (1) max quality now, do not defer; (2) complex → backlog story; (3) docs only outside temp analysis zone.
 
-AskQuestion choices: accept forever (none) | TASKED now/later | new_story→PA.3 | doc-task | deferred-INDEX.
-If new_story→PA.3: do NOT scaffold story in P5 — handoff «open PA.3 / Architect Studio with bullet intake from WAIVED IDs».
-If operator picks TASKED now: reclassify those gaps to TASKED and continue scaffold threshold below.
-
-Scaffold только для TASKED. Sync @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
+Scaffold: TASKED → task folders; new_story → backlog draft file must exist (path in decision log). Sync @$tasksRoot/bullrun-launch-index.md; YAML остаётся режимом по умолчанию для P3.
 
 Порог P5 (override в `$planFile` vs новый pkg) — считай только TASKED:
 - safe-override в plan: TASKED ≤ 3, README paths ≤ 5, 0 новых story folders, тот же эпик (post-audit).
 - иначе: scaffold task-папок + черновик pkg + `activation: none`; отдельная P1 для обновления current.yaml.
-- TASKED = 0 → `activation: none`; всё равно выдай disposition-таблицу + bullrun wave note (WAIVED list).
+- TASKED = 0 → `activation: none`; всё равно выдай disposition-таблицу + decision log + bullrun wave note.
 
 Если порог override: добавь/обнови в `$planFile` подраздел `Явно прописанный safe-override (<wave>)` с:
 1) `run_mode=<wave_name>`,
 2) нумерованным списком `README.md` (каждый path — exists на диске),
 3) правилом: при `run_mode` исполняется **только** этот список, без смены active pkg,
 4) disposition-таблицей (все gap ID) или ссылкой на неё в bullrun note.
-P5 checklist: уникальный run_mode; нет мёртвых run_mode без секции; disposition table полная (все ID из audit); нет «ignored» без WAIVED; каждый WAIVED имеет follow_up; AskQuestion выполнен или явно N/A по триггеру; `activation: run_mode=…` или `activation: none`.
+P5 checklist: уникальный run_mode; нет мёртвых run_mode без секции; disposition table полная; нет «ignored» без WAIVED; каждый gap имеет follow_up; decision log полный; **no AskQuestion**; `activation: run_mode=…` или `activation: none`.
 P5 appendix (dates): новые gap-task gates — те же правила дат (§P1 appendix artifact dates); $printUtcNowCmd после live verify.
-В конце: таблица `gap | severity | disposition | reason | follow_up | task path | files`. Claims с путями к файлам.
-Product Story Done (AC/DoD) ≠ empty OPEN gap-list — зафиксируй оба явно при handoff.
+В конце: таблица `gap | severity | disposition | reason | follow_up | task/story path | files` + блок:
+
+## P5 Decision log (auto)
+| Gap | Sev | Disposition | Reason | Follow_up | Action taken |
+
+Claims с путями к файлам. Product Story Done (AC/DoD) ≠ empty OPEN gap-list — зафиксируй оба явно при handoff.
 ```
 
-Примечания (не в copy-paste): disposition + follow_up копируются в §safe-override / `$planFile` при override, иначе — bullrun story/wave note. P7 читает эту таблицу; WAIVED не reopen как OPEN только из‑за «нет патча».
+Примечания (не в copy-paste): disposition + follow_up + decision log копируются в §safe-override / `$planFile` при override, иначе — bullrun story/wave note. P7 читает эту таблицу; WAIVED не reopen как OPEN только из‑за «нет патча».
 
 
 
@@ -778,18 +794,17 @@ Wave complete iff: 0 OPEN and 0 incomplete TASKED.
 Do not claim «правки по gap-листу выполнены» when actionable set was empty (all WAIVED / activation none) — say «actionable gaps closed or none; WAIVED recorded».
 If TASKED were executed: claim «правки по actionable gap-листу выполнены» only after fact verify.
 
-Stop-rule: if @$priorReaudit set and per-gap status+evidence delta vs pass N-1 is empty AND no new Critical/Medium OPEN → verdict WAVE_STALLED_NO_DELTA; STOP further P5→P7 loops.
+Stop-rule: if @$priorReaudit set and per-gap status+evidence delta vs pass N-1 is empty AND no new Critical/Medium OPEN → verdict WAVE_STALLED_NO_DELTA; STOP further P5→P7 loops (no AskQuestion).
 
-WAIVED follow-up interview (mandatory on WAVE_STALLED_NO_DELTA):
-- If any WAIVED has missing/unclear follow_up OR follow_up=none but reason ∈ {out-of-DoD, operator} without prior P5 AskQuestion evidence → AskQuestion (same choices as P5).
-- Without operator answer: wave status stays WAVE_STALLED_NO_DELTA (not «permanently accepted»).
-- After answer: write follow_up into disposition/bullrun; if TASKED now → handoff P5 re-triage; if new_story→PA.3 → handoff Architect Studio / PA.3; if none → permanently accept WAIVED.
-- If all WAIVED already have explicit follow_up from P5 → do not re-interview; report follow_up map and stop.
+Follow_up / disposition completeness:
+- If P5 disposition+follow_up complete → accept map; stalled with no delta → WAVE_STALLED_NO_DELTA + STOP.
+- If follow_up/disposition missing → verdict P5_DISPOSITION_INCOMPLETE; handoff re-run P5 auto-decide (no AskQuestion).
+- follow_up=new_story with backlog draft on disk → verify path exists; do not demand code edits in this wave.
 
 Product Story Done (AC/DoD) ≠ empty OPEN gap-list; report both explicitly.
 ```
 
-Примечания (не в copy-paste): `$priorReaudit` — path к pass N−1 (опционально; без него stop-rule не срабатывает). Wave complete с WAIVED — норма; OPEN блокирует audit wave, не обязательно product Done. Follow_up map из P5 снимает повторный interview на stalled.
+Примечания (не в copy-paste): `$priorReaudit` — path к pass N−1 (опционально; без него stop-rule не срабатывает). Wave complete с WAIVED — норма; OPEN блокирует audit wave, не обязательно product Done. Disposition map из P5 auto-decide — SSOT для P7.
 
 
 

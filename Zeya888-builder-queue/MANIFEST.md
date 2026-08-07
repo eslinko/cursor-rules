@@ -61,6 +61,7 @@ flowchart TB
 | [`curriculum/learning-path.md`](./curriculum/learning-path.md) | Маршрут модулей 0–6 (Human + Operative) |
 | [`contracts/scripts-operator-contract.md`](./contracts/scripts-operator-contract.md) | Operator contract для `builder_project: scripts` (tooling) |
 | [`contracts/capybara-operator-contract.md`](./contracts/capybara-operator-contract.md) | Operator contract для `builder_project: capybara` (Vue+Node + CLI) |
+| [`contracts/landing-operator-contract.md`](./contracts/landing-operator-contract.md) | Operator contract для `builder_project: landing` (Astro+TS+Tailwind) |
 | [`guides/add-builder-profile.md`](./guides/add-builder-profile.md) | SSOT bootstrap нового профиля + Gateway clone |
 
 ## Исторические пути
