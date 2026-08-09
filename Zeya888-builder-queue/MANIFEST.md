@@ -37,7 +37,7 @@ flowchart TB
 
 | Слой | Где править | Когда |
 |------|-------------|-------|
-| **Method** | `core/`, `contracts/`, `templates/` | Изменение процесса, промптов, правил |
+| **Method** | `core/`, `contracts/`, `templates/`, `prompts/` | Изменение процесса, промптов, правил |
 | **Tool** | `cli/`, `specs/profiles.yaml` | Новый проект, пути, CLI |
 | **Runtime** | `.cursor/plans/`, `pkg-*.yaml` в проекте | Операционная работа, текущий pkg |
 
@@ -48,6 +48,11 @@ flowchart TB
 | [`core/session-starter.md`](./core/session-starter.md) | Phase 0 onboarding, OPERATOR CONFIG |
 | [`core/workflow.md`](./core/workflow.md) | Короткие промпты **PA**, P1–P8 |
 | [`core/workflow-legacy.md`](./core/workflow-legacy.md) | Полные self-contained промпты |
+| [`prompts/INDEX.md`](./prompts/INDEX.md) | Индекс useful prompts по функции (architect / operator-wave / housekeeping) |
+| [`prompts/architect/cross-project-system-orientation.md`](./prompts/architect/cross-project-system-orientation.md) | Pre-PA: карта 4 проектов + cross-project docs → story candidates |
+| [`prompts/architect/parent-requirement-to-project-reqs.md`](./prompts/architect/parent-requirement-to-project-reqs.md) | Pre-PA.2: parent product REQ → per-project child REQs + связи |
+| [`prompts/architect/req-to-backlog-stories.md`](./prompts/architect/req-to-backlog-stories.md) | Post-REQ: non-UI → backlog STORY package (plan → materialize) |
+| [`prompts/architect/req-to-ui-admin-layers.md`](./prompts/architect/req-to-ui-admin-layers.md) | Post-REQ: UI → ADMIN-01…06 layer package (plan → materialize) |
 | [`cli/queue-manual.md`](./cli/queue-manual.md) | Справочник CLI |
 | [`specs/input-package-spec.md`](./specs/input-package-spec.md) | Контракт YAML пакета |
 | [`specs/profiles.yaml`](./specs/profiles.yaml) | Реестр проектов |
@@ -72,10 +77,11 @@ flowchart TB
 
 При изменении методологии обновить:
 
-1. `core/workflow.md` (если меняются промпты)
-2. `.cursor/skills/builder-session/SKILL.md`
-3. `.cursor/rules/builder-operator-habits.mdc`
-4. Соответствующий `contracts/*-operator-contract.md`
-5. `CHANGELOG.md` + bump `VERSION`
+1. `core/workflow.md` (если меняются PA/P* промпты)
+2. `prompts/` + `prompts/INDEX.md` (если меняется useful prompt вне PA/P*)
+3. `.cursor/skills/builder-session/SKILL.md`
+4. `.cursor/rules/builder-operator-habits.mdc`
+5. Соответствующий `contracts/*-operator-contract.md`
+6. `CHANGELOG.md` + bump `VERSION`
 
 **Не** править `examples/reference-plans/` для runtime — только при обновлении учебного снимка.

@@ -1,5 +1,34 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.23 — 2026-08-09
+
+- Architect prompts materialize: sync package INDEX + `{project}-mvp-dashboard.md` (backlog-dashboard-maintenance) — parent-REQ, req-to-backlog-stories, req-to-ui-admin-layers
+
+## 1.4.22 — 2026-08-09
+
+- REQ→backlog prompts: drop `$backlogPackage` input; non-UI auto reuse|new; UI always NEW package — [`req-to-backlog-stories.md`](./prompts/architect/req-to-backlog-stories.md), [`req-to-ui-admin-layers.md`](./prompts/architect/req-to-ui-admin-layers.md)
+
+## 1.4.21 — 2026-08-09
+
+- Architect: [`prompts/architect/req-to-backlog-stories.md`](./prompts/architect/req-to-backlog-stories.md) — non-UI REQ → backlog STORY package (plan → materialize)
+- Architect: [`prompts/architect/req-to-ui-admin-layers.md`](./prompts/architect/req-to-ui-admin-layers.md) — UI REQ → ADMIN-01…06 + BRIEF/INDEX (канон public-home)
+- Sync: prompts/INDEX, MANIFEST, curriculum/06, workflow §PA Pre-PA
+
+## 1.4.20 — 2026-08-09
+
+- Orientation prompt: MODE read-only + STOP after A–C; Handoff none; no PA/P1 suggestions — [`prompts/architect/cross-project-system-orientation.md`](./prompts/architect/cross-project-system-orientation.md)
+
+## 1.4.19 — 2026-08-09
+
+- Architect pre-PA.2: [`prompts/architect/parent-requirement-to-project-reqs.md`](./prompts/architect/parent-requirement-to-project-reqs.md) — parent product REQ → per-project child requirements + link matrix; materialize по команде
+- Sync: prompts/INDEX, MANIFEST, curriculum/06, workflow §PA Pre-PA note
+
+## 1.4.18 — 2026-08-09
+
+- Каталог [`prompts/`](./prompts/) + [`prompts/INDEX.md`](./prompts/INDEX.md) — useful prompts по функции (architect / operator-wave / housekeeping)
+- Architect pre-PA: [`prompts/architect/cross-project-system-orientation.md`](./prompts/architect/cross-project-system-orientation.md) — карта gateway/identity/spa/GPT UI + cross-project docs → story candidates
+- Propagation: MANIFEST, curriculum/06, workflow §PA note
+
 ## 1.4.17 — 2026-08-07
 
 - P5 **auto-decide** disposition/follow_up (без AskQuestion): quality-first / complex→`new_story` draft / docs only вне analysis — [`core/workflow.md`](./core/workflow.md)

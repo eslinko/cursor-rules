@@ -5,6 +5,12 @@
 
 Architect Studio — **рекомендуемый отдельный чат** для operative фазы **PA (Intake Analysis)**. Human layer здесь объясняет *зачем*; промпты PA — только в workflow. P1 здесь **не дублируется**.
 
+Перед PA по одному проекту можно стартовать с cross-project orientation: карта gateway / identity / spa / GPT UI и analytics по корневому `docs/` → кандидаты нисходящих story (без materialize). Промпт: [`../prompts/architect/cross-project-system-orientation.md`](../prompts/architect/cross-project-system-orientation.md). Индекс useful prompts: [`../prompts/INDEX.md`](../prompts/INDEX.md).
+
+Если есть высокоуровневый product REQ (напр. в `docs/requirements backlog/`) и нужны дочерние per-project requirements со связями — [`../prompts/architect/parent-requirement-to-project-reqs.md`](../prompts/architect/parent-requirement-to-project-reqs.md), затем PA.2 на каждый Draft child.
+
+Из готового per-project REQ в backlog: **non-UI** → [`../prompts/architect/req-to-backlog-stories.md`](../prompts/architect/req-to-backlog-stories.md) (STORY package); **UI spa/landing** → [`../prompts/architect/req-to-ui-admin-layers.md`](../prompts/architect/req-to-ui-admin-layers.md) (ADMIN-01…06, не сразу STORY). Оба — plan-first, materialize по команде.
+
 ---
 
 ## 1. Два режима общения (не смешивать)

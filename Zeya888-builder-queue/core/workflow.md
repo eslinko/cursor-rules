@@ -182,6 +182,8 @@ Wave checkpoint — $storyKey (builder_project: $builderProject)
 
 ### PA — Intake Analysis (перед P1)
 
+**Pre-PA (опц.):** cross-project system map + docs analytics → story candidates (без materialize) — [`../prompts/architect/cross-project-system-orientation.md`](../prompts/architect/cross-project-system-orientation.md). Parent product REQ → per-project child REQs (link matrix; materialize по команде) — [`../prompts/architect/parent-requirement-to-project-reqs.md`](../prompts/architect/parent-requirement-to-project-reqs.md). Per-project REQ → backlog STORY package (non-UI) или UI ADMIN-01…06 — [`../prompts/architect/req-to-backlog-stories.md`](../prompts/architect/req-to-backlog-stories.md) / [`../prompts/architect/req-to-ui-admin-layers.md`](../prompts/architect/req-to-ui-admin-layers.md). Не заменяет PA.1–PA.3.
+
 **Режим:** Analysis / shaping only — без pkg, без task README, без P3, без `$verifyCmd` pkg.  
 **Выход:** запись `$intakeArtifact` на диск → handoff «PA завершён → P1.x, @file».
 
