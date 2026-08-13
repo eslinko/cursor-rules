@@ -53,10 +53,17 @@ flowchart TB
 | [`prompts/architect/parent-requirement-to-project-reqs.md`](./prompts/architect/parent-requirement-to-project-reqs.md) | Pre-PA.2: parent product REQ → per-project child REQs + связи |
 | [`prompts/architect/req-to-backlog-stories.md`](./prompts/architect/req-to-backlog-stories.md) | Post-REQ: non-UI → backlog STORY package (plan → materialize) |
 | [`prompts/architect/req-to-ui-admin-layers.md`](./prompts/architect/req-to-ui-admin-layers.md) | Post-REQ: UI → ADMIN-01…06 layer package (plan → materialize) |
+| [`prompts/operator/operator-root-start.md`](./prompts/operator/operator-root-start.md) | Root OP bootstrap: project only → session bind |
+| [`prompts/operator/operator-root-wave.md`](./prompts/operator/operator-root-wave.md) | Root OP: stories → wave plan + handoff packets (BLD/VAL) |
+| [`prompts/operator/operator-root-subagent-run.md`](./prompts/operator/operator-root-subagent-run.md) | Root OP Phase B: profile + queueSpec → two subagents overnight |
+| [`guides/operator-root-orchestrator.md`](./guides/operator-root-orchestrator.md) | Процесс root→субагенты + roadmap MVP/Task/SDK |
+| [`guides/orchestrator-builder-reference.md`](./guides/orchestrator-builder-reference.md) | Proven overnight two-subagent SSOT (universal) |
+| [`guides/operator-how-to-run-queue.md`](./guides/operator-how-to-run-queue.md) | Human how-to: запуск очереди стори/багов в OP |
+| [`examples/reference-plans/Orchestrator_Builder_Reference.plan.md`](./examples/reference-plans/Orchestrator_Builder_Reference.plan.md) | Teaching snapshot: OP overnight two-subagent эталон |
 | [`cli/queue-manual.md`](./cli/queue-manual.md) | Справочник CLI |
 | [`specs/input-package-spec.md`](./specs/input-package-spec.md) | Контракт YAML пакета |
 | [`specs/profiles.yaml`](./specs/profiles.yaml) | Реестр проектов |
-| [`examples/reference-plans/`](./examples/reference-plans/) | Teaching snapshots — не runtime SSOT |
+| [`examples/reference-plans/`](./examples/reference-plans/) | Teaching snapshots — не runtime SSOT (`*_builder` + Orchestrator_Builder_Reference) |
 | [`guides/spa-ui-visual-pipeline.md`](./guides/spa-ui-visual-pipeline.md) | Spa UI Visual Pipeline — полный SSOT UI-0..UI-3 (visual/mixed tasks) |
 | [`guides/builder-artifact-dates.md`](./guides/builder-artifact-dates.md) | Дисциплина дат pkg / gate / run-summary; `--print-utc-now`, `--check-dates` |
 | [`guides/fixed-builder-plan-execution.md`](./guides/fixed-builder-plan-execution.md) | Fixed `*_builder.plan.md`: @attach, не Build; отвязка от чужого чата Cursor |

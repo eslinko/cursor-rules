@@ -1,5 +1,33 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.28 — 2026-08-13
+
+- Archive: [`examples/reference-plans/Orchestrator_Builder_Reference.plan.md`](./examples/reference-plans/Orchestrator_Builder_Reference.plan.md) — teaching snapshot эталона OP overnight рядом с builder plans
+- Sync: reference-plans/README, MANIFEST
+
+## 1.4.27 — 2026-08-13
+
+- Guide: [`guides/operator-how-to-run-queue.md`](./guides/operator-how-to-run-queue.md) — простой мануал: как задать очередь стори/багов и запустить OP overnight
+- Sync: curriculum/00 FAQ, operator-root-orchestrator, subagent-run, reference Related, MANIFEST
+
+## 1.4.26 — 2026-08-13
+
+- Guide: [`guides/orchestrator-builder-reference.md`](./guides/orchestrator-builder-reference.md) — universal proven Phase B overnight (two subagents, non-stop, plan-sim v1)
+- Prompt: [`prompts/operator/operator-root-subagent-run.md`](./prompts/operator/operator-root-subagent-run.md) — `$builderProject` + free-form `$queueSpec` → process/session/wave + run
+- Sync: operator-root-orchestrator §Phase B proven path; `.cursor/plans/Orchestrator_Builder_Reference.md` → pointer; INDEX/MANIFEST
+
+## 1.4.25 — 2026-08-12
+
+- Prompt: [`prompts/operator/operator-root-start.md`](./prompts/operator/operator-root-start.md) — bootstrap OP: `$builderProject=` only → session YAML + bind Ask (reuse|create|task)
+- Guide: Bootstrap § + `DELIVER_TO` in handoff packet; START vs WAVE links
+- Sync: operator-root-wave presuppose session; prompts/INDEX, MANIFEST
+
+## 1.4.24 — 2026-08-12
+
+- Guide: [`guides/operator-root-orchestrator.md`](./guides/operator-root-orchestrator.md) — root OP → builder/validator subagents (process + MVP/Task/SDK roadmap)
+- Prompt: [`prompts/operator/operator-root-wave.md`](./prompts/operator/operator-root-wave.md) — wave MD + handoff packets
+- Sync: prompts/INDEX (category `operator/`), MANIFEST
+
 ## 1.4.23 — 2026-08-09
 
 - Architect prompts materialize: sync package INDEX + `{project}-mvp-dashboard.md` (backlog-dashboard-maintenance) — parent-REQ, req-to-backlog-stories, req-to-ui-admin-layers
