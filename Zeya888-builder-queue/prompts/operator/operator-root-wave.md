@@ -6,7 +6,34 @@
 **SSOT phases:** [`../../core/workflow.md`](../../core/workflow.md) — не дублировать fences; только заполнять переменные  
 **Метод:** [`.cursor/rules/analysis.mdc`](../../../../../.cursor/rules/analysis.mdc)
 
-**Когда:** в чате `OP-<project>` нужно из списка `@STORY-…` построить wave plan и выдать готовые handoff packets для `BLD-*` / `VAL-*` / CLI.
+## Юзкейсы (когда этот промпт)
+
+| # | Ситуация | Действие |
+|---|----------|----------|
+| 1 | В `OP-<project>` уже есть ready session; BLD/VAL чаты открыты/именованы; нужна **очередь stories + handoff** | WAVE: wave MD + один packet за раз → paste |
+| 2 | Повторная волна в том же OP-диалоге (те же BLD/VAL titles) | WAVE снова; **не** обязателен новый START, если session ready |
+| 3 | Operator сам ведёт BLD/VAL (paste MVP), без overnight Task | WAVE (не subagent-run) |
+
+**Вход:** `builder_project` + `stories: [@…]` + `mode: sequential|batched-by-pkg`.
+
+**Да, реюз существующих worker’ов:** WAVE рассчитан на уже привязанные чаты из session. Идентификация — см. ниже.
+
+**Не этот промпт:**
+
+| Ситуация | Куда |
+|----------|------|
+| Нет session / холодный OP | сначала [`operator-root-start.md`](./operator-root-start.md) |
+| «Задал очередь и ушёл» двумя Task, без paste | [`operator-root-subagent-run.md`](./operator-root-subagent-run.md) |
+
+### Как достоверно идентифицировать BLD/VAL (MVP wave)
+
+| Механизм | Где | Как работает |
+|----------|-----|----------------|
+| **`*_chat_title`** (канон) | `OP-<project>.session.yaml` | Packet поле `DELIVER_TO: BLD-<project>` / `VAL-<project>` / `shell`. Оператор (или OP) paste в чат с **этим title**. |
+| Cursor internal chat UUID | — | **Не** SSOT. START явно: не invent chat IDs. |
+| **`*_agent_id`** (Task uuid) | session.yaml (Phase B) | Для WAVE **не** обязателен. Если ids уже есть — опционально Task resume вместо paste ([START](./operator-root-start.md) §5); основной путь WAVE = paste по titles. |
+
+**Итого:** реюзить **можно** (и нужно) — по **именам чатов**, записанным в session при START (`bind_mode: reuse|create`). Имя при создании чата = то, что оператор задал/подтвердил (defaults `BLD-`/`VAL-`), не внутренний id Cursor.
 
 **Запреты root:** code edits, pytest, invent AC, silent advance без path on disk, переписывать полный текст P1–P8 (ссылайся на workflow §).
 

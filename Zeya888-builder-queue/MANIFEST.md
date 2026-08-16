@@ -55,7 +55,7 @@ flowchart TB
 | [`prompts/architect/req-to-ui-admin-layers.md`](./prompts/architect/req-to-ui-admin-layers.md) | Post-REQ: UI → ADMIN-01…06 layer package (plan → materialize) |
 | [`prompts/operator/operator-root-start.md`](./prompts/operator/operator-root-start.md) | Root OP bootstrap: project only → session bind |
 | [`prompts/operator/operator-root-wave.md`](./prompts/operator/operator-root-wave.md) | Root OP: stories → wave plan + handoff packets (BLD/VAL) |
-| [`prompts/operator/operator-root-subagent-run.md`](./prompts/operator/operator-root-subagent-run.md) | Root OP Phase B: profile + queueSpec → two subagents overnight |
+| [`prompts/operator/operator-root-subagent-run.md`](./prompts/operator/operator-root-subagent-run.md) | Root OP Phase B: profile + queueSpec → OP-*.plan.md + two subagents overnight |
 | [`guides/operator-root-orchestrator.md`](./guides/operator-root-orchestrator.md) | Процесс root→субагенты + roadmap MVP/Task/SDK |
 | [`guides/orchestrator-builder-reference.md`](./guides/orchestrator-builder-reference.md) | Proven overnight two-subagent SSOT (universal) |
 | [`guides/operator-how-to-run-queue.md`](./guides/operator-how-to-run-queue.md) | Human how-to: запуск очереди стори/багов в OP |
@@ -74,6 +74,7 @@ flowchart TB
 | [`contracts/scripts-operator-contract.md`](./contracts/scripts-operator-contract.md) | Operator contract для `builder_project: scripts` (tooling) |
 | [`contracts/capybara-operator-contract.md`](./contracts/capybara-operator-contract.md) | Operator contract для `builder_project: capybara` (Vue+Node + CLI) |
 | [`contracts/landing-operator-contract.md`](./contracts/landing-operator-contract.md) | Operator contract для `builder_project: landing` (Astro+TS+Tailwind) |
+| [`contracts/zeya888-operator-contract.md`](./contracts/zeya888-operator-contract.md) | Operator contract для `builder_project: zeya888` (WordPress/PHP, focus `zeya888.me`) |
 | [`guides/add-builder-profile.md`](./guides/add-builder-profile.md) | SSOT bootstrap нового профиля + Gateway clone |
 
 ## Исторические пути

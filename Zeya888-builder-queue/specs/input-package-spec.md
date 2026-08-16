@@ -30,6 +30,7 @@
 | `scripts` | `scripts/docs/tasks` | `scripts-active-package.current.yaml` | `scripts-active-packages/` |
 | `capybara` | `capybara/docs/tasks` | `capybara-active-package.current.yaml` | `capybara-active-packages/` |
 | `landing` | `landing/docs/tasks` | `landing-active-package.current.yaml` | `landing-active-packages/` |
+| `zeya888` | `zeya888.me/docs/tasks` | `zeya888-active-package.current.yaml` | `zeya888-active-packages/` |
 
 `package_file` в указателе — путь **относительно** `{tasks_dir}/`.
 
@@ -148,6 +149,7 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 | gateway | `gateway_input_package` |
 | gpt | `gpt_input_package`, `task_batch_gim_keys` |
 | spa | `spa_input_package` (будущее) |
+| zeya888 | `zeya888_input_package` |
 
 Колонка **Input package** в `bullrun-launch-index.md`.
 

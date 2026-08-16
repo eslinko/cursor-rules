@@ -212,6 +212,28 @@ python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --pr
 
 ---
 
+## 5e. Профиль `zeya888` (WordPress / PHP — focus `zeya888.me`)
+
+`--project zeya888` — активен. Active pkg: `pkg-000000-20260814-bootstrap` → **ok 1 paths** (profile marker). Контракт: [zeya888-operator-contract.md](../contracts/zeya888-operator-contract.md). Runtime plan: `.cursor/plans/Zeya888_builder.plan.md`. **Fixed plan:** @attach + workflow §P3/P6 — не Build на файле. **Next:** author `STORY-ZEYA-BUG-*` from audit → P1.3. Schema: [BUG-STORY-SCHEMA.md](../../../zeya888.me/docs/tasks/backlog-stories/BUG-STORY-SCHEMA.md).
+
+### Verify / list
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project zeya888 --verify
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project zeya888 --list
+```
+
+### Build window
+
+```bash
+python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project zeya888 \
+  --write-build-window --window-flat-start 1 --window-flat-end K
+```
+
+`K` — из `--list`. Tests: `cd zeya888.me && php -v`. Pipeline — [zeya888-story-execution-pipeline.md](../../../zeya888.me/docs/tasks/zeya888-story-execution-pipeline.md).
+
+---
+
 ## 6. Профиль `taxonomy` (queueless meta-script)
 
 **Taxonomy Cycle Builder** — ручной цикл обновления меток (телеметрия → решения → патчи gateway + spa). **Не** pkg-очередь: нет `--list`, `--write-build-window`, `pkg-*.yaml`.

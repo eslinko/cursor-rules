@@ -26,7 +26,7 @@
 |--------|------------|
 | [`operator/operator-root-start.md`](./operator/operator-root-start.md) | OP chat: только `$builderProject=` → role + session bind (reuse\|create\|task) |
 | [`operator/operator-root-wave.md`](./operator/operator-root-wave.md) | OP chat: story links → wave MD + handoff packets для BLD/VAL/CLI (MVP paste) |
-| [`operator/operator-root-subagent-run.md`](./operator/operator-root-subagent-run.md) | OP chat: `$builderProject` + `$queueSpec` → два субагента overnight (Phase B) |
+| [`operator/operator-root-subagent-run.md`](./operator/operator-root-subagent-run.md) | OP chat: `$builderProject` + `$queueSpec` → новый `.cursor/plans/OP-…plan.md` (transpose эталона) + два субагента overnight |
 
 ## operator-wave
 

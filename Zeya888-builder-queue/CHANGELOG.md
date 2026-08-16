@@ -1,5 +1,19 @@
 # Changelog — Zeya888 Builder Queue
 
+## 1.4.31 — 2026-08-16
+
+- Prompts: `operator-root-start` / `wave` / `subagent-run` — секция **Юзкейсы** + таблица идентификации (MVP titles vs Phase B `*_agent_id`)
+
+## 1.4.30 — 2026-08-14
+
+- Profile: `zeya888` (`focus_folder: zeya888.me`, WordPress/PHP, skill `wordpress-pro`) — `profiles.yaml`, console, tasks bootstrap, [zeya888-operator-contract.md](./contracts/zeya888-operator-contract.md), `.cursor/plans/Zeya888_builder.plan.md`
+- Sync: workflow / session-starter / queue-manual §5e / MANIFEST / builder-session SKILL / builder-operator-habits
+
+## 1.4.29 — 2026-08-14
+
+- Prompt: [`prompts/operator/operator-root-subagent-run.md`](./prompts/operator/operator-root-subagent-run.md) — transpose etalon → `.cursor/plans/OP-<project>-<slug>.plan.md` (profile + queue, console-fill fences), then process/session/wave + overnight
+- Sync: how-to §1/§5, orchestrator-builder-reference §3, prompts/INDEX
+
 ## 1.4.28 — 2026-08-13
 
 - Archive: [`examples/reference-plans/Orchestrator_Builder_Reference.plan.md`](./examples/reference-plans/Orchestrator_Builder_Reference.plan.md) — teaching snapshot эталона OP overnight рядом с builder plans

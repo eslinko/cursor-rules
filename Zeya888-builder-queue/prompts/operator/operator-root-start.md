@@ -6,9 +6,27 @@
 **SSOT фаз:** [`../../core/workflow.md`](../../core/workflow.md)  
 **Метод:** [`.cursor/rules/analysis.mdc`](../../../../../.cursor/rules/analysis.mdc)
 
-**Когда:** новый или «холодный» чат `OP-<project>` — нужно понять оркестрацию, привязать builder/validator, записать session file. **Вход только имя проекта.**
+## Юзкейсы (когда этот промпт)
 
-**Не когда:** уже есть ready session и список `@STORY` — тогда [`operator-root-wave.md`](./operator-root-wave.md).
+| # | Ситуация | Действие |
+|---|----------|----------|
+| 1 | Новый / «холодный» чат `OP-<project>` — нет `OP-<project>.session.yaml` | START: role + bind Ask + записать session |
+| 2 | Session есть, но titles/bind сомнительны | START → Ask «reuse as-is / rebind?» |
+| 3 | Нужно только понять роли OP/BLD/VAL и пути профиля | START до §6 STOP; **без** wave/packets |
+
+**Вход:** только `$builderProject=` (имя ключа из `profiles.yaml`).
+
+**Не этот промпт:**
+
+| Ситуация | Куда |
+|----------|------|
+| Session `status: ready` + список `@STORY` → wave MD + paste packets | [`operator-root-wave.md`](./operator-root-wave.md) |
+| Очередь + overnight двумя Task-субагентами без paste | [`operator-root-subagent-run.md`](./operator-root-subagent-run.md) |
+
+**Идентификация worker’ов после START (факт из guide):**
+
+- **MVP (wave):** по **названиям чатов** `OP-` / `BLD-` / `VAL-` в `session.yaml` (`*_chat_title`). Cursor chat UUID **не** выдумывать.
+- **Phase B (subagent-run):** по **`builder_agent_id` / `validator_agent_id`** (uuid Task) в том же session.yaml — пишет/resume уже RUN, не START.
 
 ---
 

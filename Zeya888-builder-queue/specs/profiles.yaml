@@ -170,3 +170,25 @@ projects:
     execution_skill_primary: typescript-pro
     execution_skill_fallback: javascript-pro
     execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/typescript-pro/SKILL.md
+
+  zeya888:
+    enabled: true
+    focus_folder: zeya888.me
+    tasks_dir: zeya888.me/docs/tasks
+    active_packages_dir: zeya888-active-packages
+    current_pointer: zeya888-active-package.current.yaml
+    build_windows_subdir: run-reports/zeya888-build-windows
+    build_window_prefix: zeya888-cursor-build-window
+    next_readme_dotfile: .zeya888-next-readme
+    pkg_path_prefix: zeya888.me/docs/tasks/
+    plan_file: .cursor/plans/Zeya888_builder.plan.md
+    pipeline_doc: zeya888.me/docs/tasks/zeya888-story-execution-pipeline.md
+    default_input_kind: backlog_story
+    input_package_yaml_key: zeya888_input_package
+    artifact_kind: zeya888_cursor_build_window
+    build_window_title: Zeya888 Cursor build window
+    test_command: 'cd zeya888.me && php -v'
+    stack_label: WordPress (PHP)
+    execution_skill_primary: wordpress-pro
+    execution_skill_fallback: php-pro
+    execution_skill_path: .cursor/skills/sources/jeffallan-claude-skills/skills/wordpress-pro/SKILL.md

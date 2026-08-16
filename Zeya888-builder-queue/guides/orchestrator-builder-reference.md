@@ -55,6 +55,7 @@ Default для этого эталона: `overnight: on`, `pause_after_story: f
 
 | Artifact | Path |
 |----------|------|
+| Working Cursor plan | `.cursor/plans/OP-<project>-<slug>.plan.md` (transpose etalon; never edit `.cursor/plans/Orchestrator_Builder_Reference.plan.md`) |
 | Process SSOT | `{tasksRoot}/run-reports/operator-sessions/OP-<project>.process.md` |
 | Session SSOT | `{tasksRoot}/run-reports/operator-sessions/OP-<project>.session.yaml` |
 | Wave MD | `{tasksRoot}/run-reports/operator-waves/wave-<YYYYMMDD>-<slug>.md` |

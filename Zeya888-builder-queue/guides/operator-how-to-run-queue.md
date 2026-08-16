@@ -6,6 +6,7 @@
 
 | Нужен агенту | Документ |
 |--------------|----------|
+| Эталон плана (шаблон, не править) | [`.cursor/plans/Orchestrator_Builder_Reference.plan.md`](../../../../.cursor/plans/Orchestrator_Builder_Reference.plan.md) |
 | Эталон правил | [`orchestrator-builder-reference.md`](./orchestrator-builder-reference.md) |
 | Промпт вставки | [`../prompts/operator/operator-root-subagent-run.md`](../prompts/operator/operator-root-subagent-run.md) |
 | Карта фаз | [`operator-root-orchestrator.md`](./operator-root-orchestrator.md) |
@@ -19,7 +20,7 @@
 3. Заполните две строки:
    - `$builderProject=` — ключ профиля (`landing`, `gateway`, `spa`, `identity`, `gpt`, …)
    - `$queueSpec=` — **как угодно по смыслу**, что брать в очередь (см. §3)
-4. Отправьте. Дальше OP сам: прочитает профиль → соберёт очередь → создаст process/session/wave на диске → поднимет **двух** субагентов (builder + validator) → гонит каждую задачу по фазам до конца или явного «стоп».
+4. Отправьте. Дальше OP сам: прочитает профиль → соберёт очередь → **запишет новый рабочий план** `.cursor/plans/OP-<project>-<slug>.plan.md` (копия структуры эталона [Orchestrator_Builder_Reference.plan.md](../../../../.cursor/plans/Orchestrator_Builder_Reference.plan.md), с этой очередью и константами профиля, как после выбора профиля в workflow-console) → process/session/wave → поднимет **двух** субагентов → гонит очередь до конца или явного «стоп». Эталон **не** правится.
 5. Вы вмешиваетесь только если: нужно остановить (`стоп` / `stop` / `pause` / `halt`), или OP спросил уточнение (пустая/двусмысленная очередь).
 
 Push в remote **по умолчанию не делается** — коммиты локальные; push когда скажете отдельно.
@@ -92,6 +93,7 @@ $queueSpec=P0-P1 Ready
 
 | Файл | Зачем вам |
 |------|-----------|
+| `.cursor/plans/OP-<project>-<slug>.plan.md` | Рабочий план этой волны (эталон только шаблон) |
 | `{tasks}/run-reports/operator-sessions/OP-<project>.process.md` | Человекочитаемый сценарий этой волны |
 | `…/OP-<project>.session.yaml` | Связка субагентов + overnight флаги |
 | `…/operator-waves/wave-….md` | Живой статус очереди (DONE / BLOCKED / next) |
