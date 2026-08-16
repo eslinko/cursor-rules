@@ -1,17 +1,20 @@
 ---
-description: Zeya888 Builder Queue operator habits for gateway, GPT UI, identity, spa-app, and scripts (Web3)
+description: Zeya888 Builder Queue operator habits for gateway, GPT UI, identity, spa-app, scripts (tooling), capybara, landing, and zeya888
 globs:
   - doge-complaints-gateway/**
   - GPT UI/**
   - doge-identity-service/**
   - spa-app/**
   - scripts/**
+  - capybara/**
+  - landing/**
+  - zeya888.me/**
 alwaysApply: false
 ---
 
 # Builder operator habits
 
-When the operator names `builder_project` (gateway, gpt, identity, spa, scripts) or works on Zeya888 Builder Queue / pkg / build window:
+When the operator names `builder_project` (gateway, gpt, identity, spa, scripts, capybara, landing, zeya888) or works on Zeya888 Builder Queue / pkg / build window:
 
 1. **Before Build execution:** from workspace root run  
    `python3 docs/methodology/Zeya888-builder-queue/cli/builder_resolve_queue.py --project <key> --verify`  
@@ -37,14 +40,27 @@ When the operator names `builder_project` (gateway, gpt, identity, spa, scripts)
    - эпик-файл без строки в индексе → не декомпозирован → `@.cursor/commands/bullrun-epic-decompose.md`, не P3;
    - после каждого закрытого task/story — обновить индекс в той же итерации;
    - оператор задаёт `input_mode: epic_story | requirement | backlog_story` (или `run_mode=…` для audit override) — не смешивать в одном pkg; P1/P4 — [identity-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/identity-operator-contract.md) §4–§5.
-11. **Scripts (`builder_project: scripts`)** — полный контракт: [scripts-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/scripts-operator-contract.md):
-   - перед batch-run: `bullrun-launch-index.md` + `scripts-active-package.current.yaml` + `--verify`; до первого P1 ожидаемо FAIL (bootstrap);
-   - primary intake: P1.3 `STORY-SCR-*` из `scripts/docs/tasks/backlog-stories/`; shaping — `scripts/docs/runtime-infrastructure/`;
-   - эпик `EPIC-SCR-*` без task queue в индексе → не декомпозирован → P1, не P3;
-   - после каждого закрытого task/story — обновить индекс в той же итерации;
-   - execution skill: `javascript-pro`; tests: `npm run test:unit` из корня workspace;
-   - не редактировать `.cursor/plans/Scripts_builder.plan.md` без запроса оператора.
-12. **Fixed builder plans (`*_builder.plan.md`):** execution — @attach в **текущем** project-чате + [workflow.md](../../docs/methodology/Zeya888-builder-queue/core/workflow.md) §P3/P6; **не** нажимать Build / Execute plan на файле плана ([fixed-builder-plan-execution.md](../../docs/methodology/Zeya888-builder-queue/guides/fixed-builder-plan-execution.md)). Ephemeral P1/P5 plans — Plan mode только в том project-чате, где идёт волна.
+11. **Scripts (`builder_project: scripts`)** — tooling only: [scripts-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/scripts-operator-contract.md):
+   - scope: `EPIC-SCR-02-tooling` / `STORY-SCR-WFCONSOLE*`; capybara work → `builder_project: capybara`;
+   - перед batch-run: `scripts/docs/tasks/bullrun-launch-index.md` + `scripts-active-package.current.yaml` + `--verify`.
+12. **Capybara (`builder_project: capybara`)** — полный контракт: [capybara-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/capybara-operator-contract.md):
+   - перед batch-run: `capybara/docs/tasks/bullrun-launch-index.md` + `capybara-active-package.current.yaml` + `--project capybara --verify`;
+   - primary intake: P1.3 `STORY-SCR-CAPY*` / `STORY-SCR-CAPYUI*`; **не** через `builder_project: scripts`;
+   - stack: Vue 3 + Node monolith + CLI в `scripts/lib/capybara/`; skills `vue-expert` / `javascript-pro`;
+   - runtime P3/P6 — @attach `.cursor/plans/Capybara_builder.plan.md` (не Build на файле);
+   - new profile SSOT: [add-builder-profile.md](../../docs/methodology/Zeya888-builder-queue/guides/add-builder-profile.md).
+13. **Landing (`builder_project: landing`)** — полный контракт: [landing-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/landing-operator-contract.md):
+   - перед batch-run: `landing/docs/tasks/bullrun-launch-index.md` + `landing-active-package.current.yaml` + `--project landing --verify`;
+   - primary intake: P1.1 epic from living `bullrun-landing-index.md` / `epics/epic-0N-*`; **не** P3 на raw `story.md`;
+   - stack: Astro + TypeScript + Tailwind; skills `typescript-pro` / `javascript-pro`;
+   - runtime P3/P6 — @attach `.cursor/plans/Landing_builder.plan.md` (не Build на файле).
+14. **Zeya888 (`builder_project: zeya888`)** — полный контракт: [zeya888-operator-contract.md](../../docs/methodology/Zeya888-builder-queue/contracts/zeya888-operator-contract.md):
+   - перед batch-run: `zeya888.me/docs/tasks/bullrun-launch-index.md` + `zeya888-active-package.current.yaml` + `--project zeya888 --verify`;
+   - primary intake: P1.3 `STORY-ZEYA-BUG-*` from audit/schema; **не** invent; **запрет** exploit/PoC;
+   - stack: WordPress (PHP) in `zeya888.me/`; skills `wordpress-pro` / `php-pro`;
+   - runtime P3/P6 — @attach `.cursor/plans/Zeya888_builder.plan.md` (не Build на файле);
+   - new profile SSOT: [add-builder-profile.md](../../docs/methodology/Zeya888-builder-queue/guides/add-builder-profile.md).
+15. **Fixed builder plans (`*_builder.plan.md`):** execution — @attach в **текущем** project-чате + [workflow.md](../../docs/methodology/Zeya888-builder-queue/core/workflow.md) §P3/P6; **не** нажимать Build / Execute plan на файле плана ([fixed-builder-plan-execution.md](../../docs/methodology/Zeya888-builder-queue/guides/fixed-builder-plan-execution.md)). Ephemeral P1/P5 plans — Plan mode только в том project-чате, где идёт волна.
 
 Session onboarding: `@docs/methodology/Zeya888-builder-queue/core/session-starter.md`  
 Workflow phases: `@docs/methodology/Zeya888-builder-queue/core/workflow.md`  
